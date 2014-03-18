@@ -40,6 +40,7 @@ module HixIO
 		self.config_key => {
 			:db_uri => 'postgres://hix_io@localhost/hix_io',
 			:skip_models => false,
+			:dev => false,
 		}
 	}.freeze
 
@@ -60,6 +61,13 @@ module HixIO
 		super( section )
 
 		Sequel.extension :core_extensions
+
+		# Molly guard. Hopefully this makes it harder tromp on the production database.
+		#
+		if self.dev? and self.config.db_uri !~ /dev$/
+			self.log.fatal( "We're in dev mode and the database name doesn't end in 'dev'." )
+			exit
+		end
 
 		@db ||= Sequel.connect( self.config.db_uri, :logger => self.log )
 		self.db.sql_log_level = :debug
@@ -100,6 +108,12 @@ module HixIO
 		end
 
 		return @models
+	end
+
+	# Are we in development mode?
+	#
+	def self::dev?
+		return self.config.dev
 	end
 
 end

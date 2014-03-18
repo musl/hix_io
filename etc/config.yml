@@ -1,5 +1,6 @@
 hix_io:
-    db_uri: "postgres://hix_io@localhost/hix_io"
+    dev: true
+    db_uri: "postgres://hix_io@localhost/hix_io_dev"
 mongrel2:
     configdb: 'etc/api.sqlite'
 logging:
