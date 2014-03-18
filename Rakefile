@@ -51,8 +51,9 @@ begin
 		s.required_ruby_version = '>= 2.0.0'
 		s.executables           = %w[hix_io_migrate hix_io_configure]
 
+		s.add_dependency 'strelka', '~> 0.8'
 		s.add_dependency 'sequel', '~> 4.7'
-		s.add_dependency 'sqlite3', '~> 1.3'
+		s.add_dependency 'pg', '~> 1.17'
 		s.add_dependency 'loggability', '~> 0.10'
 
 		s.add_development_dependency 'pry', '~> 0.9'
@@ -60,7 +61,7 @@ begin
 		s.add_development_dependency 'rdoc-generator-fivefish', '>= 0.1'
 		s.add_development_dependency 'rspec', '~> 2.14'
 		s.add_development_dependency 'ruby-prof', '~> 0.14'
-		s.add_development_dependency 'simplecov', '~> 0.7.1'
+		s.add_development_dependency 'simplecov', '~> 0.8'
 	end
 
 	Gem::PackageTask.new( spec ).define
