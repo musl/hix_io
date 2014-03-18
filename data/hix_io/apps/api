@@ -1,0 +1,33 @@
+# vim: set nosta noet ts=4 sw=4 ft=ruby:
+# encoding: UTF-8
+
+require 'strelka'
+require 'hix_io'
+
+# Provides REST resources for the application.
+#
+class API < Strelka::App
+
+	extend Configurability
+	config_key :api
+
+	extend Loggability
+	log_to :hix_io
+
+	plugins \
+		:routing,
+		:negotiation,
+		:parameters,
+		:restresources
+
+	# Defaults for Configurability.
+	CONFIG_DEFAULTS = {}
+
+	# Configurability hook. When the app is configured, build the REST resources.
+	#
+	def self::configure( section )
+		resource( HixIO::Post, :readonly => true )
+	end
+
+end
+

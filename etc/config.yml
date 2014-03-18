@@ -1,0 +1,10 @@
+hix_io:
+    db_uri: "postgres://hix_io@localhost/hix_io"
+mongrel2:
+    configdb: 'etc/api.sqlite'
+logging:
+    __default__: "fatal (color)"
+    hix_io: "info (color)"
+    loggability: "warn (color)"
+    configurability: "warn (color)"
+
