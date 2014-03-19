@@ -1,9 +1,14 @@
+
+/* Import both 300 and 400 so we get a 'real' bold face. */
 @import url(http://fonts.googleapis.com/css?family=Open+Sans:300,400);
+
+/* For source code listings. */
+@import url(http://fonts.googleapis.com/css?family=Source+Code+Pro:300);
 
 html, button, input, select, textarea,
 .pure-g [class *= "pure-u"],
 .pure-g-r [class *= "pure-u"] {
-    font-family: Share, sans-serif;
+    font-family: "Open Sans", sans-serif;
 	font-size: 10pt;
 	font-weight: 300;
 	color: #565d64;
@@ -17,8 +22,41 @@ h1, h2, h3, h4, h5, h6, h7 {
 	font-weight: 300;
 }
 
+a {
+	color: #00a0ff;
+}
+
+a:hover {
+	color: #00a0ff;
+}
+
+a:active {
+	color: #00a0ff;
+}
+
+a:focus {
+	color: #00a0ff;
+}
+
+a:visited {
+	color: #0070d0;
+}
+
 pre {
+	overflow: auto;
 	border: 1px #d0d0d0 dotted;
+	padding: 0.25em;
+	background-color: #fafafa;
+	font-family: "Source Code Pro", monospace;
+	font-size: 9pt;
+}
+
+pre > code {
+	word-wrap: normal;
+	white-space: pre;
+	background-color: inherit !important;
+	font-family: "Source Code Pro", monospace;
+	font-size: 9pt;
 }
 
 .l-box {
@@ -27,6 +65,13 @@ pre {
 
 .pure-menu {
 	margin-bottom: 1em;
+}
+
+.pure-menu li a:active,
+.pure-menu li a:focus,
+.pure-menu li a:hover {
+	background-color: #fff6e6;
+	color: #e08000 !important;
 }
 
 .pure-menu-selected a {
@@ -54,10 +99,14 @@ pre {
 	margin: 0;
 	border: 0;
 	height: 1px;
-	background-color: #d0d0d0;
-	background-image: -webkit-linear-gradient(left, rgba(0,0,0,0.01), rgba(0,0,0,0.25), rgba(0,0,0,0.01));
-	background-image:    -moz-linear-gradient(left, rgba(0,0,0,0.01), rgba(0,0,0,0.25), rgba(0,0,0,0.01));
-	background-image:     -ms-linear-gradient(left, rgba(0,0,0,0.01), rgba(0,0,0,0.25), rgba(0,0,0,0.01));
-	background-image:      -o-linear-gradient(left, rgba(0,0,0,0.01), rgba(0,0,0,0.25), rgba(0,0,0,0.01));
+	width: 25%
+	background-image: -webkit-linear-gradient(left, rgba(0,0,0,0.1), rgba(0,0,0,0.25), rgba(0,0,0,0.1));
+	background-image:    -moz-linear-gradient(left, rgba(0,0,0,0.1), rgba(0,0,0,0.25), rgba(0,0,0,0.1));
+	background-image:     -ms-linear-gradient(left, rgba(0,0,0,0.1), rgba(0,0,0,0.25), rgba(0,0,0,0.1));
+	background-image:      -o-linear-gradient(left, rgba(0,0,0,0.1), rgba(0,0,0,0.25), rgba(0,0,0,0.1));
+}
+
+.post > p {
+	text-align: justify;
 }
 
