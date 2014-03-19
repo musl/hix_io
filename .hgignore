@@ -1,3 +1,4 @@
 pkg/.*
-docs/.*
+data/hix_io/static/docs/.*
 .*.sqlite
+.*.vim
