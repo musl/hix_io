@@ -1,36 +1,63 @@
-@import url(http://fonts.googleapis.com/css?family=Share:400,700);
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:300,400);
 
 html, button, input, select, textarea,
 .pure-g [class *= "pure-u"],
 .pure-g-r [class *= "pure-u"] {
     font-family: Share, sans-serif;
-	font-size: 12pt;
+	font-size: 10pt;
+	font-weight: 300;
+	color: #565d64;
 }
 
 body {
-	background: #f0f0f0;
+	background: #e0e0e0;
+}
+
+h1, h2, h3, h4, h5, h6, h7 {
+	font-weight: 300;
+}
+
+pre {
+	border: 1px #d0d0d0 dotted;
 }
 
 .l-box {
 	padding: 1em;
 }
 
-h1, h2, h3, h4, h5, h6, h7 {
-	font-weight: 700;
-}
-
 .pure-menu {
 	margin-bottom: 1em;
 }
 
+.pure-menu-selected a {
+	background-color: #e6f6ff;
+	color: #0080e0 !important;
+}
+
+.pure-menu-heading {
+	color: #000000 !important;
+}
+
 .post {
 	margin: 0 0 1em 0;
-	border: 1px #d0d0d0 solid;
-	padding: 0 1em;
-	background: #f7f7f7;
+	border: 1px #b7b7b7 solid;
+	padding: 0 1.25em;
+	background: #ffffff;
 }
 
 .post > h2 {
-	border-bottom: 1px #d0d0d0 dotted;
+	margin-bottom: 0.25em;
+	color: #000000;
+}
+
+.post > hr {
+	margin: 0;
+	border: 0;
+	height: 1px;
+	background-color: #d0d0d0;
+	background-image: -webkit-linear-gradient(left, rgba(0,0,0,0.01), rgba(0,0,0,0.25), rgba(0,0,0,0.01));
+	background-image:    -moz-linear-gradient(left, rgba(0,0,0,0.01), rgba(0,0,0,0.25), rgba(0,0,0,0.01));
+	background-image:     -ms-linear-gradient(left, rgba(0,0,0,0.01), rgba(0,0,0,0.25), rgba(0,0,0,0.01));
+	background-image:      -o-linear-gradient(left, rgba(0,0,0,0.01), rgba(0,0,0,0.25), rgba(0,0,0,0.01));
 }
 

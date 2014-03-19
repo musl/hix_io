@@ -124,7 +124,7 @@ begin require 'rdoc/task'
 	desc 'Generate rdoc documentation'
 	RDoc::Task.new do |rdoc|
 		rdoc.name       = :docs
-		rdoc.rdoc_dir   = 'docs'
+		rdoc.rdoc_dir   = 'data/hix_io/static/docs'
 		rdoc.title      = "hix_io - #{HixIO::VERSION} - Developer Documentation"
 		rdoc.generator  = 'fivefish'
 		rdoc.main       = "README.rdoc"
@@ -134,6 +134,7 @@ begin require 'rdoc/task'
 	desc 'Generate rdoc coverage information'
 	RDoc::Task.new do |rdoc|
 		rdoc.name       = :docs_coverage
+		rdoc.rdoc_dir   = 'data/hix_io/docs/coverage'
 		rdoc.options    = [ '-C1' ]
 		rdoc.rdoc_files = [ 'lib', *FileList['*.rdoc'] ]
 	end

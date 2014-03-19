@@ -1,0 +1,80 @@
+#!/usr/bin/env ruby
+
+require 'hix_io'
+
+POSTS = {}
+
+POSTS["A Plain HTML Post"] = <<EOF
+<p>Nullam non tortor dolor. Morbi ultricies condimentum massa, mollis
+dictum augue sollicitudin in. Suspendisse ac ipsum ac dui vulputate
+pellentesque. Nulla blandit magna semper rutrum euismod. Nullam vel
+aliquam tellus, vel volutpat magna. In gravida quam eu nibh vehicula
+bibendum. Ut pretium quam non lorem commodo feugiat. Sed condimentum
+dolor at magna venenatis, ac malesuada arcu pretium. Donec ultricies
+mauris risus, vehicula cursus nisi facilisis ut. Curabitur sodales
+eros augue, vitae volutpat diam commodo ut. Curabitur interdum est
+sapien, sit amet eleifend purus lacinia non. Phasellus in purus mattis,
+adipiscing enim nec, dictum tellus. Cras bibendum gravida magna.</p>
+
+<p>Nullam non tortor dolor. Morbi ultricies condimentum massa, mollis
+dictum augue sollicitudin in. Suspendisse ac ipsum ac dui vulputate
+pellentesque. Nulla blandit magna semper rutrum euismod. Nullam vel
+aliquam tellus, vel volutpat magna. In gravida quam eu nibh vehicula
+bibendum. Ut pretium quam non lorem commodo feugiat. Sed condimentum
+dolor at magna venenatis, ac malesuada arcu pretium. Donec ultricies
+mauris risus, vehicula cursus nisi facilisis ut. Curabitur sodales
+eros augue, vitae volutpat diam commodo ut. Curabitur interdum est
+sapien, sit amet eleifend purus lacinia non. Phasellus in purus mattis,
+adipiscing enim nec, dictum tellus. Cras bibendum gravida magna.</p>
+EOF
+
+POSTS["A Post About Code"] = <<EOF
+<p>Nullam non tortor dolor. Morbi ultricies condimentum massa, mollis
+dictum augue sollicitudin in. Suspendisse ac ipsum ac dui vulputate
+pellentesque. Nulla blandit magna semper rutrum euismod. Nullam vel
+aliquam tellus, vel volutpat magna. In gravida quam eu nibh vehicula
+bibendum. Ut pretium quam non lorem commodo feugiat. Sed condimentum
+dolor at magna venenatis, ac malesuada arcu pretium. Donec ultricies
+mauris risus, vehicula cursus nisi facilisis ut. Curabitur sodales
+eros augue, vitae volutpat diam commodo ut. Curabitur interdum est
+sapien, sit amet eleifend purus lacinia non. Phasellus in purus mattis,
+adipiscing enim nec, dictum tellus. Cras bibendum gravida magna.</p>
+
+<pre>
+#!/usr/bin/env ruby
+
+require 'hix_io'
+
+config = ARGV.shift || abort "Usage: %s <config.yml>" % [File.basename( $0 )]
+HixIO.load_config( config )
+POSTS.each do |title,body|
+	HixIO::Post.create( :title => title, :body => body )
+end
+</pre>
+
+<pre>
+#!/usr/bin/env bash
+
+echo "hello world"
+</pre>
+
+<pre>
+#!/usr/bin/env python
+#
+import textwrap
+
+words = 'some words to print out'
+width = 10
+
+for line in textwrap.wrap(words, width):
+    print line
+</pre>
+
+EOF
+
+config = ARGV.shift || abort( "Usage: %s <config.yml>" % [File.basename( $0 )] )
+HixIO.load_config( config )
+POSTS.each do |title,body|
+	HixIO::Post.create( :title => title, :body => body )
+end
+

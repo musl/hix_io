@@ -11,13 +11,18 @@ can.route("posts/:id");
 var Posts = can.Control.extend({
 
   // called when a new posts() is created
-  "init" : function( element , options ){
+  "init" : function( element, options ){
     
     // get all posts and render them with
     // a template in the element's html
     var el = this.element;
     Post.findAll({}, function(posts){
-        el.html( can.view('/templates/posts.ejs', {posts: posts}) )
+        el.html(can.view('/templates/posts.ejs', { posts: posts }))
+
+		// Do syntax highlighting after the view finishes rendering.
+		$('pre').each(function( i, e ) {
+			hljs.highlightBlock(e);
+		});
     });
   }
 

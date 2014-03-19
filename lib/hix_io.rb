@@ -65,9 +65,10 @@ module HixIO
 		# Molly guard. Hopefully this makes it harder tromp on the production database.
 		#
 		if self.dev? and self.config.db_uri !~ /dev$/
-			self.log.fatal( "We're in dev mode and the database name doesn't end in 'dev'." )
-			exit
+			raise "We're in dev mode and the database name doesn't end in 'dev'."
 		end
+
+		self.log.level = :debug if self.dev?
 
 		@db ||= Sequel.connect( self.config.db_uri, :logger => self.log )
 		self.db.sql_log_level = :debug

@@ -1,6 +1,7 @@
 <% posts.each( function(post) { %>
 	<div class="post">
 		<h2><%= post.attr("title"); %></h2>
-		<p><%= post.attr("body"); %></p>
+		<hr>
+		<p><%== post.attr("body"); %></p>
 	</div>
 <% }); %>

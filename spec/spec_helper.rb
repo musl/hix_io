@@ -9,7 +9,7 @@ if ENV['COVERAGE']
 	require 'json'
 	require 'simplecov'
 	SimpleCov.start do
-		coverage_dir 'docs/coverage'
+		coverage_dir 'data/hix_io/static/docs/coverage'
 		add_filter 'spec'
 		#add_filter 'var'
 		#add_group "Strelka Extensions", "lib/strelka"

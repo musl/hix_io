@@ -24,5 +24,12 @@ describe( HixIO ) do
 		end
 	end
 
+	it 'checks the db uri when in dev mode' do
+		conf = subject.config
+		conf.dev = true
+		conf.db_uri = "sqlite:/"
+		expect { subject.configure( conf ) }.to raise_error( /dev mode/i )
+	end
+
 end
 
