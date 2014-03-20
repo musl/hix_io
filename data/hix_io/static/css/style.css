@@ -59,6 +59,13 @@ pre > code {
 	font-size: 9pt;
 }
 
+div#main > div.loading {
+	margin: 0 auto;
+	height: 128px;
+	width: 128px;
+	background: transparent url('/images/loading.gif') no-repeat center top;
+}
+
 .l-box {
 	padding: 1em;
 }
@@ -93,6 +100,11 @@ pre > code {
 .post > h2 {
 	margin-bottom: 0.25em;
 	color: #000000;
+}
+
+.post > h2 > a {
+	text-decoration: none;
+	color: inherit;
 }
 
 .post > hr {

@@ -1,6 +1,6 @@
 <% posts.each( function(post) { %>
 	<div class="post">
-		<h2><%= post.attr("title"); %></h2>
+		<h2><%== can.route.link(post.attr('title'), {id: post.attr('id')}, {}); %></h2>
 		<hr>
 		<p><%== post.attr("body"); %></p>
 	</div>

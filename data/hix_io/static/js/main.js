@@ -1,6 +1,5 @@
 // vim: set nosta noet ts=4 sw=4 ft=javascript:
 
-		
 /*
  * For all 'code' elements nested within 'pre' elements:
  *
@@ -28,34 +27,37 @@ var Post = can.Model.extend({
 	findOne: 'GET /api/v1/posts/{id}'
 }, {});
 
-can.route("posts/:id");
+var Router = can.Control({
 
-// Organizes a list of posts
-var Posts = can.Control.extend({
+	defaults: {} 
 
-	// called when a new posts() is created
+}, {
+
 	"init" : function( element, options ){
+		// Any load-once stuff should be loaded here.
 
-		// get all posts and render them with
-		// a template in the element's html
-		var el = this.element;
-		Post.findAll({}, function(posts){
-			el.html(can.view('/templates/posts.ejs', { posts: posts }))
+		// Setup route templates.
+		can.route("posts/:id");
+
+		// We're the routing authority.
+		can.route.ready();
+	},
+
+	'route' : function() {
+		Post.findAll({}, function(posts) {
+			$('#main').html(can.view('/templates/posts.ejs', { posts: posts }));
+			highlightSyntax();
+		});
+	},
+
+	'posts/:id route' : function(data) {
+		Post.findOne({ id: data.id }, function(post) {
+			$('#main').html(can.view('/templates/post.ejs', { post: post }));
 			highlightSyntax();
 		});
 	}
-});
-
-// Routing puts all the widget controllers together
-// along with managing routes
-var Routing = can.Control.extend({
-
-	init : function(){
-		new Posts("#posts");
-	}
 
 });
 
-// create routing controller
-new Routing(document.body);
+$(window).ready( function() { new Router(); });
 
