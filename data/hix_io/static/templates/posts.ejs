@@ -2,11 +2,11 @@
 	<div class="post">
 		<h2><%== can.route.link(post.attr('title'), {id: post.attr('id')}, {}); %></h2>
 		<hr>
+		<p class="post-meta">Updated: <%= post.attr('updated_at') %></p>
 		<p><%== post.attr("body"); %></p>
 	</div>
 <% }); %>
 
-<!--
 <div class="pager-box">
 	<ul id="pager" class="pure-paginator">
 		<% if(opts.page > 0) { %>
@@ -30,5 +30,4 @@
 		<% } %>
 	</ul>
 </div>
--->
 

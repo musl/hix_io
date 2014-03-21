@@ -35,5 +35,15 @@ class API < Strelka::App
 		return res
 	end
 
+	get '/posts/search/' do |req|
+		req.params.add( :q, :string )
+		res = req.response
+		res.for( :json ) do
+			query = '%%%s%%' % [req.params[:q]]
+			HixIO::Post.where(Sequel.join([:title,:body]).like(query)).all
+		end
+		return res
+	end
+
 end
 

@@ -1,5 +1,6 @@
 <div class="post">
 	<h2><%= post.attr("title"); %></h2>
 	<hr>
+	<p class="post-meta">Updated: <%= post.attr('updated_at') %></p>
 	<p><%== post.attr("body"); %></p>
 </div>

@@ -100,6 +100,12 @@ div#main > div.loading {
 	background: #ffffff;
 }
 
+.post-meta {
+	margin: 0;
+	font-size: 8pt;
+	text-align: right !important;
+}
+
 .post > h2 {
 	margin-bottom: 0.25em;
 	color: #000000;
@@ -139,5 +145,9 @@ div#main > div.loading {
 .pager-button-selected {
 	background-color: #e6f6ff;
 	color: #0080e0;
+}
+
+.search-q {
+	width: 100%;
 }
 

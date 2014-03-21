@@ -22,6 +22,9 @@ function highlightSyntax() {
 	});
 }
 
+/*
+ * Perform a synchronous HTTP request and return the body as a json string.
+ */
 function syncReq(type, path) {
 	return function(params) {
 		var result = null;
@@ -29,6 +32,7 @@ function syncReq(type, path) {
 		$.ajax({
 			url: path,
 			type: 'get',
+			data: params,
 			dataType: 'json',
 			async: false,
 			success: function(data) {
@@ -36,33 +40,30 @@ function syncReq(type, path) {
 			}
 		});
 
-		return result;	
+		return result;
+	};
+}
+
+/*
+ * Perform an asynchronous HTTP request and return the deferred result.
+ */
+function asyncReq(type, path) {
+	return function(params) {
+		return $.ajax({
+			url: '/api/v1/posts/search',
+			type: 'get',
+			data: params,
+			dataType: 'json'
+		});
 	};
 }
 
 var Post = can.Model.extend({
 	findAll: 'GET /api/v1/posts',
 	findOne: 'GET /api/v1/posts/{id}',
-	count:   syncReq('GET', '/api/v1/posts/count')
+	count:   syncReq('GET', '/api/v1/posts/count'),
+	search:  asyncReq('GET', '/api/v1/posts/search')
 }, {});
-
-var Pager = can.Control({
-	defaults: {
-		view: '/templates/pager.ejs',
-		target: '#pager',
-		per_page: 5,
-		count: 0,
-		pages: 0,
-		page: 0
-	}
-}, {
-	'init' : function(element, options) {
-		this.options.count = options.model.count();
-		this.options.pages = Math.ceil(this.options.count / this.options.per_page);
-
-		$(options.target).html(can.view(this.options.view, this.options));
-	}
-});
 
 var Router = can.Control({
 	defaults: {
@@ -122,11 +123,19 @@ var Router = can.Control({
 	},
 
 	'posts/:id route' : function(data) {
-		var target = $(this.options.target)
+		var target = $(this.options.target);
 
 		Post.findOne({ id: data.id }, function(post) {
 			target.html(can.view('/templates/post.ejs', { post: post }));
 			highlightSyntax();
+		});
+	},
+
+	'#search submit' : function(el,ev) {
+		var target = $(this.options.target);
+
+		Post.search({q: el.context.q.value}).done( function(data) {
+			target.html(can.view('/templates/search.ejs', { posts: Post.models(data) }));
 		});
 	},
 
