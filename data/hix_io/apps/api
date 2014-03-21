@@ -29,5 +29,11 @@ class API < Strelka::App
 		resource( HixIO::Post, :readonly => true )
 	end
 
+	get '/posts/count' do |req|
+		res = req.response
+		res.for( :json ) { HixIO::Post.count }
+		return res
+	end
+
 end
 

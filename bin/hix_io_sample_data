@@ -4,100 +4,6 @@ require 'hix_io'
 
 POSTS = {}
 
-POSTS["A Plain HTML Post"] = <<EOF
-<p>Nullam non tortor dolor. Morbi ultricies condimentum massa, mollis
-dictum augue sollicitudin in. Suspendisse ac ipsum ac dui vulputate
-pellentesque. Nulla blandit magna semper rutrum euismod. Nullam vel
-aliquam <a href="#">tellus</a>, vel volutpat magna. In gravida quam eu nibh vehicula
-bibendum. Ut pretium quam non lorem commodo feugiat. Sed condimentum
-dolor at <i>magna</i> venenatis, ac malesuada arcu pretium. Donec ultricies
-mauris risus, vehicula cursus nisi facilisis ut. Curabitur sodales
-eros augue, vitae volutpat <b>diam</b> commodo ut. Curabitur interdum est
-sapien, sit amet eleifend purus lacinia non. Phasellus in purus mattis,
-adipiscing enim nec, dictum tellus. Cras bibendum gravida magna.</p>
-
-<h2>A List</h2>
-<ul>
-	<li>The first.</li>
-	<li>The second.</li>
-	<li>The third.
-		<ol>
-			<li>The first.</li>
-			<li>The second.</li>
-			<li>The third.</li>
-			<li>The fourth.</li>
-		</ol>
-	</li>
-	<li>The fourth.</li>
-	<li>The fifth.
-		<ol>
-			<li>The first.</li>
-			<li>The second.</li>
-			<li>The third.</li>
-		</ol>
-	</li>
-</ul>
-
-<h2>An Address</h2>
-<address>somebody@example.org</address>
-
-<h2>A Table</h2>
-
-<table class="pure-table pure-table-striped">
-	<thead>
-		<tr>
-			<th>Name</th>
-			<th>Type</th>
-			<th>Price</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr>
-			<td>Gorgonzola</td>
-			<td>Soft</td>
-			<td>$3.33 / oz</td>
-		</tr>
-		<tr>
-			<td>Swiss</td>
-			<td>Soft</td>
-			<td>$1.95 / oz</td>
-		</tr>
-		<tr>
-			<td>Parmesan</td>
-			<td>Hard</td>
-			<td>$2.83 / oz</td>
-		</tr>
-	</tbody>
-</table>
-
-<h2>A Form</h2>
-
-<form class="pure-form pure-form-stacked">
-	<fieldset>
-		<legend>Give me your stuff:</legend>
-		
-		<label for="email">Email</label>
-		<input id="email" type="email" placeholder="Email">
-		
-		<label for="password">password</label>
-		<input id="password" type="password" placeholder="Password">
-
-		<button type="submit" class="pure-button pure-button-primary">Send</button>
-	</fieldset>
-</form>
-
-<p>Nullam non tortor dolor. Morbi ultricies condimentum massa, mollis
-dictum augue sollicitudin in. Suspendisse ac ipsum ac dui vulputate
-pellentesque. Nulla blandit magna semper rutrum euismod. Nullam vel
-aliquam tellus, vel volutpat magna. In gravida quam eu nibh vehicula
-bibendum. Ut pretium quam non lorem commodo feugiat. Sed condimentumg
-dolor at magna venenatis, ac malesuada arcu pretium. Donec ultricies
-mauris risus, vehicula cursus nisi facilisis ut. Curabitur sodales
-eros augue, vitae volutpat diam commodo ut. Curabitur interdum est
-sapien, sit amet eleifend purus lacinia non. Phasellus in purus mattis,
-adipiscing enim nec, dictum tellus. Cras bibendum gravida magna.</p>
-EOF
-
 POSTS["A Post Ruby"] = <<EOF
 <pre><code>
 # vim: set nosta noet ts=4 sw=4 ft=ruby:
@@ -240,6 +146,100 @@ Pointer :   ^
 >>+.                    Add 1 to Cell #5 gives us an exclamation point
 >++.                    And finally a newline from Cell #6
 </code></pre>
+EOF
+
+POSTS["A Plain HTML Post"] = <<EOF
+<p>Nullam non tortor dolor. Morbi ultricies condimentum massa, mollis
+dictum augue sollicitudin in. Suspendisse ac ipsum ac dui vulputate
+pellentesque. Nulla blandit magna semper rutrum euismod. Nullam vel
+aliquam <a href="#">tellus</a>, vel volutpat magna. In gravida quam eu nibh vehicula
+bibendum. Ut pretium quam non lorem commodo feugiat. Sed condimentum
+dolor at <i>magna</i> venenatis, ac malesuada arcu pretium. Donec ultricies
+mauris risus, vehicula cursus nisi facilisis ut. Curabitur sodales
+eros augue, vitae volutpat <b>diam</b> commodo ut. Curabitur interdum est
+sapien, sit amet eleifend purus lacinia non. Phasellus in purus mattis,
+adipiscing enim nec, dictum tellus. Cras bibendum gravida magna.</p>
+
+<h2>A List</h2>
+<ul>
+	<li>The first.</li>
+	<li>The second.</li>
+	<li>The third.
+		<ol>
+			<li>The first.</li>
+			<li>The second.</li>
+			<li>The third.</li>
+			<li>The fourth.</li>
+		</ol>
+	</li>
+	<li>The fourth.</li>
+	<li>The fifth.
+		<ol>
+			<li>The first.</li>
+			<li>The second.</li>
+			<li>The third.</li>
+		</ol>
+	</li>
+</ul>
+
+<h2>An Address</h2>
+<address>somebody@example.org</address>
+
+<h2>A Table</h2>
+
+<table class="pure-table pure-table-striped">
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>Type</th>
+			<th>Price</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>Gorgonzola</td>
+			<td>Soft</td>
+			<td>$3.33 / oz</td>
+		</tr>
+		<tr>
+			<td>Swiss</td>
+			<td>Soft</td>
+			<td>$1.95 / oz</td>
+		</tr>
+		<tr>
+			<td>Parmesan</td>
+			<td>Hard</td>
+			<td>$2.83 / oz</td>
+		</tr>
+	</tbody>
+</table>
+
+<h2>A Form</h2>
+
+<form class="pure-form pure-form-stacked">
+	<fieldset>
+		<legend>Give me your stuff:</legend>
+		
+		<label for="email">Email</label>
+		<input id="email" type="email" placeholder="Email">
+		
+		<label for="password">password</label>
+		<input id="password" type="password" placeholder="Password">
+
+		<button type="submit" class="pure-button pure-button-primary">Send</button>
+	</fieldset>
+</form>
+
+<p>Nullam non tortor dolor. Morbi ultricies condimentum massa, mollis
+dictum augue sollicitudin in. Suspendisse ac ipsum ac dui vulputate
+pellentesque. Nulla blandit magna semper rutrum euismod. Nullam vel
+aliquam tellus, vel volutpat magna. In gravida quam eu nibh vehicula
+bibendum. Ut pretium quam non lorem commodo feugiat. Sed condimentumg
+dolor at magna venenatis, ac malesuada arcu pretium. Donec ultricies
+mauris risus, vehicula cursus nisi facilisis ut. Curabitur sodales
+eros augue, vitae volutpat diam commodo ut. Curabitur interdum est
+sapien, sit amet eleifend purus lacinia non. Phasellus in purus mattis,
+adipiscing enim nec, dictum tellus. Cras bibendum gravida magna.</p>
 EOF
 
 config = ARGV.shift || abort( "Usage: %s <config.yml>" % [File.basename( $0 )] )

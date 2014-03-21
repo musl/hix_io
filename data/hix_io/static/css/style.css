@@ -8,7 +8,7 @@
 html, button, input, select, textarea,
 .pure-g [class *= "pure-u"],
 .pure-g-r [class *= "pure-u"] {
-    font-family: "Open Sans", sans-serif;
+	font-family: "Open Sans", sans-serif;
 	font-size: 10pt;
 	font-weight: 300;
 	color: #565d64;
@@ -92,8 +92,11 @@ div#main > div.loading {
 
 .post {
 	margin: 0 0 1em 0;
-	border: 1px #b7b7b7 solid;
-	padding: 0 1.25em;
+	/*border: 1px #b7b7b7 solid;*/
+	-webkit-border-radius: 2px;
+	-moz-border-radius:    2px;
+	border-radius:         2px;
+	padding: 1px 1em; /* the vertical padding needs to be set to avoid a bug */
 	background: #ffffff;
 }
 
@@ -120,5 +123,21 @@ div#main > div.loading {
 
 .post > p {
 	text-align: justify;
+}
+
+.pager-box {
+	margin: 0 0 1em 0;
+	padding: 1.25em;
+	text-align: center;
+}
+
+.pager-button {
+	background-color: #fff;
+	color: #000;
+}
+
+.pager-button-selected {
+	background-color: #e6f6ff;
+	color: #0080e0;
 }
 

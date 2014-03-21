@@ -1,14 +1,5 @@
-<% posts.each( function(post) { %>
-	<div class="post">
-		<h2><%== can.route.link(post.attr('title'), {id: post.attr('id')}, {}); %></h2>
-		<hr>
-		<p><%== post.attr("body"); %></p>
-	</div>
-<% }); %>
-
-<!--
 <div class="pager-box">
-	<ul id="pager" class="pure-paginator">
+	<ul id="pager" class="pure-paginator"><!-- pure-button pure-button-active -->
 		<% if(opts.page > 0) { %>
 			<li><a class="pure-button pager-button prev" href="#!<%= opts.page - 1 %>">&#171;</a></li>
 		<% } else { %>
@@ -30,5 +21,3 @@
 		<% } %>
 	</ul>
 </div>
--->
-
