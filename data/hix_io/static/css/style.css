@@ -120,7 +120,6 @@ div#main > div.loading {
 	margin: 0;
 	border: 0;
 	height: 1px;
-	width: 25%
 	background-image: -webkit-linear-gradient(left, rgba(0,0,0,0.1), rgba(0,0,0,0.25), rgba(0,0,0,0.1));
 	background-image:    -moz-linear-gradient(left, rgba(0,0,0,0.1), rgba(0,0,0,0.25), rgba(0,0,0,0.1));
 	background-image:     -ms-linear-gradient(left, rgba(0,0,0,0.1), rgba(0,0,0,0.25), rgba(0,0,0,0.1));
