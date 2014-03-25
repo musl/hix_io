@@ -1,3 +1,4 @@
+<div id="pager"></div>
 <% posts.each( function(post) { %>
 	<div class="post">
 		<h2><%== can.route.link(post.attr('title'), {id: post.attr('id')}, {}); %></h2>
@@ -6,28 +7,4 @@
 		<p><%== post.attr("body"); %></p>
 	</div>
 <% }); %>
-
-<div class="pager-box">
-	<ul id="pager" class="pure-paginator">
-		<% if(opts.page > 0) { %>
-			<li><a class="pure-button pager-button prev" href="#!<%= opts.page - 1 %>">&#171;</a></li>
-		<% } else { %>
-			<li><a class="pure-button pure-button-disabled pager-button prev" href="#!<%= opts.page %>">&#171;</a></li>
-		<% } %>
-
-		<% for( var i = 0; i < opts.pages; i++ ) { %>
-			<% if(opts.page == i) { %>
-				<li><a class="pure-button pager-button pager-button-selected" href="#!<%= i %>"><%= i + 1 %></a></li>
-			<% } else { %>
-				<li><a class="pure-button pager-button" href="#!<%= i %>"><%= i + 1 %></a></li>
-			<% } %>
-		<% } %>
-
-		<% if(opts.page < opts.pages - 1) { %>
-			<li><a class="pure-button pager-button next" href="#!<%= opts.page + 1 %>">&#187;</a></li>
-		<% } else { %>
-			<li><a class="pure-button pure-button-disabled pager-button next" href="#!<%= opts.page %>">&#187;</a></li>
-		<% } %>
-	</ul>
-</div>
 

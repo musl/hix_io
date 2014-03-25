@@ -14,9 +14,9 @@ function highlightSyntax() {
 		var el = $(e);
 		var lang = el.attr('data-language');
 
-		if(typeof lang == 'undefined') {
+		if(!lang) {
 			hljs.highlightBlock(e);
-		} else if(typeof hljs.getLanguage(lang) != 'undefined') {
+		} else if(hljs.getLanguage(lang)) {
 			el.html(hljs.highlight(lang, el.html(), true));
 		}
 	});
@@ -49,7 +49,7 @@ function syncReq(type, path) {
  */
 function asyncReq(type, path) {
 	return function(params) {
-		return $.ajax({
+		return can.ajax({
 			url: '/api/v1/posts/search',
 			type: 'get',
 			data: params,
@@ -65,81 +65,92 @@ var Post = can.Model.extend({
 	search:  asyncReq('GET', '/api/v1/posts/search')
 }, {});
 
-var Router = can.Control({
-	defaults: {
-		target: '#main',
-		posts_per_page: 2,
-		post_count: 0,
-		pages: 0,
-	} 
-}, {
-	'init' : function(element, options) {
-		// Any load-once stuff should be loaded here.
-		this.options.post_count = Post.count();
-		this.options.pages = Math.ceil(this.options.post_count / this.options.posts_per_page);
+var PostList = can.Control({}, {
+	init: function(element, options) {
+		var self = this;
 
-		// Setup route templates.
-		can.route(':page');
+		this.pager = new Pager(element, {
+			model: Post,
+			per_page: 30,
+			on_change: function() { self.update(); },
+		});
+
 		can.route('posts/:id');
-
-		// We're the routing authority.
-		can.route.ready();
+		this.update();
 	},
 
-	'route' : function() {
-		var target = $(this.options.target);
-		var params = { offset: 0, limit: this.options.posts_per_page };
-		var opts = { page: 0, pages: this.options.pages };
-	
-		console.log( params );
+	update: function() {
+		var self = this;
 
-		Post.findAll( params,
-			function(posts) {
-				target.html(can.view('/templates/posts.ejs', { posts: posts, opts: opts }));
-				highlightSyntax();
-			}
-		);
-	},
-
-	':page route' : function(data) {
-		var target = $(this.options.target);
-		var params = {
-			offset: parseInt(data.page) * this.options.posts_per_page,
-			limit: this.options.posts_per_page
-		};
-		var opts = {
-			page: parseInt(data.page),
-			pages: this.options.pages
-		};
-
-		console.log( params );
-
-		Post.findAll( params,
-			function(posts) {
-				target.html(can.view('/templates/posts.ejs', { posts: posts, opts: opts }));
-				highlightSyntax();
-			}
-		);
-	},
-
-	'posts/:id route' : function(data) {
-		var target = $(this.options.target);
-
-		Post.findOne({ id: data.id }, function(post) {
-			target.html(can.view('/templates/post.ejs', { post: post }));
+		Post.findAll(this.pager.query_params(), function(posts) {
+			self.element.html(can.view('/templates/posts.ejs', { posts: posts }));
+			self.pager.update();
 			highlightSyntax();
 		});
 	},
 
-	'#search submit' : function(el,ev) {
-		var target = $(this.options.target);
+	'posts/:id route': function(data) {
+		var self = this;
 
-		Post.search({q: el.context.q.value}).done( function(data) {
-			target.html(can.view('/templates/search.ejs', { posts: Post.models(data) }));
+		Post.findOne({ id: data.id }, function(post) {
+			self.element.html(can.view('/templates/post.ejs', { post: post }));
+			highlightSyntax();
 		});
 	},
 
+	'#search submit': function(el,ev) {
+		var self = this;
+
+		Post.search({q: el.context.q.value}).done( function(data) {
+			self.element.html(can.view('/templates/search.ejs', { posts: Post.models(data) }));
+		});
+	},
 });
 
-$(document).ready(function() { new Router(document.body); });
+var Pager = can.Control({
+	defaults: {
+		view: '/templates/pager.ejs',
+		target: '#pager',
+	}
+},{
+	init: function(element, options) {
+		var self = this;
+		var count = parseInt(options.model.count());
+		var per_page = parseInt(options.per_page);
+
+		this.state = new can.Map({
+			count: count,
+			per_page: per_page,
+			pages: Math.ceil(count / per_page),
+			page: 0,
+		});
+
+		this.state.bind('change', function() { self.update(); });
+		this.state.bind('change', options.on_change);
+
+		if(options.target) {
+			this.options.target = options.target;
+		}
+	},
+
+	update: function() {
+		$(this.options.target).html(can.view(this.options.view, this.state));
+	},
+
+	query_params: function() {
+		return {
+			offset: this.state.page * this.state.per_page,
+			limit: this.state.per_page,
+		};
+	},
+
+	'{target} a click': function(el, ev) {
+		this.state.attr('page', parseInt(el.attr('data-page')));
+	}
+});
+
+$(document).ready(function() {
+	var post_list = new PostList('#main');
+	can.route.ready();
+});
 

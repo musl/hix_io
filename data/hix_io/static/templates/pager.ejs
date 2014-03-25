@@ -1,0 +1,26 @@
+<div class="pager-box">
+	<ul id="pager" class="pure-paginator">
+
+		<% if(this.page > 0) { %>
+			<li><a class="pure-button pager-button prev" data-page="<%= this.page - 1 %>">&#171;</a></li>
+		<% } else { %>
+			<li><a class="pure-button pure-button-disabled pager-button prev">&#171;</a></li>
+		<% } %>
+
+		<% for( var i = 0; i < this.pages; i++ ) { %>
+			<% if(this.page == i) { %>
+				<li><a class="pure-button pager-button pager-button-selected"><%= i + 1 %></a></li>
+			<% } else { %>
+				<li><a class="pure-button pager-button" data-page="<%= i %>"><%= i + 1 %></a></li>
+			<% } %>
+		<% } %>
+
+		<% if(this.page < this.pages - 1) { %>
+			<li><a class="pure-button pager-button next" data-page="<%= this.page + 1 %>">&#187;</a></li>
+		<% } else { %>
+			<li><a class="pure-button pure-button-disabled pager-button next">&#187;</a></li>
+		<% } %>
+
+	</ul>
+</div>
+
