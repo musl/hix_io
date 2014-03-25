@@ -242,9 +242,15 @@ sapien, sit amet eleifend purus lacinia non. Phasellus in purus mattis,
 adipiscing enim nec, dictum tellus. Cras bibendum gravida magna.</p>
 EOF
 
-config = ARGV.shift || abort( "Usage: %s <config.yml>" % [File.basename( $0 )] )
+config = ARGV.shift || abort( "Usage: %s <config.yml> [count]" % [File.basename( $0 )] )
+count = (ARGV.shift || 1).to_i
+
 HixIO.load_config( config )
-POSTS.each do |title,body|
-	HixIO::Post.create( :title => title, :body => body )
+HixIO.log.level = :fatal
+
+count.times do
+	POSTS.each do |title,body|
+		HixIO::Post.create( :title => title, :body => body )
+	end
 end
 
