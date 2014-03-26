@@ -145,7 +145,7 @@ var PostControl = can.Control.extend({}, {
  *        var self = this;
  *        
  *        this.pager = new Pager(element, {
- *            model: Post,
+ *            model: MyModel,
  *            per_page: 5, 
  *            on_change: function() { self.update(); },
  *        });
