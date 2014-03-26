@@ -65,18 +65,17 @@ var Post = can.Model.extend({
 	search:  asyncReq('GET', '/api/v1/posts/search')
 }, {});
 
-var PostList = can.Control({}, {
+var PostControl = can.Control.extend({}, {
 	init: function(element, options) {
 		var self = this;
 
 		this.pager = new Pager(element, {
 			model: Post,
-			per_page: 30,
+			per_page: 15, 
 			on_change: function() { self.update(); },
 		});
 
-		can.route('posts/:id');
-		this.update();
+		can.route('post/:id');
 	},
 
 	update: function() {
@@ -89,7 +88,11 @@ var PostList = can.Control({}, {
 		});
 	},
 
-	'posts/:id route': function(data) {
+	route: function() {
+		this.update();
+	},
+
+	'post/:id route': function(data) {
 		var self = this;
 
 		Post.findOne({ id: data.id }, function(post) {
@@ -97,17 +100,23 @@ var PostList = can.Control({}, {
 			highlightSyntax();
 		});
 	},
+});
 
-	'#search submit': function(el,ev) {
+var SearchControl = can.Control.extend({}, {
+	init: function(element, options) {
+		can.route('search');
+	},
+
+	'search route': function(data) {
 		var self = this;
 
-		Post.search({q: el.context.q.value}).done( function(data) {
+		Post.search({q: data.q}).done( function(data) {
 			self.element.html(can.view('/templates/search.ejs', { posts: Post.models(data) }));
 		});
 	},
 });
 
-var Pager = can.Control({
+var Pager = can.Control.extend({
 	defaults: {
 		view: '/templates/pager.ejs',
 		target: '#pager',
@@ -145,12 +154,30 @@ var Pager = can.Control({
 	},
 
 	'{target} a click': function(el, ev) {
-		this.state.attr('page', parseInt(el.attr('data-page')));
+		var page = parseInt(el.attr('data-page'));
+
+		if(page >= 0 && page < pages) {
+			this.state.attr('page', page);
+		}
 	}
 });
 
 $(document).ready(function() {
-	var post_list = new PostList('#main');
+	
+	// TODO write a general router that picks the proper control based on route.
+
+	var el = '#main';
+
+	var post_list = new PostControl(el);
+	var search_results = new SearchControl(el);
+
+	$('#search').keyup(function(e) {
+		if(e.keyCode == 13) {
+			window.location.hash = can.route.url({route: 'search', q: e.target.value});
+		}
+	});
+
 	can.route.ready();
+
 });
 

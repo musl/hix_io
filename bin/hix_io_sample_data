@@ -223,9 +223,6 @@ adipiscing enim nec, dictum tellus. Cras bibendum gravida magna.</p>
 		<label for="email">Email</label>
 		<input id="email" type="email" placeholder="Email">
 		
-		<label for="password">password</label>
-		<input id="password" type="password" placeholder="Password">
-
 		<button type="submit" class="pure-button pure-button-primary">Send</button>
 	</fieldset>
 </form>
