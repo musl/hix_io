@@ -58,6 +58,9 @@ function asyncReq(type, path) {
 	};
 }
 
+/*
+ * Posts for a blog.
+ */
 var Post = can.Model.extend({
 	findAll: 'GET /api/v1/posts',
 	findOne: 'GET /api/v1/posts/{id}',
@@ -65,13 +68,16 @@ var Post = can.Model.extend({
 	search:  asyncReq('GET', '/api/v1/posts/search')
 }, {});
 
+/*
+ * Provide a list of posts or details on a single post.
+ */
 var PostControl = can.Control.extend({}, {
 	init: function(element, options) {
 		var self = this;
 
 		this.pager = new Pager(element, {
 			model: Post,
-			per_page: 15, 
+			per_page: 5, 
 			on_change: function() { self.update(); },
 		});
 
@@ -102,20 +108,82 @@ var PostControl = can.Control.extend({}, {
 	},
 });
 
-var SearchControl = can.Control.extend({}, {
-	init: function(element, options) {
-		can.route('search');
-	},
-
-	'search route': function(data) {
-		var self = this;
-
-		Post.search({q: data.q}).done( function(data) {
-			self.element.html(can.view('/templates/search.ejs', { posts: Post.models(data) }));
-		});
-	},
-});
-
+/*
+ * A reusable pager control.
+ *
+ * Provides pagination with any model with the following requirements:
+ *
+ * - The given model provides a function count() which is the total number of
+ *   items that are available.
+ *
+ * - You provide a function that gets called when the pager is changed. The
+ *   callback must call update() on the pager in return so that the pager gets
+ *   re-rendered. This means that your view is in control - you can put the
+ *   pager's element inside another template if you wish.
+ *
+ * - The model supports limit and offset parameters to findAll(). If so, it's
+ *   as easy as passing the object returned from query_params() to your
+ *   findAll(). You'll likely be building a custom set of parameters anyway, so
+ *   you'll probably want to use query_params() as a starting point and tack on
+ *   your other parameters.
+ *
+ * Basic usage:
+ *
+ * The basic idea is that this control will be used by other controls and it's
+ * target element in the dom will be contained in or rendered by another
+ * template.
+ *
+ * In your control's init funciton, create a new Pager, passing in the element
+ * that your view is bound to or the one that contains the target element for
+ * the pager, and the options you'd like. Be sure to include the callback
+ * 'on_change' that re-renders your view. In that function, make sure to use
+ * query_params() to get the current offset and limit to pass to findAll().
+ *
+ * Also, make sure to call update() on the pager in that function. For example:
+ *
+ *    init: function(element, options) {
+ *        var self = this;
+ *        
+ *        this.pager = new Pager(element, {
+ *            model: Post,
+ *            per_page: 5, 
+ *            on_change: function() { self.update(); },
+ *        });
+ *    },
+ *    
+ *    update: function() {
+ *        var self = this;
+ *        
+ *        MyModel.findAll(this.pager.query_params(), function(items) {
+ *            self.element.html(can.view('my_template.ejs', { items: items }));
+ *            self.pager.update();
+ *        });
+ *    },
+ *
+ * In your template (my_template.ejs above), make sure to include the element
+ * that your pager renders to. It's '#pager' by default.
+ * 
+ * Options you can pass to new Pager(element, options) are:
+ *
+ *     on_change:
+ *         The function to call when the pager is clicked and it
+ *         results in a page change.
+ *
+ *     model:
+ *         The model that this pager is paging through.
+ *
+ *     per_page:
+ *         The number of items per page.
+ *
+ *     pad:
+ *         The number of numbers to show on each side of the curent page in the
+ *         pager. The default is 2.
+ *
+ *     target:
+ *         The selector that yields one element to render the pager into.
+ *         Defaults to '#pager'.
+ *
+ */
 var Pager = can.Control.extend({
 	defaults: {
 		view: '/templates/pager.ejs',
@@ -132,9 +200,9 @@ var Pager = can.Control.extend({
 			per_page: per_page,
 			pages: Math.ceil(count / per_page),
 			page: 0,
+			pad: 2,
 		});
 
-		this.state.bind('change', function() { self.update(); });
 		this.state.bind('change', options.on_change);
 
 		if(options.target) {
@@ -143,6 +211,22 @@ var Pager = can.Control.extend({
 	},
 
 	update: function() {
+		p = this.state.page;
+		c = this.state.pages;
+		a = this.state.pad;
+
+		// Find the ammount we need to extend each side of the window to account for
+		// collapses on the opposite side. This allows for a roughly constant-width
+		// control.
+		//
+	    ds = Math.min(0, c - (p + a) - 1);	
+		de = Math.max(0, -1 * (p - a)) + 1;
+
+		// Calculate and store the indexes for the window.
+		//
+		this.state.window_start = Math.max(0, p - a + ds);
+		this.state.window_end   = Math.min(c, p + a + de);
+
 		$(this.options.target).html(can.view(this.options.view, this.state));
 	},
 
@@ -156,12 +240,32 @@ var Pager = can.Control.extend({
 	'{target} a click': function(el, ev) {
 		var page = parseInt(el.attr('data-page'));
 
-		if(page >= 0 && page < pages) {
+		if(page >= 0 && page < this.state.pages) {
 			this.state.attr('page', page);
 		}
 	}
 });
 
+/*
+ * Provide a control for displaying search results.
+ */
+var SearchControl = can.Control.extend({}, {
+	init: function(element, options) {
+		can.route('search');
+	},
+
+	'search route': function(data) {
+		var self = this;
+
+		Post.search({q: data.q}).done( function(data) {
+			self.element.html(can.view('/templates/search.ejs', { posts: Post.models(data) }));
+		});
+	},
+});
+
+/*
+ * A standard jQuery entry-point.
+ */
 $(document).ready(function() {
 	
 	// TODO write a general router that picks the proper control based on route.

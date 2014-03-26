@@ -90,6 +90,8 @@ div#main > div.loading {
 	color: #000000 !important;
 }
 
+/* Post Styles */
+
 .post {
 	margin: 0 0 1em 0;
 	/*border: 1px #b7b7b7 solid;*/
@@ -130,6 +132,8 @@ div#main > div.loading {
 	text-align: justify;
 }
 
+/* Pagination Controls */
+
 .pager-box {
 	margin: 0 0 1em 0;
 	padding: 1.25em;
@@ -145,6 +149,36 @@ div#main > div.loading {
 	background-color: #e6f6ff;
 	color: #0080e0;
 }
+
+.pure-button.first {
+	border-right: 1px #f0f0f0 solid;
+	-webkit-border-radius: 2px 0 0 2px;
+	-moz-border-radius:    2px 0 0 2px;
+	border-radius:         2px 0 0 2px;
+	color: #565D64;
+}
+
+.pure-button.prev {
+	border-right: 1px #f0f0f0 solid;
+	border-radius: 0;
+	color: #565D64;
+}
+
+.pure-button.next {
+	border-left: 1px #f0f0f0 solid;
+	border-radius: 0;
+	color: #565D64;
+}
+
+.pure-button.last {
+	border-left: 1px #f0f0f0 solid;
+	-webkit-border-radius: 0 2px 2px 0;
+	-moz-border-radius:    0 2px 2px 0;
+	border-radius:         0 2px 2px 0;
+	color: #565D64;
+}
+
+/* Search Form */
 
 .search-q {
 	width: 100%;
