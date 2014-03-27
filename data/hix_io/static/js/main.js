@@ -155,6 +155,9 @@ var Post = can.Model.extend({
  *         The selector that yields one element to render the pager into.
  *         Defaults to '#pager'.
  *
+ * TODO - js cookie support to keep what page we're on, making sure that page
+ * exists when loading.
+ *
  */
 var Pager = can.Control.extend({
 
