@@ -192,8 +192,6 @@ var Pager = can.Control.extend({
 
 		p = parseInt(options.pad);
 		if(p > 0) { this.options.pad = p; }
-
-		console.log('init: ' + this.state.page);
 	},
 
 	update: function() {
@@ -275,12 +273,12 @@ var PostControl = can.Control.extend({}, {
 			cookie: 'hix_io_pager_page',
 		});
 
+		can.route('posts');
 		can.route('post/:id');
 	},
 
 	update: function() {
 		var self = this;
-		console.log('updating the view');
 
 		Post.findAll(this.pager.query_params(), function(posts) {
 			self.element.html(can.view('/templates/posts.ejs', {
@@ -291,11 +289,11 @@ var PostControl = can.Control.extend({}, {
 		});
 	},
 
-	route: function() {
+	'posts route': function() {
 		this.update();
 	},
 
-	'post/:id route': function(data) {
+	'posts/:id route': function(data) {
 		var self = this;
 
 		Post.findOne({ id: data.id }, function(post) {
@@ -303,6 +301,62 @@ var PostControl = can.Control.extend({}, {
 				post: post
 			}));
 			highlightSyntax();
+		});
+	},
+});
+
+/*
+ * A control for listing and displaying projects.
+ */
+var CodeControl = can.Control.extend({}, {
+	init: function() {
+		can.route('code');
+	},
+
+	'code route': function() {
+		this.element.html('code');
+	},
+});
+
+/*
+ * A control for shortening urls.
+ */
+var URLControl = can.Control.extend({}, {
+	init: function() {
+		can.route('urls');
+	},
+
+	'urls route': function() {
+		this.element.html('urls');
+	},
+});
+
+/*
+ * A control to update the menu based on the hash.
+ */
+var MenuControl = can.Control.extend({
+	defaults: {
+		selected_class: 'pure-menu-selected',
+	},	
+}, {
+	init: function(element, options) {
+		var self = this;
+
+		if(options.selected_class) {
+			this.options.selected_class = options.selected_class;
+		}
+		can.route.bind('route', function() { self.update(); });
+	},
+
+	update: function() {
+		var self = this;
+		
+		$(this.element).find('a').each(function(i,e) {
+			if(e.href.match(new RegExp(can.route.attr('route') + '$'))){ 
+				$(e).parent().addClass(self.options.selected_class);
+			} else {
+				$(e).parent().removeClass(self.options.selected_class);
+			}
 		});
 	},
 });
@@ -339,22 +393,36 @@ var Router = can.Control.extend({
 	defaults: {
 		main: '#main',
 		menu: '#menu',
+		default_route: 'posts',
 	},
 }, {
 	init: function(element, options) {
 		// Handle options.
 		//
-		if(options.main) { this.options.menu = options.main; }
+		if(options.main) { this.options.main = options.main; }
 		if(options.menu) { this.options.menu = options.menu; }
+		if(options.default_route) { this.options.default_route = options.default_route; }
 
-		// TODO create missing controls
-		//new MenuControl(this.options.menu);
+		// Instantiate all of the controls. This assumes that nobody's doing anything
+		// stupid inside of init methods, like making http calls, writing to the main
+		// element, etc.
+		//
+		new MenuControl(this.options.menu);
 		new SearchControl(this.options.main);
 		new PostControl(this.options.main);
-		//new CodeControl(this.options.main);
-		//new URLControl(this.options.main);
+		new CodeControl(this.options.main);
+		new URLControl(this.options.main);
 
+		// All routes get defined in each control's init method, all of the routes we
+		// need should be ready by now.
 		can.route.ready();
+
+		// Direct the browser to the default route.
+		//
+		if(!can.route.attr('route') ||
+		   can.route.attr('route') == '') {
+			can.route.attr('route', this.options.default_route);
+		}
 	},
 
 	/*
@@ -368,9 +436,12 @@ var Router = can.Control.extend({
 });
 
 /******************************************************************************/
-// A standard jQuery entry point.
+// Entry point.
 /******************************************************************************/
 
+/*
+ * Start up the main router.
+ */
 $(document).ready(function() {
 	new Router(document.body);
 });

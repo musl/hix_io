@@ -1,4 +1,3 @@
-<div id="pager"></div>
 <% posts.each( function(post) { %>
 	<div class="post">
 		<h2><%== can.route.link(post.attr('title'), {id: post.attr('id')}, {}); %></h2>
@@ -7,3 +6,4 @@
 		<p><%== post.attr("body"); %></p>
 	</div>
 <% }); %>
+<div id="pager"></div>
