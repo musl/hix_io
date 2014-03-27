@@ -198,7 +198,7 @@ var Pager = can.Control.extend({
 		if(p > 0) { this.options.pad = p; }
 	},
 
-	update: function() {
+	check: function() {
 		// Attempt to update the count if we have something that doesn't make sense
 		// as a count.
 		//
@@ -219,6 +219,10 @@ var Pager = can.Control.extend({
 				$.cookie(this.options.cookie, this.state.page);
 			}
 		}
+	},
+
+	update: function() {
+		this.check();
 
 		p = this.state.page;
 		c = this.state.pages;
@@ -240,6 +244,7 @@ var Pager = can.Control.extend({
 	},
 
 	query_params: function() {
+		this.check();
 		return {
 			offset: this.state.page * this.state.per_page,
 			limit: this.state.per_page,
