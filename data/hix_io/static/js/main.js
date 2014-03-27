@@ -137,58 +137,67 @@ var Post = can.Model.extend({
  * 
  * Options you can pass to new Pager(element, options) are:
  *
- *     on_change:
+ *     on_change: (required)
  *         The function to call when the pager is clicked and it
  *         results in a page change.
  *
- *     model:
+ *     model: (required)
  *         The model that this pager is paging through.
  *
- *     per_page:
+ *     per_page: (optional, default: 10)
  *         The number of items per page.
  *
- *     pad:
+ *     pad: (optional, default: 2)
  *         The number of numbers to show on each side of the curent page in the
- *         pager. The default is 2.
+ *         pager.
  *
- *     target:
+ *     target: (optional, default: '#pager')
  *         The selector that yields one element to render the pager into.
- *         Defaults to '#pager'.
  *
  * TODO - js cookie support to keep what page we're on, making sure that page
  * exists when loading.
  *
  */
 var Pager = can.Control.extend({
-
 	defaults: {
 		view: '/templates/pager.ejs',
 		target: '#pager',
+		model: null,
 	},
-
 },{
-
 	init: function(element, options) {
-		var self = this;
-		var count = parseInt(options.model.count());
-		var per_page = parseInt(options.per_page);
-
 		this.state = new can.Map({
-			count: count,
-			per_page: per_page,
-			pages: Math.ceil(count / per_page),
+			count: 0,
+			per_page: 10,
+			pages: 0, 
 			page: 0,
 			pad: 2,
 		});
 
 		this.state.bind('change', options.on_change);
 
+		this.options.model = options.model;
+
 		if(options.target) {
 			this.options.target = options.target;
 		}
+
+		p = parseInt(options.per_page);
+		if(p > 0) { this.options.per_page = p; }
+
+		p = parseInt(options.pad);
+		if(p > 0) { this.options.pad = p; }
 	},
 
 	update: function() {
+		// Attempt to update the count if we have something that doesn't make sense
+		// as a count.
+		//
+		if(this.state.count <= 0) {
+			this.state.count = parseInt(this.options.model.count());
+			this.state.pages = Math.ceil(this.state.count / this.state.per_page);
+		}
+
 		p = this.state.page;
 		c = this.state.pages;
 		a = this.state.pad;
@@ -217,12 +226,10 @@ var Pager = can.Control.extend({
 
 	'{target} a click': function(el, ev) {
 		var page = parseInt(el.attr('data-page'));
-
 		if(page >= 0 && page < this.state.pages) {
 			this.state.attr('page', page);
 		}
 	},
-
 });
 
 
@@ -230,7 +237,6 @@ var Pager = can.Control.extend({
  * Provide a list of posts or details on a single post.
  */
 var PostControl = can.Control.extend({}, {
-
 	init: function(element, options) {
 		var self = this;
 
@@ -265,14 +271,12 @@ var PostControl = can.Control.extend({}, {
 			highlightSyntax();
 		});
 	},
-
 });
 
 /*
  * Provide a control for displaying search results.
  */
 var SearchControl = can.Control.extend({}, {
-
 	init: function(element, options) {
 		can.route('search');
 	},
@@ -284,7 +288,6 @@ var SearchControl = can.Control.extend({}, {
 			self.element.html(can.view('/templates/search.ejs', { posts: Post.models(data) }));
 		});
 	},
-
 });
 
 /*
@@ -297,51 +300,24 @@ var SearchControl = can.Control.extend({}, {
  *
  */
 var Router = can.Control.extend({
-
 	defaults: {
 		main: '#main',
 		menu: '#menu',
 	},
-
 }, {
-
 	init: function(element, options) {
-
-		// Extract the route name from the hash.	
-		//
-		var route = window.location.hash.match( /#!(\w+)/ );
-		if(route) { route = route.pop(); }
-
 		// Handle options.
 		//
 		if(options.main) { this.options.menu = options.main; }
 		if(options.menu) { this.options.menu = options.menu; }
 
-		console.log("Route: " + route);
-
-		// TODO create a navigation control.
+		// TODO create missing controls
 		//new MenuControl(this.options.menu);
-
-		// Searches may be performed from any page, so the route needs to be present.
 		new SearchControl(this.options.main);
+		new PostControl(this.options.main);
+		//new CodeControl(this.options.main);
+		//new URLControl(this.options.main);
 
-		// Pick the control(s) that match the route.
-		//
-		switch(route) {
-			case 'code':
-				// TODO create a code control
-				//new CodeControl(this.options.main);
-				break;
-			case 'url':
-				// TODO create a url control
-				//new URLControl(this.options.main);
-				break;
-			case 'post':
-			default:
-				new PostControl(this.options.main);
-				break;
-		}
- 
 		can.route.ready();
 	},
 
@@ -353,7 +329,6 @@ var Router = can.Control.extend({
 			window.location.hash = can.route.url({route: 'search', q: e.target.value});
 		}
 	},
-
 });
 
 /******************************************************************************/
