@@ -1,5 +1,9 @@
 // vim: set nosta noet ts=4 sw=4 ft=javascript:
 
+/******************************************************************************/
+// Utility functions
+/******************************************************************************/
+
 /*
  * For all 'code' elements nested within 'pre' elements:
  *
@@ -23,7 +27,7 @@ function highlightSyntax() {
 }
 
 /*
- * Perform a synchronous HTTP request and return the body as a json string.
+ * Perform a synchronous HTTP request and return the body.
  */
 function syncReq(type, path) {
 	return function(params) {
@@ -58,6 +62,10 @@ function asyncReq(type, path) {
 	};
 }
 
+/******************************************************************************/
+// Models
+/******************************************************************************/
+
 /*
  * Posts for a blog.
  */
@@ -68,45 +76,9 @@ var Post = can.Model.extend({
 	search:  asyncReq('GET', '/api/v1/posts/search')
 }, {});
 
-/*
- * Provide a list of posts or details on a single post.
- */
-var PostControl = can.Control.extend({}, {
-	init: function(element, options) {
-		var self = this;
-
-		this.pager = new Pager(element, {
-			model: Post,
-			per_page: 5, 
-			on_change: function() { self.update(); },
-		});
-
-		can.route('post/:id');
-	},
-
-	update: function() {
-		var self = this;
-
-		Post.findAll(this.pager.query_params(), function(posts) {
-			self.element.html(can.view('/templates/posts.ejs', { posts: posts }));
-			self.pager.update();
-			highlightSyntax();
-		});
-	},
-
-	route: function() {
-		this.update();
-	},
-
-	'post/:id route': function(data) {
-		var self = this;
-
-		Post.findOne({ id: data.id }, function(post) {
-			self.element.html(can.view('/templates/post.ejs', { post: post }));
-			highlightSyntax();
-		});
-	},
-});
+/******************************************************************************/
+// Controls
+/******************************************************************************/
 
 /*
  * A reusable pager control.
@@ -185,11 +157,14 @@ var PostControl = can.Control.extend({}, {
  *
  */
 var Pager = can.Control.extend({
+
 	defaults: {
 		view: '/templates/pager.ejs',
 		target: '#pager',
-	}
+	},
+
 },{
+
 	init: function(element, options) {
 		var self = this;
 		var count = parseInt(options.model.count());
@@ -243,13 +218,58 @@ var Pager = can.Control.extend({
 		if(page >= 0 && page < this.state.pages) {
 			this.state.attr('page', page);
 		}
-	}
+	},
+
+});
+
+
+/*
+ * Provide a list of posts or details on a single post.
+ */
+var PostControl = can.Control.extend({}, {
+
+	init: function(element, options) {
+		var self = this;
+
+		this.pager = new Pager(element, {
+			model: Post,
+			per_page: 5, 
+			on_change: function() { self.update(); },
+		});
+
+		can.route('post/:id');
+	},
+
+	update: function() {
+		var self = this;
+
+		Post.findAll(this.pager.query_params(), function(posts) {
+			self.element.html(can.view('/templates/posts.ejs', { posts: posts }));
+			self.pager.update();
+			highlightSyntax();
+		});
+	},
+
+	route: function() {
+		this.update();
+	},
+
+	'post/:id route': function(data) {
+		var self = this;
+
+		Post.findOne({ id: data.id }, function(post) {
+			self.element.html(can.view('/templates/post.ejs', { post: post }));
+			highlightSyntax();
+		});
+	},
+
 });
 
 /*
  * Provide a control for displaying search results.
  */
 var SearchControl = can.Control.extend({}, {
+
 	init: function(element, options) {
 		can.route('search');
 	},
@@ -261,27 +281,80 @@ var SearchControl = can.Control.extend({}, {
 			self.element.html(can.view('/templates/search.ejs', { posts: Post.models(data) }));
 		});
 	},
+
 });
 
 /*
- * A standard jQuery entry-point.
+ * Setup the initial environment, route requests to controllers, and handle
+ * events for the whole document.
  */
-$(document).ready(function() {
-	
-	// TODO write a general router that picks the proper control based on route.
+var Router = can.Control.extend({
 
-	var el = '#main';
+	defaults: {
+		main: '#main',
+		menu: '#menu',
+	},
 
-	var post_list = new PostControl(el);
-	var search_results = new SearchControl(el);
+}, {
 
-	$('#search').keyup(function(e) {
+	init: function(element, options) {
+
+		// Extract the route name from the hash.	
+		//
+		var route = window.location.hash.match( /#!(\w+)/ );
+		if(route) { route = route.pop(); }
+
+		// Handle options.
+		//
+		if(options.main) { this.options.menu = options.main; }
+		if(options.menu) { this.options.menu = options.menu; }
+
+
+		console.log("Route: " + route);
+	   	console.log(this.options.controls[route]);
+
+		// TODO create a navigation control.
+		//new MenuControl(this.options.menu);
+
+		// Searches may be performed from any page, so the route needs to be present.
+		new SearchControl(this.options.main);
+
+		// Pick the control(s) that match the route.
+		//
+		switch(route) {
+			case 'code':
+				// TODO create a code controller
+				//new CodeControl(this.options.main);
+				break;
+			case 'url':
+				// TODO create a url controller
+				//new URLControl(this.options.main);
+				break;
+			case 'post':
+			default:
+				new PostControl(this.options.main);
+				break;
+		}
+ 
+		can.route.ready();
+	},
+
+	/*
+	 * Handle the search event globally.
+	 */
+	'#search keyup': function(el,e) {
 		if(e.keyCode == 13) {
 			window.location.hash = can.route.url({route: 'search', q: e.target.value});
 		}
-	});
+	},
 
-	can.route.ready();
+});
 
+/******************************************************************************/
+// A standard jQuery entry point.
+/******************************************************************************/
+
+$(document).ready(function() {
+	new Router(document.body);
 });
 
