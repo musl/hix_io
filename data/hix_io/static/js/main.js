@@ -285,8 +285,13 @@ var SearchControl = can.Control.extend({}, {
 });
 
 /*
- * Setup the initial environment, route requests to controllers, and handle
+ * Setup the initial environment, route requests to control, and handle
  * events for the whole document.
+ *
+ * TODO - tie routes, controls, and the menu together with an associative
+ * arrray. Bonus points for some way of registering controls so that we don't
+ * have to maintain the menu or list of controls.
+ *
  */
 var Router = can.Control.extend({
 
@@ -321,11 +326,11 @@ var Router = can.Control.extend({
 		//
 		switch(route) {
 			case 'code':
-				// TODO create a code controller
+				// TODO create a code control
 				//new CodeControl(this.options.main);
 				break;
 			case 'url':
-				// TODO create a url controller
+				// TODO create a url control
 				//new URLControl(this.options.main);
 				break;
 			case 'post':
