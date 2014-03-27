@@ -309,9 +309,7 @@ var Router = can.Control.extend({
 		if(options.main) { this.options.menu = options.main; }
 		if(options.menu) { this.options.menu = options.menu; }
 
-
 		console.log("Route: " + route);
-	   	console.log(this.options.controls[route]);
 
 		// TODO create a navigation control.
 		//new MenuControl(this.options.menu);
