@@ -99,6 +99,11 @@ var Post = can.Model.extend({
  *   you'll probably want to use query_params() as a starting point and tack on
  *   your other parameters.
  *
+ * If you'd like to store the current page in a javascript cookie, make sure
+ * to set the 'cookie' option when creating the pager. You'll also need the
+ * jquery-cookie plugin, or a function called $.cookie() that works the same
+ * way. 
+ *
  * Basic usage:
  *
  * The basic idea is that this control will be used by other controls and it's
@@ -154,8 +159,9 @@ var Post = can.Model.extend({
  *     target: (optional, default: '#pager')
  *         The selector that yields one element to render the pager into.
  *
- * TODO - js cookie support to keep what page we're on, making sure that page
- * exists when loading.
+ *     cookie: (optional, default: null)
+ *         The name of the javascript cookie that's set to retain the current
+ *         page number. Set this to a simple string to enable the cookie.
  *
  */
 var Pager = can.Control.extend({
@@ -163,6 +169,7 @@ var Pager = can.Control.extend({
 		view: '/templates/pager.ejs',
 		target: '#pager',
 		model: null,
+		cookie: null,
 	},
 },{
 	init: function(element, options) {
@@ -177,6 +184,8 @@ var Pager = can.Control.extend({
 		this.state.bind('change', options.on_change);
 
 		this.options.model = options.model;
+
+		this.options.cookie = options.cookie;
 
 		if(options.target) {
 			this.options.target = options.target;
@@ -196,6 +205,19 @@ var Pager = can.Control.extend({
 		if(this.state.count <= 0) {
 			this.state.count = parseInt(this.options.model.count());
 			this.state.pages = Math.ceil(this.state.count / this.state.per_page);
+		}
+
+		// If enabled, retrieve and store the current page.
+		//
+		if(this.options.cookie) {
+			stored_page = parseInt($.cookie(this.options.cookie));
+			if(stored_page >= 0 &&
+			   stored_page < this.state.pages &&
+			   stored_page != this.state.page ) {
+				this.state.page = stored_page;
+			} else {
+				$.cookie(this.options.cookie, this.state.page);
+			}
 		}
 
 		p = this.state.page;
@@ -227,6 +249,7 @@ var Pager = can.Control.extend({
 	'{target} a click': function(el, ev) {
 		var page = parseInt(el.attr('data-page'));
 		if(page >= 0 && page < this.state.pages) {
+			$.cookie(this.options.cookie, page);
 			this.state.attr('page', page);
 		}
 	},
@@ -244,6 +267,7 @@ var PostControl = can.Control.extend({}, {
 			model: Post,
 			per_page: 5, 
 			on_change: function() { self.update(); },
+			cookie: 'hix_io_pager_page',
 		});
 
 		can.route('post/:id');
