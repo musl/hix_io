@@ -181,49 +181,22 @@ var Pager = can.Control.extend({
 			pad: 2,
 		});
 
-		this.state.bind('change', options.on_change);
+		this.state.bind('page', options.on_change);
 
 		this.options.model = options.model;
-
 		this.options.cookie = options.cookie;
-
-		if(options.target) {
-			this.options.target = options.target;
-		}
+		if(options.target) { this.options.target = options.target; }
 
 		p = parseInt(options.per_page);
 		if(p > 0) { this.options.per_page = p; }
 
 		p = parseInt(options.pad);
 		if(p > 0) { this.options.pad = p; }
-	},
 
-	check: function() {
-		// Attempt to update the count if we have something that doesn't make sense
-		// as a count.
-		//
-		if(this.state.count <= 0) {
-			this.state.count = parseInt(this.options.model.count());
-			this.state.pages = Math.ceil(this.state.count / this.state.per_page);
-		}
-
-		// If enabled, retrieve and store the current page.
-		//
-		if(this.options.cookie) {
-			stored_page = parseInt($.cookie(this.options.cookie));
-			if(stored_page >= 0 &&
-			   stored_page < this.state.pages &&
-			   stored_page != this.state.page ) {
-				this.state.page = stored_page;
-			} else {
-				$.cookie(this.options.cookie, this.state.page);
-			}
-		}
+		console.log('init: ' + this.state.page);
 	},
 
 	update: function() {
-		this.check();
-
 		p = this.state.page;
 		c = this.state.pages;
 		a = this.state.pad;
@@ -232,19 +205,45 @@ var Pager = can.Control.extend({
 		// collapses on the opposite side. This allows for a roughly constant-width
 		// control.
 		//
-	    ds = Math.min(0, c - (p + a) - 1);	
+		ds = Math.min(0, c - (p + a) - 1);	
 		de = Math.max(0, -1 * (p - a)) + 1;
 
 		// Calculate and store the indexes for the window.
 		//
-		this.state.window_start = Math.max(0, p - a + ds);
-		this.state.window_end   = Math.min(c, p + a + de);
+		this.state.attr('window_start', Math.max(0, p - a + ds));
+		this.state.attr('window_end', Math.min(c, p + a + de));
 
 		$(this.options.target).html(can.view(this.options.view, this.state));
 	},
 
 	query_params: function() {
-		this.check();
+		// Attempt to update the count if we have something that doesn't make sense
+		// as a count.
+		//
+		if(this.state.count <= 0) {
+			this.state.attr('count', parseInt(this.options.model.count()));
+			this.state.attr('pages', Math.ceil(this.state.count / this.state.per_page));
+		}
+
+		// If enabled, use a JavaScript cookie to restore the last page viewed.
+		//
+		if(this.options.cookie) {
+			stored_page = parseInt($.cookie(this.options.cookie));
+
+			if(stored_page >= 0 &&
+			   stored_page < this.state.pages &&
+			   stored_page != this.state.page ) {
+
+				// Suppress the change event so the view isn't rendered multiple times.
+				//
+				this.state.unbind('page', this.options.on_change);
+				this.state.attr('page', stored_page);
+				this.state.bind('page', this.options.on_change);
+			} else {
+				$.cookie(this.options.cookie, this.state.page);
+			}
+		}
+
 		return {
 			offset: this.state.page * this.state.per_page,
 			limit: this.state.per_page,
@@ -253,13 +252,14 @@ var Pager = can.Control.extend({
 
 	'{target} a click': function(el, ev) {
 		var page = parseInt(el.attr('data-page'));
+
 		if(page >= 0 && page < this.state.pages) {
 			$.cookie(this.options.cookie, page);
 			this.state.attr('page', page);
 		}
+
 	},
 });
-
 
 /*
  * Provide a list of posts or details on a single post.
@@ -280,9 +280,12 @@ var PostControl = can.Control.extend({}, {
 
 	update: function() {
 		var self = this;
+		console.log('updating the view');
 
 		Post.findAll(this.pager.query_params(), function(posts) {
-			self.element.html(can.view('/templates/posts.ejs', { posts: posts }));
+			self.element.html(can.view('/templates/posts.ejs', {
+				posts: posts
+			}));
 			self.pager.update();
 			highlightSyntax();
 		});
@@ -296,7 +299,9 @@ var PostControl = can.Control.extend({}, {
 		var self = this;
 
 		Post.findOne({ id: data.id }, function(post) {
-			self.element.html(can.view('/templates/post.ejs', { post: post }));
+			self.element.html(can.view('/templates/post.ejs', {
+				post: post
+			}));
 			highlightSyntax();
 		});
 	},
@@ -314,7 +319,9 @@ var SearchControl = can.Control.extend({}, {
 		var self = this;
 
 		Post.search({q: data.q}).done( function(data) {
-			self.element.html(can.view('/templates/search.ejs', { posts: Post.models(data) }));
+			self.element.html(can.view('/templates/search.ejs', {
+				posts: Post.models(data)
+			}));
 		});
 	},
 });
