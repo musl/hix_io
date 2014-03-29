@@ -7,30 +7,28 @@ class HixIO::Post < Sequel::Model( :hix_io__posts )
 	dataset_module do
 
 		def published( params = {} )
-			offset = params[:offset] || 0
-			limit =  params[:limit]  || 10
-			return self.where( :published => true ).order( :updated_at ).offset( offset ).limit( limit ).all
+			set = self.where( :published => true ).order( :updated_at )
+			set = set.offset( params[:offset] ) unless params[:offset].nil?
+			set = set.limit( params[:limit] ) unless params[:limit].nil?
+			return set
 		end
 
 		def detail( id )
-			return self.where( :id => id, :published => true ).first
-		end
-
-		def published_count
-			return self.where( :published => true ).count
+			return self.where( :id => id, :published => true )
 		end
 
 		def search( params = {} )
 			# We'll trust sequel's quoting here, for now. I'd like to make sure it does
 			# the right thing at some point.
-			cols   = [:title, :body]
-			terms  = [params[:q].split( /\s+/ )].flatten
-			opts   = {
-				:language => (params[:language] || 'english'),
+			terms = [params[:q].to_s.split( /\s+/ )].flatten
+			opts  = {
+				:language => (params[:language] || 'english')
 			}
-			offset = params[:offset] || 0
-			limit  = params[:limit] || 10
-			return self.full_text_search( cols, terms, opts ).offset( offset ).limit( limit ).all
+
+			set = self.published.full_text_search( [:title, :body], terms, opts )
+			set = set.offset( params[:offset] ) unless params[:offset].nil?
+			set = set.limit( params[:limit] ) unless params[:limit].nil?
+			return set
 		end
 
 	end

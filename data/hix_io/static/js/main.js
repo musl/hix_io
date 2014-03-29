@@ -70,10 +70,11 @@ function asyncReq(type, path) {
  * Posts for a blog.
  */
 var Post = can.Model.extend({
-	findAll: 'GET /api/v1/posts',
-	findOne: 'GET /api/v1/posts/{id}',
-	count:   syncReq('GET', '/api/v1/posts/count'),
-	search:  asyncReq('GET', '/api/v1/posts/search')
+	findAll:      'GET /api/v1/posts',
+	findOne:      'GET /api/v1/posts/{id}',
+	count:        syncReq('GET', '/api/v1/posts/count'),
+	search:       asyncReq('GET', '/api/v1/posts/search'),
+	search_count: syncReq('GET', '/api/v1/posts/search/count'),
 }, {});
 
 /******************************************************************************/
@@ -83,21 +84,10 @@ var Post = can.Model.extend({
 /*
  * A reusable pager control.
  *
- * Provides pagination with any model with the following requirements:
- *
- * - The given model provides a function count() which is the total number of
- *   items that are available.
- *
- * - You provide a function that gets called when the pager is changed. The
- *   callback must call update() on the pager in return so that the pager gets
- *   re-rendered. This means that your view is in control - you can put the
- *   pager's element inside another template if you wish.
- *
- * - The model supports limit and offset parameters to findAll(). If so, it's
- *   as easy as passing the object returned from query_params() to your
- *   findAll(). You'll likely be building a custom set of parameters anyway, so
- *   you'll probably want to use query_params() as a starting point and tack on
- *   your other parameters.
+ * You provide a function that gets called when the pager is changed. The
+ * callback must call update() on the pager in return so that the pager gets
+ * re-rendered. This means that your view is in control - you can put the
+ * pager's element inside another template if you wish.
  *
  * If you'd like to store the current page in a javascript cookie, make sure
  * to set the 'cookie' option when creating the pager. You'll also need the
@@ -122,8 +112,8 @@ var Post = can.Model.extend({
  *        var self = this;
  *        
  *        this.pager = new Pager(element, {
- *            model: MyModel,
  *            per_page: 5, 
+ *            count_func: MyModel.count;
  *            on_change: function() { self.update(); },
  *        });
  *    },
@@ -146,8 +136,9 @@ var Post = can.Model.extend({
  *         The function to call when the pager is clicked and it
  *         results in a page change.
  *
- *     model: (required)
- *         The model that this pager is paging through.
+ *     count_func: (required)
+ *         The function to call to get the total number of items to be paged
+ *         through.
  *
  *     per_page: (optional, default: 10)
  *         The number of items per page.
@@ -168,8 +159,9 @@ var Pager = can.Control.extend({
 	defaults: {
 		view: '/templates/pager.ejs',
 		target: '#pager',
-		model: null,
+		count_func: null,
 		cookie: null,
+		on_change: null,
 	},
 },{
 	init: function(element, options) {
@@ -183,8 +175,10 @@ var Pager = can.Control.extend({
 
 		this.state.bind('page', options.on_change);
 
-		this.options.model = options.model;
+		this.options.on_change = options.on_change;
+		this.options.count_func = options.count_func;
 		this.options.cookie = options.cookie;
+
 		if(options.target) { this.options.target = options.target; }
 
 		p = parseInt(options.per_page);
@@ -214,12 +208,15 @@ var Pager = can.Control.extend({
 		$(this.options.target).html(can.view(this.options.view, this.state));
 	},
 
-	query_params: function() {
+	query_params: function(params) {
+
+		if(!params) { params = {}; }
+
 		// Attempt to update the count if we have something that doesn't make sense
 		// as a count.
 		//
 		if(this.state.count <= 0) {
-			this.state.attr('count', parseInt(this.options.model.count()));
+			this.state.attr('count', parseInt(this.options.count_func(params)));
 			this.state.attr('pages', Math.ceil(this.state.count / this.state.per_page));
 		}
 
@@ -242,17 +239,18 @@ var Pager = can.Control.extend({
 			}
 		}
 
-		return {
-			offset: this.state.page * this.state.per_page,
-			limit: this.state.per_page,
-		};
+		params.offset = this.state.page * this.state.per_page;
+		params.limit = this.state.per_page;
+		return params;
 	},
 
 	'{target} a click': function(el, ev) {
 		var page = parseInt(el.attr('data-page'));
 
 		if(page >= 0 && page < this.state.pages) {
-			$.cookie(this.options.cookie, page);
+			if(this.options.cookie) {
+				$.cookie(this.options.cookie, page);
+			}
 			this.state.attr('page', page);
 		}
 
@@ -267,8 +265,8 @@ var PostControl = can.Control.extend({}, {
 		var self = this;
 
 		this.pager = new Pager(element, {
-			model: Post,
 			per_page: 5, 
+			count_func: Post.count,
 			on_change: function() { self.update(); },
 			cookie: 'hix_io_post_page',
 		});
@@ -370,11 +368,12 @@ var SearchControl = can.Control.extend({}, {
 
 		this.q = '';
 		this.pager = new Pager(element, {
-			model: Post,
 			per_page: 5, 
+			count_func: Post.search_count,
 			on_change: function() { self.update(); },
-			cookie: 'hix_io_search_page',
 		});
+
+		window.pager = this.pager;
 
 		can.route('search');
 	},
@@ -382,8 +381,7 @@ var SearchControl = can.Control.extend({}, {
 	update: function() {
 		var self = this;
 
-		params = this.pager.query_params();
-		params.q = this.q;
+		params = this.pager.query_params({ q: this.q });
 
 		console.log(params);
 
@@ -393,7 +391,6 @@ var SearchControl = can.Control.extend({}, {
 				posts: Post.models(data),
 			}));
 			self.pager.update();
-			console.log(self.pager);
 		});
 	},
 

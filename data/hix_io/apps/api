@@ -19,19 +19,19 @@ class API < Strelka::App
 		req.params.add( :limit, :integer )
 
 		res = req.response
-		res.for( :json ) { HixIO::Post.published( req.params ) }
+		res.for( :json ) { HixIO::Post.published( req.params ).all }
 		return res
 	end
 
 	get '/posts/:id' do |req|
 		res = req.response
-		res.for( :json ) { HixIO::Post.detail( req.params[:id] ) }
+		res.for( :json ) { HixIO::Post.detail( req.params[:id] ).frst }
 		return res
 	end
 
 	get '/posts/count' do |req|
 		res = req.response
-		res.for( :json ) { HixIO::Post.published_count }
+		res.for( :json ) { HixIO::Post.published.count }
 		return res
 	end
 
@@ -41,7 +41,15 @@ class API < Strelka::App
 		req.params.add( :limit, :integer )
 
 		res = req.response
-		res.for( :json ) { HixIO::Post.search( req.params ) }
+		res.for( :json ) { HixIO::Post.search( req.params ).all }
+		return res
+	end
+
+	get '/posts/search/count' do |req|
+		req.params.add( :q, :string )
+
+		res = req.response
+		res.for( :json ) { HixIO::Post.search( req.params ).count }
 		return res
 	end
 
