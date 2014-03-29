@@ -270,7 +270,7 @@ var PostControl = can.Control.extend({}, {
 			model: Post,
 			per_page: 5, 
 			on_change: function() { self.update(); },
-			cookie: 'hix_io_pager_page',
+			cookie: 'hix_io_post_page',
 		});
 
 		can.route('posts');
@@ -366,17 +366,40 @@ var MenuControl = can.Control.extend({
  */
 var SearchControl = can.Control.extend({}, {
 	init: function(element, options) {
+		var self = this;
+
+		this.q = '';
+		this.pager = new Pager(element, {
+			model: Post,
+			per_page: 5, 
+			on_change: function() { self.update(); },
+			cookie: 'hix_io_search_page',
+		});
+
 		can.route('search');
 	},
 
-	'search route': function(data) {
+	update: function() {
 		var self = this;
 
-		Post.search({q: data.q}).done( function(data) {
+		params = this.pager.query_params();
+		params.q = this.q;
+
+		console.log(params);
+
+		Post.search(params).done( function(data) {
 			self.element.html(can.view('/templates/search.ejs', {
-				posts: Post.models(data)
+				q: self.q,
+				posts: Post.models(data),
 			}));
+			self.pager.update();
+			console.log(self.pager);
 		});
+	},
+
+	'search route': function(data) {
+		this.q = data.q;
+		this.update();
 	},
 });
 

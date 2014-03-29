@@ -5,13 +5,16 @@ Sequel.migration do
 
 	up do
 		create_table( :posts ) do
-			primary_key   :id
+			primary_key :id
 
-			String        :title, :nil => false
-			String        :body, :nil => false
+			String      :title, :nil => false
+			String      :body, :nil => false
+			boolean     :published, :nil => false, :default => false
 
-			timestamptz   :created_at
-			timestamptz   :updated_at
+			timestamptz :created_at
+			timestamptz :updated_at
+
+			full_text_index [:title, :body], :language => 'english'
 		end
 	end
 

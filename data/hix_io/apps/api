@@ -8,40 +8,40 @@ require 'hix_io'
 #
 class API < Strelka::App
 
-	extend Configurability
-	config_key :api
-
 	extend Loggability
 	log_to :hix_io
 
-	plugins \
-		:routing,
-		:negotiation,
-		:parameters,
-		:restresources
+	plugins :routing, :negotiation, :parameters
+	param :id, :integer
 
-	# Defaults for Configurability.
-	CONFIG_DEFAULTS = {}
+	get '/posts' do |req|
+		req.params.add( :offset, :integer )
+		req.params.add( :limit, :integer )
 
-	# Configurability hook. When the app is configured, build the REST resources.
-	#
-	def self::configure( section )
-		resource( HixIO::Post, :readonly => true )
+		res = req.response
+		res.for( :json ) { HixIO::Post.published( req.params ) }
+		return res
+	end
+
+	get '/posts/:id' do |req|
+		res = req.response
+		res.for( :json ) { HixIO::Post.detail( req.params[:id] ) }
+		return res
 	end
 
 	get '/posts/count' do |req|
 		res = req.response
-		res.for( :json ) { HixIO::Post.count }
+		res.for( :json ) { HixIO::Post.published_count }
 		return res
 	end
 
-	get '/posts/search/' do |req|
+	get '/posts/search' do |req|
 		req.params.add( :q, :string )
+		req.params.add( :offset, :integer )
+		req.params.add( :limit, :integer )
+
 		res = req.response
-		res.for( :json ) do
-			query = '%%%s%%' % [req.params[:q]]
-			HixIO::Post.where(Sequel.join([:title,:body]).like(query)).all
-		end
+		res.for( :json ) { HixIO::Post.search( req.params ) }
 		return res
 	end
 

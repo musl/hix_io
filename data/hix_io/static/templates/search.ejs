@@ -1,5 +1,5 @@
 <div class="post">
-<h2>Search Results</h2>
+<h2>Search Results for '<%= q %>'</h2>
 <% if(posts.length > 0) { %>
 	<ul>
 	<% posts.each( function(post) { %>
@@ -13,3 +13,4 @@
 	<p>No posts matched.</p>
 <% } %>
 </div>
+<div id="pager"></div>

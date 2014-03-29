@@ -247,7 +247,7 @@ HixIO.log.level = :fatal
 
 count.times do
 	POSTS.each do |title,body|
-		HixIO::Post.create( :title => title, :body => body )
+		HixIO::Post.create( :title => title, :body => body, :published => true )
 	end
 end
 
