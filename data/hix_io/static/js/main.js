@@ -152,7 +152,7 @@ var PostControl = can.Control.extend({}, {
 		this.pager = new Pager(element, {
 			per_page: 5,
 			on_change: function() { self.update(); },
-			target: '#post_pager',
+			target: '#posts_pager',
 		});
 
 		can.route('posts');
