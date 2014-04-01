@@ -94,6 +94,8 @@ var Pager = can.Control.extend({
 
 		this.state.bind('page', options.on_change);
 
+		// The reason we need this is that the element won't exist when this control
+		// is created.
 		this.options.target = options.target;
 
 		p = parseInt(options.per_page);
