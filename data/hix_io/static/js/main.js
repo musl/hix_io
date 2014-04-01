@@ -63,9 +63,11 @@ var Post = can.Model.extend({
 /*
  * A reusable pager control.
  *
- *     count_func: (required)
- *         The function to call to get the total number of items to be paged
- *         through.
+ *     target: (required)
+ *         The selector that yields one element to render the pager into.
+ *
+ *     on_change: (required)
+ *         The function you want called when the pager's page changes.
  *
  *     per_page: (optional, default: 10)
  *         The number of items per page.
@@ -74,13 +76,11 @@ var Post = can.Model.extend({
  *         The number of numbers to show on each side of the curent page in the
  *         pager.
  *
- *     target: (optional, default: '#pager')
- *         The selector that yields one element to render the pager into.
  */
 var Pager = can.Control.extend({
 	defaults: {
 		view: '/templates/pager.ejs',
-		target: '#pager',
+		target: null,
 	},
 },{
 	init: function(element, options) {
@@ -94,7 +94,7 @@ var Pager = can.Control.extend({
 
 		this.state.bind('page', options.on_change);
 
-		if(options.target) { this.options.target = options.target; }
+		this.options.target = options.target;
 
 		p = parseInt(options.per_page);
 		if(p > 0) { this.options.per_page = p; }
@@ -152,6 +152,7 @@ var PostControl = can.Control.extend({}, {
 		this.pager = new Pager(element, {
 			per_page: 5,
 			on_change: function() { self.update(); },
+			target: '#post_pager',
 		});
 
 		can.route('posts');
@@ -199,6 +200,7 @@ var SearchControl = can.Control.extend({}, {
 		this.pager = new Pager(element, {
 			per_page: 5,
 			on_change: function() { self.update(); },
+			target: '#search_pager',
 		});
 
 		can.route('search');
