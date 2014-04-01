@@ -2,11 +2,11 @@
 	<ul id="pager" class="pure-paginator">
 
 		<% if(this.page > 0) { %>
-			<li><a class="pure-button pager-button first" data-page="0">&nbsp;</a></li>
-			<li><a class="pure-button pager-button prev" data-page="<%= this.page - 1 %>">&nbsp;</a></li>
+			<li><a class="pure-button pager-button first" data-page="0">&lt;&lt;</a></li>
+			<li><a class="pure-button pager-button prev" data-page="<%= this.page - 1 %>">&lt;</a></li>
 		<% } else { %>
-			<li><a class="pure-button pure-button-disabled pager-button first">&nbsp;</a></li>
-			<li><a class="pure-button pure-button-disabled pager-button prev">&nbsp;</a></li>
+			<li><a class="pure-button pure-button-disabled pager-button first">&lt;&lt;</a></li>
+			<li><a class="pure-button pure-button-disabled pager-button prev">&lt;</a></li>
 		<% } %>
 
 		<% for( var i = this.window_start; i < this.window_end; i++ ) { %>
@@ -18,11 +18,11 @@
 		<% } %>
 
 		<% if(this.page < this.pages - 1) { %>
-			<li><a class="pure-button pager-button next" data-page="<%= this.page + 1 %>">&nbsp;</a></li>
-			<li><a class="pure-button pager-button last" data-page="<%= this.pages - 1 %>">&nbsp;</a></li>
+			<li><a class="pure-button pager-button next" data-page="<%= this.page + 1 %>">&gt;</a></li>
+			<li><a class="pure-button pager-button last" data-page="<%= this.pages - 1 %>">&gt;&gt;</a></li>
 		<% } else { %>
-			<li><a class="pure-button pure-button-disabled pager-button next">&nbsp;</a></li>
-			<li><a class="pure-button pure-button-disabled pager-button last">&nbsp;</a></li>
+			<li><a class="pure-button pure-button-disabled pager-button next">&gt;</a></li>
+			<li><a class="pure-button pure-button-disabled pager-button last">&gt;&gt;</a></li>
 		<% } %>
 
 	</ul>
