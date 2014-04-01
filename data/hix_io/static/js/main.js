@@ -211,8 +211,8 @@ var SearchControl = can.Control.extend({}, {
 
 		Post.search(params).done(function(data) {
 			self.element.html(can.view('/templates/search.ejs', {
-				q: params.q,
 				posts: Post.models(data.posts),
+				q: self.q,
 			}));
 			self.pager.update(data.count);
 		});
