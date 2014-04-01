@@ -30,7 +30,7 @@ class API < Strelka::App
 
 	get '/posts/:id' do |req|
 		res = req.response
-		res.for( :json ) { HixIO::Post.detail( req.params[:id] ).frst }
+		res.for( :json ) { HixIO::Post.detail( req.params[:id] ).first }
 		return res
 	end
 
