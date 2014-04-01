@@ -14,12 +14,17 @@ class API < Strelka::App
 	plugins :routing, :negotiation, :parameters
 	param :id, :integer
 
+	default_type :json
+
 	get '/posts' do |req|
 		req.params.add( :offset, :integer )
 		req.params.add( :limit, :integer )
 
 		res = req.response
-		res.for( :json ) { HixIO::Post.published( req.params ).all }
+		res.for( :json ) {{
+			:count => HixIO::Post.published.count,
+			:posts => HixIO::Post.published( req.params ).all,
+		}}
 		return res
 	end
 
@@ -29,27 +34,16 @@ class API < Strelka::App
 		return res
 	end
 
-	get '/posts/count' do |req|
-		res = req.response
-		res.for( :json ) { HixIO::Post.published.count }
-		return res
-	end
-
 	get '/posts/search' do |req|
 		req.params.add( :q, :string )
 		req.params.add( :offset, :integer )
 		req.params.add( :limit, :integer )
 
 		res = req.response
-		res.for( :json ) { HixIO::Post.search( req.params ).all }
-		return res
-	end
-
-	get '/posts/search/count' do |req|
-		req.params.add( :q, :string )
-
-		res = req.response
-		res.for( :json ) { HixIO::Post.search( req.params ).count }
+		res.for( :json ) {{
+			:count => HixIO::Post.search( :q => req.params[:q] ).count,
+			:posts => HixIO::Post.search( req.params ).all,
+		}}
 		return res
 	end
 
