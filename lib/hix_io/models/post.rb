@@ -42,8 +42,7 @@ class HixIO::Post < Sequel::Model( :hix_io__posts )
 			opts = { :language => (params[:language] || 'english') }
 			terms = params[:q].to_s.slice( 0..qmax ).split( /[\s]+/ ).reject( &:empty? )
 
-			# FIXME there has to be a better way to return an empty set
-			return self.where( :id => -1 ) if terms.empty?
+			return self.nullify if terms.empty?
 
 			set = self.published.full_text_search( [:title, :body], terms, opts )
 			set = set.offset( params[:offset] ) unless params[:offset].nil?

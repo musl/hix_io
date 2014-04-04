@@ -62,6 +62,11 @@ module HixIO
 
 		Sequel.extension :core_extensions
 
+		Sequel.extension :null_dataset
+		# FIXME - this shouldn't be required, but the extension doesn't appear to be
+		# loading correctly.
+		Sequel::Dataset.send( :include, Sequel::Dataset::Nullifiable )
+
 		# Molly guard. Hopefully this makes it harder tromp on the production database.
 		#
 		if self.dev? and self.config.db_uri !~ /dev$/
