@@ -62,11 +62,6 @@ module HixIO
 
 		Sequel.extension :core_extensions
 
-		Sequel.extension :null_dataset
-		# FIXME - this shouldn't be required, but the extension doesn't appear to be
-		# loading correctly.
-		Sequel::Dataset.send( :include, Sequel::Dataset::Nullifiable )
-
 		# Molly guard. Hopefully this makes it harder tromp on the production database.
 		#
 		if self.dev? and self.config.db_uri !~ /dev$/
@@ -77,7 +72,9 @@ module HixIO
 
 		@db ||= Sequel.connect( self.config.db_uri, :logger => self.log )
 		self.db.sql_log_level = :debug
+
 		self.db.extension :pg_json
+		self.db.extension :null_dataset
 
 		# We may not want to load models at runtime. For example, if
 		# we're only interested in constants, utilities, or low-level

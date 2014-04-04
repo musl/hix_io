@@ -40,7 +40,7 @@ class HixIO::Post < Sequel::Model( :hix_io__posts )
 		def search( params = {} )
 			qmax = params[:max_length] || 100
 			opts = { :language => (params[:language] || 'english') }
-			terms = params[:q].to_s.slice( 0..qmax ).split( /[\s]+/ ).reject( &:empty? )
+			terms = params[:q].to_s.strip.downcase.slice( 0..qmax ).split( /[\s]+/ ).reject( &:empty? )
 
 			return self.nullify if terms.empty?
 
