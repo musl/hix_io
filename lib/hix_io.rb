@@ -38,6 +38,7 @@ module HixIO
 	#
 	DEFAULT_CONFIG = {
 		self.config_key => {
+			:domain => 'hix.io',
 			:db_uri => 'postgres://hix_io@localhost/hix_io',
 			:skip_models => false,
 			:dev => false,
@@ -75,6 +76,7 @@ module HixIO
 
 		self.db.extension :pg_json
 		self.db.extension :null_dataset
+		self.db.extension :pg_inet
 
 		# We may not want to load models at runtime. For example, if
 		# we're only interested in constants, utilities, or low-level
@@ -117,6 +119,12 @@ module HixIO
 	#
 	def self::dev?
 		return self.config.dev
+	end
+
+	# Return this app's domain
+	#
+	def self::domain
+		return self.config.domain
 	end
 
 end

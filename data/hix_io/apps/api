@@ -34,7 +34,7 @@ class API < Strelka::App
 		return res
 	end
 
-	get '/posts/search' do |req|
+	get '/search' do |req|
 		req.params.add( :q, :string )
 		req.params.add( :offset, :integer )
 		req.params.add( :limit, :integer )
@@ -44,6 +44,36 @@ class API < Strelka::App
 			:count => HixIO::Post.search( :q => req.params[:q] ).count,
 			:posts => HixIO::Post.search( req.params ).all,
 		}}
+		return res
+	end
+
+	get '/urls' do |req|
+		res = req.response
+		res.for( :json ) {{
+			:top_urls => HixIO::URL.top.limit( 10 ).all,
+			:latest_urls => HixIO::URL.latest.limit( 10 ).all,
+		}}
+		return res
+	end
+
+	post '/urls' do |req|
+		req.params.add( :url, :string )
+
+		self.log.warn 'POST: /urls, url: %p' % [req.params[:url]]
+
+		# FIXME - use the forwarded IP from mongrel2
+		source_ip = req.remote_ip.to_s
+
+		self.log.warn 'source ip: %p' % [source_ip]
+
+		res = req.response
+		res.for( :json ) do
+			begin
+				HixIO::URL.shorten( :url => req.params[:url], :source_ip => source_ip )
+			rescue => e
+				e
+			end
+		end
 		return res
 	end
 

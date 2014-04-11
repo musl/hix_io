@@ -1,4 +1,4 @@
-// vim: set nosta noet ts=4 sw=4 ft=javascript:
+/* vim: set nosta noet ts=4 sw=4 ft=javascript: */
 
 /******************************************************************************/
 // Utility functions
@@ -51,9 +51,23 @@ function asyncReq(path, method, type) {
  * Posts for a blog.
  */
 var Post = can.Model.extend({
-	findOne: 'GET /api/v1/posts/{id}',
 	list:    asyncReq('/api/v1/posts'),
-	search:  asyncReq('/api/v1/posts/search'),
+	findOne: 'GET /api/v1/posts/{id}',
+}, {});
+
+/*
+ * Posts for a blog.
+ */
+var URL = can.Model.extend({
+	list:    asyncReq('/api/v1/urls'),
+	shorten: asyncReq('/api/v1/urls', 'POST'),
+}, {});
+
+/*
+ * Search across all objects in the database.
+ */
+var Search = can.Model.extend({
+	list:    asyncReq('/api/v1/search'),
 }, {});
 
 /******************************************************************************/
@@ -94,8 +108,10 @@ var Pager = can.Control.extend({
 
 		this.state.bind('page', options.on_change);
 
-		// The reason we need this is that the element won't exist when this control
-		// is created.
+		/*
+		 * The reason we need this is that the element won't exist when this control
+		 * is created.
+		 */
 		this.options.target = options.target;
 
 		p = parseInt(options.per_page);
@@ -113,15 +129,17 @@ var Pager = can.Control.extend({
 		c = this.state.attr('pages');
 		a = this.state.attr('pad');
 
-		// Find the ammount we need to extend each side of the window to account for
-		// collapses on the opposite side. This allows for a roughly constant-width
-		// control.
-		//
+		/*
+		 * Find the ammount we need to extend each side of the window to account for
+		 * collapses on the opposite side. This allows for a roughly constant-width
+		 * control.
+		 */
 		ds = Math.min(0, c - (p + a) - 1);	
 		de = Math.max(0, -1 * (p - a)) + 1;
 
-		// Calculate and store the indexes for the window.
-		//
+		/*
+		 * Calculate and store the indexes for the window.
+		 */
 		this.state.attr('window_start', Math.max(0, p - a + ds));
 		this.state.attr('window_end', Math.min(c, p + a + de));
 
@@ -213,7 +231,7 @@ var SearchControl = can.Control.extend({}, {
 
 		params = this.pager.params({ q: this.q });
 
-		Post.search(params).done(function(data) {
+		Search.list(params).done(function(data) {
 			self.element.html(can.view('/templates/search.ejs', {
 				posts: Post.models(data.posts),
 				q: self.q,
@@ -249,8 +267,33 @@ var URLControl = can.Control.extend({}, {
 		can.route('urls');
 	},
 
+	update: function() {
+		var self = this;
+
+		URL.list().done(function(data) {
+			self.element.html(can.view('/templates/urls.ejs', {
+				top_urls: URL.models(data.top_urls),
+				latest_urls: URL.models(data.latest_urls),
+			}));
+		});
+	},
+
 	'urls route': function() {
-		this.element.html('urls');
+		this.update();
+	},
+
+	'#shorten keyup': function(el,e) {
+		var self = this;
+
+		if(e.keyCode == 13) {
+			console.log(e.target.value);
+			URL.shorten({url: e.target.value}).success(function(data) {
+				console.log("Success:" + data);
+				self.update();
+			}).error(function(data) {
+				console.log("FAIL:" + data);
+			});
+		}
 	},
 });
 
@@ -273,7 +316,7 @@ var MenuControl = can.Control.extend({
 
 	update: function() {
 		var self = this;
-		
+
 		$(this.element).find('a').each(function(i,e) {
 			if(e.href.match(new RegExp(can.route.attr('route') + '$'))){ 
 				$(e).parent().addClass(self.options.selected_class);
@@ -301,28 +344,33 @@ var Router = can.Control.extend({
 	},
 }, {
 	init: function(element, options) {
-		// Handle options.
-		//
+	/*
+	 * Handle options.
+	 */
 		if(options.main) { this.options.main = options.main; }
 		if(options.menu) { this.options.menu = options.menu; }
 		if(options.default_route) { this.options.default_route = options.default_route; }
 
-		// Instantiate all of the controls. This assumes that nobody's doing anything
-		// stupid inside of init methods, like making http calls, writing to the main
-		// element, etc.
-		//
+		/*
+		 * Instantiate all of the controls. This assumes that nobody's doing anything
+		 * stupid inside of init methods, like making http calls, writing to the main
+		 * element, etc.
+		 */
 		new MenuControl(this.options.menu);
 		new SearchControl(this.options.main);
 		new PostControl(this.options.main);
 		new CodeControl(this.options.main);
 		new URLControl(this.options.main);
 
-		// All routes get defined in each control's init method, all of the routes we
-		// need should be ready by now.
+		/*
+		 * All routes get defined in each control's init method, all of the routes we
+		 * need should be ready by now.
+		 */
 		can.route.ready();
 
-		// Direct the browser to the default route.
-		//
+		/*
+		 * Direct the browser to the default route.
+		 */
 		if(!can.route.attr('route') ||
 		   can.route.attr('route') == '') {
 			can.route.attr('route', this.options.default_route);

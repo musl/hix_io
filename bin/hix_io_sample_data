@@ -251,3 +251,14 @@ count.times do
 	end
 end
 
+%w[
+http://slashdot.org/
+http://eff.org/
+http://kernel.org/
+http://freebsd.org/
+].each do |url|
+	HixIO::URL.shorten( :url => url, :source_ip => '0.0.0.0' )
+end
+
+
+
