@@ -38,7 +38,6 @@ module HixIO
 	#
 	DEFAULT_CONFIG = {
 		self.config_key => {
-			:domain => 'hix.io',
 			:db_uri => 'postgres://hix_io@localhost/hix_io',
 			:skip_models => false,
 			:dev => false,

@@ -10,29 +10,30 @@ class HixIO::URL < Sequel::Model( :hix_io__urls )
 	def self.shorten( params = {} )
 		url = URI( params[:url] )
 
-		HixIO.log.warn params
-
 		unless url.scheme and url.host
 			raise ArgumentError, 'Invalid URL.'
 		end
 
-		if url.host =~ /#{HixIO.domain}\.?$/i
-			raise ArgumentError, 'Unacceptable URL.'
+		if url.host =~ /#{HixIO.domain}(\.)?$/i
+			raise ArgumentError, 'Unacceptable URL: %s' % [params[:url]]
 		end
 
 		short = Zlib::crc32( url.to_s ).to_s( 36 )
 
-		return self.create( :url => url, :short => short, :source_ip => params[:source_ip] )
+		return self.find_or_create( :url => url.to_s ) { |u|
+			u.short = short
+			u.source_ip = params[:source_ip]
+		}
 	end
 
 	dataset_module do
 
 		def top
-			return self.order_by( :hits )
+			return self.order( Sequel.desc( :hits ) )
 		end
 
 		def latest
-			return self.order_by( :created_at )
+			return self.order( Sequel.desc( :created_at ) )
 		end
 
 	end

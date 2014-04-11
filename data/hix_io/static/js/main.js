@@ -184,12 +184,14 @@ var PostControl = can.Control.extend({}, {
 
 		params = this.pager.params();
 
-		Post.list(params).done(function(data) {
+		Post.list(params).success(function(data) {
 			self.element.html(can.view('/templates/posts.ejs', {
 				posts: Post.models(data.posts),
 			}));
 			self.pager.update(data.count);
 			highlightSyntax();
+		}).error(function(data) {
+			// FIXME Error handling.
 		});
 	},
 
@@ -231,12 +233,14 @@ var SearchControl = can.Control.extend({}, {
 
 		params = this.pager.params({ q: this.q });
 
-		Search.list(params).done(function(data) {
+		Search.list(params).success(function(data) {
 			self.element.html(can.view('/templates/search.ejs', {
 				posts: Post.models(data.posts),
 				q: self.q,
 			}));
 			self.pager.update(data.count);
+		}).error(function(data) {
+			// FIXME Error handling.
 		});
 	},
 
@@ -270,11 +274,13 @@ var URLControl = can.Control.extend({}, {
 	update: function() {
 		var self = this;
 
-		URL.list().done(function(data) {
+		URL.list().success(function(data) {
 			self.element.html(can.view('/templates/urls.ejs', {
 				top_urls: URL.models(data.top_urls),
 				latest_urls: URL.models(data.latest_urls),
 			}));
+		}).error(function(data) {
+			// FIXME Error handling.
 		});
 	},
 
@@ -288,10 +294,9 @@ var URLControl = can.Control.extend({}, {
 		if(e.keyCode == 13) {
 			console.log(e.target.value);
 			URL.shorten({url: e.target.value}).success(function(data) {
-				console.log("Success:" + data);
 				self.update();
 			}).error(function(data) {
-				console.log("FAIL:" + data);
+				// FIXME Error handling.
 			});
 		}
 	},

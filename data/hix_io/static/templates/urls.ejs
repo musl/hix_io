@@ -1,3 +1,5 @@
+
+<!-- TODO: Hide this if the requestor isn't on the white-list. -->
 <div class="post">
 	<div class="l-box">
 		<div class="pure-form pure-g">
@@ -7,6 +9,7 @@
 	</div>
 </div>
 
+<!-- always show this -->
 <div class="post">
 	<div class="l-box">
 		<div class="pure-form pure-g">
@@ -14,7 +17,11 @@
 				<h1>Latest <%= latest_urls.length %> URLs</h1>
 				<ol>
 					<% latest_urls.each( function(u) { %>
-						<li><a href="http://hix.io/<%= u.short %>">http://hix.io/<%= u.short %></a><br><dd><%= u.url %></dd></li>
+						<li>
+							<a href="http://hix.io/<%= u.short %>">http://hix.io/<%= u.short %></a>
+							<dd><%= u.created_at %></dd>
+							<dd><small><%= u.url %></small></dd>
+						</li>
 					<% }); %>
 				</ol>
 			</div>
@@ -22,7 +29,11 @@
 				<h1>Top <%= top_urls.length %> URLs</h1>
 				<ol>
 					<% top_urls.each( function(u) { %>
-						<li><a href="http://hix.io/<%= u.short %>">http://hix.io/<%= u.short %></a><dd><%= u.url %></dd></li>
+						<li>
+							<a href="http://hix.io/<%= u.short %>">http://hix.io/<%= u.short %></a>
+							<dd><%= u.hits %> hits</dd>
+							<dd><small><%= u.url %></small></dd>
+						</li>
 					<% }); %>
 				</ol>
 			</div>

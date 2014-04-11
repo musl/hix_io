@@ -56,24 +56,22 @@ class API < Strelka::App
 		return res
 	end
 
+	# TODO: host-based auth for this route.
 	post '/urls' do |req|
 		req.params.add( :url, :string )
 
-		self.log.warn 'POST: /urls, url: %p' % [req.params[:url]]
-
-		# FIXME - use the forwarded IP from mongrel2
-		source_ip = req.remote_ip.to_s
-
-		self.log.warn 'source ip: %p' % [source_ip]
+		url = nil
+		begin
+			url = HixIO::URL.shorten(
+				:url => req.params[:url],
+				:source_ip => [req.headers.x_forwarded_for].flatten.first
+			)
+		rescue ArgumentError => e
+			finish_with( HTTP::UNPROCESSABLE_ENTITY, e.message )
+		end
 
 		res = req.response
-		res.for( :json ) do
-			begin
-				HixIO::URL.shorten( :url => req.params[:url], :source_ip => source_ip )
-			rescue => e
-				e
-			end
-		end
+		res.for( :json ) { url }
 		return res
 	end
 

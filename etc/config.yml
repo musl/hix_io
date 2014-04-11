@@ -1,11 +1,12 @@
 hix_io:
+    domain: 'hix.io'
     dev: true
-    db_uri: "postgres://hix_io@localhost/hix_io_dev"
+    db_uri: 'postgres://hix_io@localhost/hix_io_dev'
 mongrel2:
     configdb: 'etc/api.sqlite'
 logging:
-    __default__: "fatal (color)"
-    hix_io: "info (color)"
-    loggability: "warn (color)"
-    configurability: "warn (color)"
+    __default__: 'fatal (color)'
+    hix_io: 'info (color)'
+    loggability: 'warn (color)'
+    configurability: 'warn (color)'
 
