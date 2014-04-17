@@ -11,13 +11,6 @@ var HixIO = {};
 /******************************************************************************/
 
 /*
- * Display a notification.
- */
-HixIO.notify = function (message, message_class, timeout) { 
-	HixIO.message_control.notify(message, message_class, timeout);
-};
-
-/*
  * For all 'code' elements nested within 'pre' elements:
  *
  * - If the attribute 'data-language' is defined and Highlight.js recognizes
@@ -349,10 +342,20 @@ HixIO.MenuControl = can.Control.extend({
 
 /*
  * A message bar.
+ *
+ * Send messages like this:
+ *
+ *    var message_control = MessageControl.new('#my_message_bar');
+ *    my_control.notify({
+ *        message: 'success',
+ *        message_class: 'success-message',
+ *        timeout: 5
+ *    });
+ *
  */
 HixIO.MessageControl = can.Control.extend({
 	defaults: {
-		timeout: 10000 // milliseconds
+		timeout: 10 //seconds
 	}
 },{
 	init: function(element, options) {
@@ -362,53 +365,77 @@ HixIO.MessageControl = can.Control.extend({
 
 		this.stack = new can.List();
 		this.stack.bind('add', function() {
-			if(self.stack.length === 0) { return; }
 			if(self.element.is(':visible')) { return; }
 			self.update();
 			self.element.slideDown('fast');
 		});
 	},
 
-	// TODO finish polishing the message stack.
+	notify: function(message) {
+		this.stack.push(message);
+	},
+
 	update: function() {
 		var self = this;
 		var obj = this.stack.shift();
 
-		if(!obj and this.element.is(':visible')) {
-			this.element.slideUp('slow');
-			return;
-		}
-
 		var timeout = this.options.timeout;
-		var t = parseInt(obj.timeout, 10) * 1000;
+		var t = parseInt(obj.timeout, 10);
 		if(t > 0) { timeout = t; }
+		timeout = timeout * 1000;
 
 		this.element.html(can.view('/templates/message.ejs', obj));
-
-		setTimeout( function() {
+		this.timeout = setTimeout( function() {
 			if(self.stack.length > 0 ){
-				self.element.fadeOut( 'fast', function() {
+				self.element.fadeOut('fast', function() {
 					self.update();
-					self.element.fadeIn( 'fast' );
+					self.element.fadeIn('fast');
 				});
 			}else{
 				self.element.slideUp('slow');
 			}
-		}, timeout );
+		}, timeout);
 	},
 
-	notify: function(message, message_class, timeout) {
-		this.stack.push({
-			message: message,
-			message_class: message_class,
-			timeout: timeout
-		});
-	},
+	'.close-button click': function(el, ev) {
+		var self = this;
 
-	'span.close-button click': function(el, ev) {
-		this.update();
+		this.element.clearQueue();
+		clearTimeout(this.timeout);
+
+		if(this.stack.length === 0) {
+			this.element.slideUp('slow');
+		} else {
+			this.element.fadeOut('fast', function() {
+				self.update();
+				self.element.fadeIn('fast');
+			});
+		}
 	}
 });
+
+HixIO.test_notify = function() {
+	HixIO.notify({
+		message: 'success',
+		message_class: 'success-message',
+		timeout: 5
+	});
+	HixIO.notify({
+		message: 'info',
+		message_class: 'info-message',
+		timeout: 5
+	});
+	HixIO.notify({
+		message: 'warning',
+		message_class: 'warning-message',
+		timeout: 5
+	});
+	HixIO.notify({
+		message: 'error',
+		message_class: 'error-message',
+		timeout: 5
+	});
+}
 
 /*
  * Setup the initial environment, route requests to control, and handle
@@ -475,5 +502,6 @@ $(document).ready(function() {
 	HixIO.router = new HixIO.Router(document.body);
 	HixIO.menu = new HixIO.MenuControl('#menu');
 	HixIO.message_control = new HixIO.MessageControl('#messages');
+	HixIO.notify = function (m) { HixIO.message_control.notify(m); };
 });
 
