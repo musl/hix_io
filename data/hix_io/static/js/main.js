@@ -4,7 +4,7 @@
 // Namespace
 /******************************************************************************/
 
-HixIO = {};
+var HixIO = {};
 
 /******************************************************************************/
 // Utility functions
@@ -13,9 +13,9 @@ HixIO = {};
 /*
  * Display a notification.
  */
-HixIO.notify = function(message, message_class, timeout) { 
+HixIO.notify = function (message, message_class, timeout) { 
 	HixIO.message_control.notify(message, message_class, timeout);
-}
+};
 
 /*
  * For all 'code' elements nested within 'pre' elements:
@@ -37,7 +37,7 @@ HixIO.highlightSyntax = function() {
 			el.html(hljs.highlight(lang, el.html(), true));
 		}
 	});
-}
+};
 
 /*
  * Perform an asynchronous HTTP request and return the deferred result.
@@ -54,7 +54,7 @@ HixIO.asyncReq = function(path, method, type) {
 			dataType: type
 		});
 	};
-}
+};
 
 /******************************************************************************/
 // Models
@@ -65,7 +65,7 @@ HixIO.asyncReq = function(path, method, type) {
  */
 HixIO.Post = can.Model.extend({
 	list:    HixIO.asyncReq('/api/v1/posts'),
-	findOne: 'GET /api/v1/posts/{id}',
+	findOne: 'GET /api/v1/posts/{id}'
 }, {});
 
 /*
@@ -73,14 +73,14 @@ HixIO.Post = can.Model.extend({
  */
 HixIO.URL = can.Model.extend({
 	list:    HixIO.asyncReq('/api/v1/urls'),
-	shorten: HixIO.asyncReq('/api/v1/urls', 'POST'),
+	shorten: HixIO.asyncReq('/api/v1/urls', 'POST')
 }, {});
 
 /*
  * Search across all objects in the database.
  */
 HixIO.Search = can.Model.extend({
-	list:    HixIO.asyncReq('/api/v1/search'),
+	list:    HixIO.asyncReq('/api/v1/search')
 }, {});
 
 /******************************************************************************/
@@ -107,16 +107,18 @@ HixIO.Search = can.Model.extend({
 HixIO.Pager = can.Control.extend({
 	defaults: {
 		view: '/templates/pager.ejs',
-		target: null,
-	},
+		target: null
+	}
 },{
 	init: function(element, options) {
+		var p;
+
 		this.state = new can.Map({
 			count: 0,
 			per_page: 10,
 			pages: 0, 
 			page: 0,
-			pad: 2,
+			pad: 2
 		});
 
 		this.state.bind('page', options.on_change);
@@ -127,14 +129,16 @@ HixIO.Pager = can.Control.extend({
 		 */
 		this.options.target = options.target;
 
-		p = parseInt(options.per_page);
+		p = parseInt(options.per_page, 10);
 		if(p > 0) { this.options.per_page = p; }
 
-		p = parseInt(options.pad);
+		p = parseInt(options.pad, 10);
 		if(p > 0) { this.options.pad = p; }
 	},
 
 	update: function(count) {
+		var a, c, p, ds, de;
+
 		this.state.attr('count', count);
 		this.state.attr('pages', Math.ceil(this.state.count / this.state.per_page));
 
@@ -167,12 +171,12 @@ HixIO.Pager = can.Control.extend({
 	},
 
 	'{target} a click': function(el, ev) {
-		var page = parseInt(el.attr('data-page'));
+		var page = parseInt(el.attr('data-page'), 10);
 
 		if(page >= 0 && page < this.state.pages) {
 			this.state.attr('page', page);
 		}
-	},
+	}
 });
 
 /*
@@ -185,7 +189,7 @@ HixIO.PostControl = can.Control.extend({}, {
 		this.pager = new HixIO.Pager(element, {
 			per_page: 5,
 			on_change: function() { self.update(); },
-			target: '#posts_pager',
+			target: '#posts_pager'
 		});
 
 		can.route('posts');
@@ -194,17 +198,16 @@ HixIO.PostControl = can.Control.extend({}, {
 
 	update: function() {
 		var self = this;
-
-		params = this.pager.params();
+		var params = this.pager.params();
 
 		HixIO.Post.list(params).success(function(data) {
 			self.element.html(can.view('/templates/posts.ejs', {
-				posts: HixIO.Post.models(data.posts),
+				posts: HixIO.Post.models(data.posts)
 			}));
 			self.pager.update(data.count);
-			highlightSyntax();
+			HixIO.highlightSyntax();
 		}).error(function(data) {
-			// FIXME Error handling.
+			HixIO.notify('Unable to load posts.', 'error-message');
 		});
 	},
 
@@ -219,9 +222,9 @@ HixIO.PostControl = can.Control.extend({}, {
 			self.element.html(can.view('/templates/post.ejs', {
 				post: post
 			}));
-			highlightSyntax();
+			HixIO.highlightSyntax();
 		});
-	},
+	}
 });
 
 /*
@@ -235,7 +238,7 @@ HixIO.SearchControl = can.Control.extend({}, {
 		this.pager = new HixIO.Pager(element, {
 			per_page: 5,
 			on_change: function() { self.update(); },
-			target: '#search_pager',
+			target: '#search_pager'
 		});
 
 		can.route('search');
@@ -243,24 +246,23 @@ HixIO.SearchControl = can.Control.extend({}, {
 
 	update: function() {
 		var self = this;
-
-		params = this.pager.params({ q: this.q });
+		var params = this.pager.params({ q: this.q });
 
 		HixIO.Search.list(params).success(function(data) {
 			self.element.html(can.view('/templates/search.ejs', {
 				posts: HixIO.Post.models(data.posts),
-				q: self.q,
+				q: self.q
 			}));
 			self.pager.update(data.count);
 		}).error(function(data) {
-			// FIXME Error handling.
+			HixIO.notify('Unable to load search results.', 'error-message');
 		});
 	},
 
 	'search route': function(data) {
 		this.q = data.q;
 		this.update();
-	},
+	}
 });
 
 /*
@@ -273,7 +275,7 @@ HixIO.CodeControl = can.Control.extend({}, {
 
 	'code route': function() {
 		this.element.html('code');
-	},
+	}
 });
 
 /*
@@ -290,10 +292,10 @@ HixIO.URLControl = can.Control.extend({}, {
 		HixIO.URL.list().success(function(data) {
 			self.element.html(can.view('/templates/urls.ejs', {
 				top_urls: HixIO.URL.models(data.top_urls),
-				latest_urls: HixIO.URL.models(data.latest_urls),
+				latest_urls: HixIO.URL.models(data.latest_urls)
 			}));
 		}).error(function(data) {
-			// FIXME Error handling.
+			HixIO.notify("Woah! Where'd my URLs go?", 'error-message');
 		});
 	},
 
@@ -304,16 +306,15 @@ HixIO.URLControl = can.Control.extend({}, {
 	'#shorten keyup': function(el,e) {
 		var self = this;
 
-		if(e.keyCode == 13) {
-			console.log(e.target.value);
+		if(e.keyCode === 13) {
 			HixIO.URL.shorten({url: e.target.value}).success(function(data) {
 				self.update();
-				HixIO.notify('Shortened url: http://hix.io/' + data.short , 'success-message', 0);
+				HixIO.notify('Shortened url: http://hix.io/' + data.short , 'success-message', 60);
 			}).error(function(data) {
 				HixIO.notify('I wasn\'t able to shorten that.', 'warning-message');
 			});
 		}
-	},
+	}
 });
 
 /*
@@ -321,8 +322,8 @@ HixIO.URLControl = can.Control.extend({}, {
  */
 HixIO.MenuControl = can.Control.extend({
 	defaults: {
-		selected_class: 'pure-menu-selected',
-	},	
+		selected_class: 'pure-menu-selected'
+	}
 }, {
 	init: function(element, options) {
 		var self = this;
@@ -343,7 +344,7 @@ HixIO.MenuControl = can.Control.extend({
 				$(e).parent().removeClass(self.options.selected_class);
 			}
 		});
-	},
+	}
 });
 
 /*
@@ -351,8 +352,8 @@ HixIO.MenuControl = can.Control.extend({
  */
 HixIO.MessageControl = can.Control.extend({
 	defaults: {
-		timeout: 5000, // milliseconds
-	},
+		timeout: 10000 // milliseconds
+	}
 },{
 	init: function(element, options) {
 		var self = this;
@@ -361,34 +362,28 @@ HixIO.MessageControl = can.Control.extend({
 
 		this.stack = new can.List();
 		this.stack.bind('add', function() {
-			if(self.stack.length == 0) { return; }
+			if(self.stack.length === 0) { return; }
 			if(self.element.is(':visible')) { return; }
 			self.update();
 			self.element.slideDown('fast');
 		});
 	},
 
+	// TODO finish polishing the message stack.
 	update: function() {
 		var self = this;
 		var obj = this.stack.shift();
+
+		if(!obj and this.element.is(':visible')) {
+			this.element.slideUp('slow');
+			return;
+		}
+
 		var timeout = this.options.timeout;
+		var t = parseInt(obj.timeout, 10) * 1000;
+		if(t > 0) { timeout = t; }
 
 		this.element.html(can.view('/templates/message.ejs', obj));
-		
-		/*
-		if(obj.timeout) {
-			console.log(obj.timeout);
-			if(obj.timeout == 0) {
-				console.log('NO TIMEOUT');
-				while(this.stack.length > 0) {
-					this.stack.pop();
-				}
-				return;
-			} else {
-				timeout = obj.timeout;
-			}
-		}
-	    */
 
 		setTimeout( function() {
 			if(self.stack.length > 0 ){
@@ -403,29 +398,27 @@ HixIO.MessageControl = can.Control.extend({
 	},
 
 	notify: function(message, message_class, timeout) {
-		console.log(timeout);
 		this.stack.push({
 			message: message,
 			message_class: message_class,
-			timeout: timeout,
+			timeout: timeout
 		});
 	},
+
+	'span.close-button click': function(el, ev) {
+		this.update();
+	}
 });
 
 /*
  * Setup the initial environment, route requests to control, and handle
  * events for the whole document.
- *
- * TODO - tie routes, controls, and the menu together with an associative
- * arrray. Bonus points for some way of registering controls so that we don't
- * have to maintain the menu or list of controls.
- *
  */
 HixIO.Router = can.Control.extend({
 	defaults: {
 		main: '#main',
-		default_route: 'posts',
-	},
+		default_route: 'posts'
+	}
 }, {
 	init: function(element, options) {
 	/*
@@ -440,11 +433,11 @@ HixIO.Router = can.Control.extend({
 		 * stupid inside of init methods, like making http calls, writing to the main
 		 * element, etc.
 		 */
-
-		new HixIO.SearchControl(this.options.main);
-		new HixIO.PostControl(this.options.main);
-		new HixIO.CodeControl(this.options.main);
-		new HixIO.URLControl(this.options.main);
+		this.controls = [];
+		this.controls.push(new HixIO.SearchControl(this.options.main));
+		this.controls.push(new HixIO.PostControl(this.options.main));
+		this.controls.push(new HixIO.CodeControl(this.options.main));
+		this.controls.push(new HixIO.URLControl(this.options.main));
 
 		/*
 		 * All routes get defined in each control's init method, all of the routes we
@@ -456,7 +449,7 @@ HixIO.Router = can.Control.extend({
 		 * Direct the browser to the default route.
 		 */
 		if(!can.route.attr('route') ||
-		   can.route.attr('route') == '') {
+		   can.route.attr('route') === '') {
 			can.route.attr('route', this.options.default_route);
 		}
 	},
@@ -465,10 +458,10 @@ HixIO.Router = can.Control.extend({
 	 * Handle the search event globally.
 	 */
 	'#search keyup': function(el,e) {
-		if(e.keyCode == 13) {
+		if(e.keyCode === 13) {
 			window.location.hash = can.route.url({route: 'search', q: e.target.value});
 		}
-	},
+	}
 });
 
 /******************************************************************************/

@@ -210,3 +210,11 @@ div#main > div.loading {
 	color: #e08000;
 }
 
+.close-button {
+	float: right;
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	background: transparent url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAPBJREFUeNpiYBjygBFdYObMmfOBlEF6erohkpgAkNoPxBeA4ok4DQAqPA/SDOUuAClG0owiDtPDgmzAhw8fvggICMC4CUDNDFCNMM0Mb968kUDWw4zmg8PKyspeLCwsQlA+SKMEkuYd1dXVINu/YDXg3r177/78+bMdzRB0zS+QxZnQA3HPnj13GBkZz6CLCwoKygC99IPYWEjAEWsXgNgRGIgfsLoAXTPI2T9+/LiDpMQAGiPYvYAcwjA/b9682RPZEKD4C5yxsG/fvr2WlpY6TExMDKWlpf6gAEMOWGA0n0KPBWxAAjnqiBAfYAAQYAB0RHHAXeoXcgAAAABJRU5ErkJggg==') center center no-repeat;
+}
+
