@@ -82,6 +82,9 @@ HixIO.Search = can.Model.extend({
 
 /*
  * A reusable pager control.
+ * 
+ * Options for creating this control:
+ * (See the code for the defaults.)
  *
  *     target: (required)
  *         The selector that yields one element to render the pager into.
@@ -89,10 +92,10 @@ HixIO.Search = can.Model.extend({
  *     on_change: (required)
  *         The function you want called when the pager's page changes.
  *
- *     per_page: (optional, default: 10)
+ *     per_page: (optional)
  *         The number of items per page.
  *
- *     pad: (optional, default: 2)
+ *     pad: (optional)
  *         The number of numbers to show on each side of the curent page in the
  *         pager.
  *
@@ -285,7 +288,8 @@ HixIO.URLControl = can.Control.extend({}, {
 		HixIO.URL.list().success(function(data) {
 			self.element.html(can.view('/templates/urls.ejs', {
 				top_urls: HixIO.URL.models(data.top_urls),
-				latest_urls: HixIO.URL.models(data.latest_urls)
+				latest_urls: HixIO.URL.models(data.latest_urls),
+				url: self.url
 			}));
 		}).error(function(data) {
 			HixIO.notify("Woah! Where'd my URLs go?", 'error-message');
@@ -299,10 +303,10 @@ HixIO.URLControl = can.Control.extend({}, {
 	'#shorten keyup': function(el,e) {
 		var self = this;
 
-		if(e.keyCode === 13) {
+		if(e.keyCode === 13 && e.target.value !== '') {
 			HixIO.URL.shorten({url: e.target.value}).success(function(data) {
+				self.url = data;
 				self.update();
-				HixIO.notify('Shortened url: http://hix.io/' + data.short , 'success-message', 60);
 			}).error(function(data) {
 				HixIO.notify('I wasn\'t able to shorten that.', 'warning-message');
 			});
@@ -311,7 +315,18 @@ HixIO.URLControl = can.Control.extend({}, {
 });
 
 /*
- * A control to update the menu based on the hash.
+ * An application menu.
+ *
+ * This control listens to route changes and updates the classes of menu items
+ * to match the route.
+ *
+ * Options for creating this control:
+ * (See the code for the defaults.)
+ *
+ *     selected_class: (optional)
+ *         The class to add or remove based on whether the route is matches the
+ *         link's path.
+ *
  */
 HixIO.MenuControl = can.Control.extend({
 	defaults: {
@@ -343,103 +358,163 @@ HixIO.MenuControl = can.Control.extend({
 /*
  * A message bar.
  *
- * Send messages like this:
+ * Use notify to show a message that will close itself after a while. That
+ * function takes an object as its only argument. What properties must be
+ * defined on that object depend on the template consumes the object.
  *
- *    var message_control = MessageControl.new('#my_message_bar');
- *    my_control.notify({
- *        message: 'success',
- *        message_class: 'success-message',
- *        timeout: 5
- *    });
+ * The default template needs:
+ *
+ *     message: (required)
+ *         The message to display.
+ *     
+ *     message_class: (required)
+ *         The CSS class to add to this control's element.
+ *
+ * This control really only cares about the following optional property on each
+ * message object, which is available whatever template you use:
+ *
+ *     timeout: (optional)
+ *         Override the control's default message timeout.
+ *
+ * The default template allows HTML in the message and won't escape it. You may
+ * even render templates and pass the resulting string in. As you wish.
+ *
+ * Options for creating this control:
+ * (See the code for the defaults.)
+ *
+ *     timeout: (optional)
+ *         A number of seconds to wait before closing the notification.
+ *         Decimals are okay.
+ *
+ *     persist: (optional)
+ *         True or False. Do we keep the notification up if the route changes?
+ *
+ *     view: (optional)
+ *         Override the view to render.
+ *
+ *     close: (optional)
+ *         This control will close on click events on child elements that match
+ *         this selector.
+ *
+ * Ideas:
+ *     - per-message persist option
+ *     - options to disable or change FX
  *
  */
 HixIO.MessageControl = can.Control.extend({
 	defaults: {
-		timeout: 10 //seconds
+		timeout: 10.0,
+		persist: false,
+		view: '/templates/message.ejs',
+		close: '.close-button'
 	}
 },{
 	init: function(element, options) {
+		var i;
 		var self = this;
 
-		this.element.hide();
+		if(options.view) { this.options.view = options.view; }
+		if(options.persist) { this.options.persist = true; }
 
-		this.stack = new can.List();
-		this.stack.bind('add', function() {
-			if(self.element.is(':visible')) { return; }
-			self.update();
-			self.element.slideDown('fast');
+		i = parseInt(options.timeout, 10);
+		if(i > 0) { this.options.timeout = i; }
+
+		/*
+		 * Close this control on route changes, unless the persist option is set.
+		 */
+		can.route.bind('route', function(i,e) {
+			if(!self.persist) { self.close(); }
 		});
 	},
 
+	/*
+	 * Show a new message or interrupt the currently displayed message.
+	 */
 	notify: function(message) {
-		this.stack.push(message);
-	},
-
-	update: function() {
 		var self = this;
-		var obj = this.stack.shift();
+	
+		// Don't speak unless you've got something to say.	
+		if(!message) { return; }
 
-		var timeout = this.options.timeout;
-		var t = parseInt(obj.timeout, 10);
-		if(t > 0) { timeout = t; }
-		timeout = timeout * 1000;
+		this.message = message;
+		
+		// Interrupt the current message.
+		if(this.element.is(':visible')) {
+			clearTimeout(this.timeout);
 
-		this.element.html(can.view('/templates/message.ejs', obj));
-		this.timeout = setTimeout( function() {
-			if(self.stack.length > 0 ){
-				self.element.fadeOut('fast', function() {
-					self.update();
-					self.element.fadeIn('fast');
-				});
-			}else{
-				self.element.slideUp('slow');
-			}
-		}, timeout);
-	},
-
-	'.close-button click': function(el, ev) {
-		var self = this;
-
-		this.element.clearQueue();
-		clearTimeout(this.timeout);
-
-		if(this.stack.length === 0) {
-			this.element.slideUp('slow');
-		} else {
 			this.element.fadeOut('fast', function() {
 				self.update();
 				self.element.fadeIn('fast');
 			});
+			return;
 		}
-	}
+
+		this.update();
+		this.element.slideDown('fast');	
+	},
+
+	/*
+	 * Render the template and hook up the close timeout.
+	 */
+	update: function() {
+		var self = this;
+		var timeout,t;
+
+		// Don't render the view if there's nothing to say.
+		if(!this.message) { return; }
+
+		// Don't update the view if it's visible.
+		if(this.timeout || this.element.is(':visible')) { return; }
+
+		// Gah. JavaScript, you suck.
+		timeout = this.options.timeout;
+		t = parseInt(this.message.timeout, 10);
+		if( t > 0 ) { timeout = t; }
+		timeout = Math.floor(timeout * 1000);
+
+		this.element.html(can.view(this.options.view, this.message));
+		this.timeout = setTimeout(function() { self.close(); }, timeout);
+	},
+
+	/*
+	 * Hide and reset this control.
+	 */
+	close: function() {
+		var self = this;
+
+		clearTimeout(this.timeout);
+		this.timeout = null;
+
+		this.element.slideUp('slow', function() {
+			self.element.clearQueue();
+			self.element.empty();
+			self.message = null;
+		});
+	},
+
+	// Hook up the close event.
+	'{close} click': function(el, ev) { this.close(); }
 });
 
-HixIO.test_notify = function() {
-	HixIO.notify({
-		message: 'success',
-		message_class: 'success-message',
-		timeout: 5
-	});
-	HixIO.notify({
-		message: 'info',
-		message_class: 'info-message',
-		timeout: 5
-	});
-	HixIO.notify({
-		message: 'warning',
-		message_class: 'warning-message',
-		timeout: 5
-	});
-	HixIO.notify({
-		message: 'error',
-		message_class: 'error-message',
-		timeout: 5
-	});
-}
-
 /*
- * Setup the initial environment, route requests to control, and handle
- * events for the whole document.
+ * An application router.
+ * 
+ * This control is responsible for loading all of the controls that may want to
+ * write to the main content area for the application.
+ *
+ * This router also provides a 'default route' by redirecting an empty route to
+ * the configured default.
+ * 
+ * Options for creating this control:
+ * (See the code for the defaults.)
+ *
+ *     default_route: (optional)
+ *         The hash string to redirect to if the route is empty.
+ *
+ *     main: (optional)
+ *         The element to use when creating controls. The router should be
+ *         created with document.body so that it can handle app-wide events.
+ *
  */
 HixIO.Router = can.Control.extend({
 	defaults: {
@@ -502,6 +577,16 @@ $(document).ready(function() {
 	HixIO.router = new HixIO.Router(document.body);
 	HixIO.menu = new HixIO.MenuControl('#menu');
 	HixIO.message_control = new HixIO.MessageControl('#messages');
-	HixIO.notify = function (m) { HixIO.message_control.notify(m); };
+
+	/*
+	 * Convenience method for notifications. HMmmm.
+	 */
+	HixIO.notify = function (m,c,t) {
+		HixIO.message_control.notify({
+			message: m,
+			message_class: c,
+			timeout: t
+		});
+	};
 });
 

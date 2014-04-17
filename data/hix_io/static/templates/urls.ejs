@@ -9,6 +9,16 @@
 	</div>
 </div>
 
+<% if(!url) { %>
+<% } else { %>
+	<div class="post">
+		<div class="l-box">
+			Short URL: <a href="<%= url.short %>"><%= url.short %></a><br>
+			<small>Original URL: <a href="<%= url.url %>"><%= url.url %></a></small>
+		</div>
+	</div>
+<% } %>
+
 <!-- always show this -->
 <div class="post">
 	<div class="l-box">
