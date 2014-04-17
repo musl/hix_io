@@ -11,31 +11,49 @@ var HixIO = {};
 /******************************************************************************/
 
 /*
- * For all 'code' elements nested within 'pre' elements:
+ * Attempt to syntax-highlight all 'code' elements nested within 'pre'
+ * elements.
  *
- * - If the attribute 'data-language' is defined and Highlight.js recognizes
- *   the given value as a language, highlight the element.
+ * If the attribute 'data-language' is defined and Highlight.js recognizes
+ * the given value as a language, highlight the element as the given language.
  *
- * - If the attribute 'data-language' is not defined, have Highlight.js guess
- *   at the language and highlight the element.
+ * If the 'data-language' attribute is missing, guess at the language and
+ * highlight.
+ *
+ * If the 'data-language' attribute is defined but not recognized, no
+ * highlighting is performed.
+ *
  */
 HixIO.highlightSyntax = function() {
-	$('pre code').each(function(i, e) {
-		var el = $(e);
-		var lang = el.attr('data-language');
+	$('pre code').each(function(i, el) {
+		var e = $(el);
+		var lang = e.attr('data-language');
 
 		if(!lang) {
-			hljs.highlightBlock(e);
+			hljs.highlightBlock(el);
 		} else if(hljs.getLanguage(lang)) {
-			el.html(hljs.highlight(lang, el.html(), true));
+			e.html(hljs.highlight(lang, e.html(), true));
 		}
 	});
 };
 
 /*
- * Perform an asynchronous HTTP request and return the deferred result.
+ * Perform an asynchronous HTTP request and return the deferred result. See
+ * can.ajax() and JQuery.ajax() for more information. I created this to help
+ * keep the model definitions nice and clean and free of duplicated code.
+ * 
+ * Arguments:
+ *
+ *     path: (required)
+ *         The relative path for the request.
+ *
+ *     method: (optional, default: 'GET')
+ *         Your good 'ol supported HTTP verbs: GET, POST, PUT, DELETE, etc.
+ *
+ *     type: (optional, default: 'json')
+ *         Content-Type for the request.
  */
-HixIO.asyncReq = function(path, method, type) {
+HixIO.ajax = function(path, method, type) {
 	if(!method) { method = 'GET'; }
 	if(!type) { type = 'json'; }
 
@@ -49,131 +67,53 @@ HixIO.asyncReq = function(path, method, type) {
 	};
 };
 
+/*
+ * Convenience method for notifications. HMmmm.
+ */
+HixIO.notify = function (m,c,t) {
+	HixIO.message_bar.notify({
+		message: m,
+		message_class: c,
+		timeout: t
+	});
+};
+
 /******************************************************************************/
 // Models
 /******************************************************************************/
 
 /*
+ * I chose to keep the models as limited in functionality as possible. I use
+ * custom methods for findAll because I'd like the dataset count for each model
+ * returned along with the data for pagination.
+ */
+
+/*
  * Posts for a blog.
  */
 HixIO.Post = can.Model.extend({
-	list:    HixIO.asyncReq('/api/v1/posts'),
+	list: HixIO.ajax('/api/v1/posts'),
 	findOne: 'GET /api/v1/posts/{id}'
 }, {});
 
 /*
- * Posts for a blog.
+ * URLs for a URL-shortener.
  */
 HixIO.URL = can.Model.extend({
-	list:    HixIO.asyncReq('/api/v1/urls'),
-	shorten: HixIO.asyncReq('/api/v1/urls', 'POST')
+	list: HixIO.ajax('/api/v1/urls'),
+	shorten: HixIO.ajax('/api/v1/urls', 'POST')
 }, {});
 
 /*
- * Search across all objects in the database.
+ * Search across all models.
  */
 HixIO.Search = can.Model.extend({
-	list:    HixIO.asyncReq('/api/v1/search')
+	list: HixIO.ajax('/api/v1/search')
 }, {});
 
 /******************************************************************************/
 // Controls
 /******************************************************************************/
-
-/*
- * A reusable pager control.
- * 
- * Options for creating this control:
- * (See the code for the defaults.)
- *
- *     target: (required)
- *         The selector that yields one element to render the pager into.
- *
- *     on_change: (required)
- *         The function you want called when the pager's page changes.
- *
- *     per_page: (optional)
- *         The number of items per page.
- *
- *     pad: (optional)
- *         The number of numbers to show on each side of the curent page in the
- *         pager.
- *
- */
-HixIO.Pager = can.Control.extend({
-	defaults: {
-		view: '/templates/pager.ejs',
-		target: null
-	}
-},{
-	init: function(element, options) {
-		var p;
-
-		this.state = new can.Map({
-			count: 0,
-			per_page: 10,
-			pages: 0, 
-			page: 0,
-			pad: 2
-		});
-
-		this.state.bind('page', options.on_change);
-
-		/*
-		 * The reason we need this is that the element won't exist when this control
-		 * is created.
-		 */
-		this.options.target = options.target;
-
-		p = parseInt(options.per_page, 10);
-		if(p > 0) { this.options.per_page = p; }
-
-		p = parseInt(options.pad, 10);
-		if(p > 0) { this.options.pad = p; }
-	},
-
-	update: function(count) {
-		var a, c, p, ds, de;
-
-		this.state.attr('count', count);
-		this.state.attr('pages', Math.ceil(this.state.count / this.state.per_page));
-
-		p = this.state.attr('page');
-		c = this.state.attr('pages');
-		a = this.state.attr('pad');
-
-		/*
-		 * Find the ammount we need to extend each side of the window to account for
-		 * collapses on the opposite side. This allows for a roughly constant-width
-		 * control.
-		 */
-		ds = Math.min(0, c - (p + a) - 1);	
-		de = Math.max(0, -1 * (p - a)) + 1;
-
-		/*
-		 * Calculate and store the indexes for the window.
-		 */
-		this.state.attr('window_start', Math.max(0, p - a + ds));
-		this.state.attr('window_end', Math.min(c, p + a + de));
-
-		$(this.options.target).html(can.view(this.options.view, this.state));
-	},
-
-	params: function(params) {
-		if(!params) { params = {}; }
-		params.offset = this.state.page * this.state.per_page;
-		params.limit = this.state.per_page;
-		return params;
-	},
-
-	'{target} a click': function(el, ev) {
-		var page = parseInt(el.attr('data-page'), 10);
-
-		if(page >= 0 && page < this.state.pages) {
-			this.state.attr('page', page);
-		}
-	}
-});
 
 /*
  * Provide a list of posts or details on a single post.
@@ -264,13 +204,17 @@ HixIO.SearchControl = can.Control.extend({}, {
 /*
  * A control for listing and displaying projects.
  */
-HixIO.CodeControl = can.Control.extend({}, {
+HixIO.CodeControl = can.Control.extend({
+	defaults: {
+		view: '/templates/code.ejs'
+	}
+}, {
 	init: function() {
 		can.route('code');
 	},
 
 	'code route': function() {
-		this.element.html('code');
+		this.element.html(can.view(this.options.view, {}));
 	}
 });
 
@@ -314,6 +258,126 @@ HixIO.URLControl = can.Control.extend({}, {
 	}
 });
 
+/******************************************************************************/
+// Re-usable Controls
+/******************************************************************************/
+
+/*
+ * A pager.
+ *
+ * This control provides a widget for paging through many pages of objects and
+ * integrates with the control used to render the current template.
+ *
+ * The basic lifecycle for the Pager control looks like this:
+ *
+ * - The control responsible for fetching and rendering instantiates a Pager,
+ *   including a callback that handles refreshing the control's view when the
+ *   Pager changes.
+ *
+ * - When the control is ready to fetch objects from the database, it calls
+ *   params() on the pager to get the window parameters for the query.
+ *
+ * - When the request is complete and after the view has been rendered, the
+ *   control calls update() on the Pager with the total number of objects to be
+ *   paged through - which is not the same as the number of objects returned
+ *   from the request.
+ *
+ * - When the pager's page is changed (eg. because it was clicked), the pager
+ *   calls its callback to cause the control to refresh its data. It's expected
+ *   that will cause the control to call update() on the Pager once more.
+ *
+ * Basically, it's a good idea to define a function (not a route) that updates
+ * your view and calls update on the Pager. The practical upshot of doing it
+ * this way is that you can use it as the Pager's callback /and/ call that
+ * function from any number of routes.
+ *
+ * Options for creating this control:
+ * (See the code for the defaults.)
+ *
+ *     target: (required)
+ *         The selector that yields one element to render the Pager into, and
+ *         to listen for click events within.
+ *
+ *     on_change: (required)
+ *         The function you want called when the Pager changes and the view and
+ *         Pager need to be updated.
+ *
+ *     per_page: (optional)
+ *         The number of items per page.
+ *
+ *     pad: (optional)
+ *         The number of numbers to show on each side of the curent page in the
+ *         pager.
+ *
+ */
+HixIO.Pager = can.Control.extend({
+	defaults: {
+		view: '/templates/pager.ejs',
+	}
+},{
+	init: function(element, options) {
+		var p;
+
+		this.state = new can.Map({
+			count: 0,
+			per_page: 10,
+			pages: 0, 
+			page: 0,
+			pad: 2
+		});
+
+		this.state.bind('page', options.on_change);
+
+		p = parseInt(options.per_page, 10);
+		if(p > 0) { this.options.per_page = p; }
+
+		p = parseInt(options.pad, 10);
+		if(p > 0) { this.options.pad = p; }
+	},
+
+	update: function(count) {
+		var a, c, p, ds, de;
+
+		this.state.attr('count', count);
+		this.state.attr('pages', Math.ceil(this.state.count / this.state.per_page));
+
+		p = this.state.attr('page');
+		c = this.state.attr('pages');
+		a = this.state.attr('pad');
+
+		/*
+		 * Find the ammount we need to extend each side of the window to account for
+		 * collapses on the opposite side. This allows for a roughly constant-width
+		 * control.
+		 */
+		ds = Math.min(0, c - (p + a) - 1);	
+		de = Math.max(0, -1 * (p - a)) + 1;
+
+		/*
+		 * Calculate and store the indexes for the window.
+		 */
+		this.state.attr('window_start', Math.max(0, p - a + ds));
+		this.state.attr('window_end', Math.min(c, p + a + de));
+
+		$(this.options.target).html(can.view(this.options.view, this.state));
+	},
+
+	params: function(params) {
+		if(!params) { params = {}; }
+		params.offset = this.state.page * this.state.per_page;
+		params.limit = this.state.per_page;
+		return params;
+	},
+
+	'{target} a click': function(el, ev) {
+		var page = parseInt(el.attr('data-page'), 10);
+
+		if(page >= 0 && page < this.state.pages) {
+			this.state.attr('page', page);
+		}
+	}
+});
+
 /*
  * An application menu.
  *
@@ -323,22 +387,15 @@ HixIO.URLControl = can.Control.extend({}, {
  * Options for creating this control:
  * (See the code for the defaults.)
  *
- *     selected_class: (optional)
+ *     selected_class: (required)
  *         The class to add or remove based on whether the route is matches the
  *         link's path.
  *
  */
-HixIO.MenuControl = can.Control.extend({
-	defaults: {
-		selected_class: 'pure-menu-selected'
-	}
-}, {
+HixIO.Menu = can.Control.extend({},
+{
 	init: function(element, options) {
 		var self = this;
-
-		if(options.selected_class) {
-			this.options.selected_class = options.selected_class;
-		}
 		can.route.bind('route', function() { self.update(); });
 	},
 
@@ -401,7 +458,7 @@ HixIO.MenuControl = can.Control.extend({
  *     - options to disable or change FX
  *
  */
-HixIO.MessageControl = can.Control.extend({
+HixIO.MessageBar = can.Control.extend({
 	defaults: {
 		timeout: 10.0,
 		persist: false,
@@ -413,17 +470,11 @@ HixIO.MessageControl = can.Control.extend({
 		var i;
 		var self = this;
 
-		if(options.view) { this.options.view = options.view; }
-		if(options.persist) { this.options.persist = true; }
-
-		i = parseInt(options.timeout, 10);
-		if(i > 0) { this.options.timeout = i; }
-
 		/*
 		 * Close this control on route changes, unless the persist option is set.
 		 */
 		can.route.bind('route', function(i,e) {
-			if(!self.persist) { self.close(); }
+			if(!self.options.persist) { self.close(); }
 		});
 	},
 
@@ -466,8 +517,7 @@ HixIO.MessageControl = can.Control.extend({
 		// Don't update the view if it's visible.
 		if(this.timeout || this.element.is(':visible')) { return; }
 
-		// Gah. JavaScript, you suck.
-		timeout = this.options.timeout;
+		timeout = parseInt(this.options.timeout, 10);
 		t = parseInt(this.message.timeout, 10);
 		if( t > 0 ) { timeout = t; }
 		timeout = Math.floor(timeout * 1000);
@@ -499,11 +549,8 @@ HixIO.MessageControl = can.Control.extend({
 /*
  * An application router.
  * 
- * This control is responsible for loading all of the controls that may want to
- * write to the main content area for the application.
- *
- * This router also provides a 'default route' by redirecting an empty route to
- * the configured default.
+ * This router provides a 'default route' by redirecting an empty route to the
+ * configured default.
  * 
  * Options for creating this control:
  * (See the code for the defaults.)
@@ -513,43 +560,18 @@ HixIO.MessageControl = can.Control.extend({
  *
  *     main: (optional)
  *         The element to use when creating controls. The router should be
- *         created with document.body so that it can handle app-wide events.
+ *         created with document.body or a suitable top-level tag so that it
+ *         can handle app-wide events.
  *
  */
 HixIO.Router = can.Control.extend({
 	defaults: {
-		main: '#main',
-		default_route: 'posts'
+		search: '#search'
 	}
-}, {
+},{
 	init: function(element, options) {
-	/*
-	 * Handle options.
-	 */
-		if(options.main) { this.options.main = options.main; }
-		if(options.menu) { this.options.menu = options.menu; }
-		if(options.default_route) { this.options.default_route = options.default_route; }
-
-		/*
-		 * Instantiate all of the controls. This assumes that nobody's doing anything
-		 * stupid inside of init methods, like making http calls, writing to the main
-		 * element, etc.
-		 */
-		this.controls = [];
-		this.controls.push(new HixIO.SearchControl(this.options.main));
-		this.controls.push(new HixIO.PostControl(this.options.main));
-		this.controls.push(new HixIO.CodeControl(this.options.main));
-		this.controls.push(new HixIO.URLControl(this.options.main));
-
-		/*
-		 * All routes get defined in each control's init method, all of the routes we
-		 * need should be ready by now.
-		 */
 		can.route.ready();
 
-		/*
-		 * Direct the browser to the default route.
-		 */
 		if(!can.route.attr('route') ||
 		   can.route.attr('route') === '') {
 			can.route.attr('route', this.options.default_route);
@@ -559,7 +581,7 @@ HixIO.Router = can.Control.extend({
 	/*
 	 * Handle the search event globally.
 	 */
-	'#search keyup': function(el,e) {
+	'{search} keyup': function(el,e) {
 		if(e.keyCode === 13) {
 			window.location.hash = can.route.url({route: 'search', q: e.target.value});
 		}
@@ -567,26 +589,32 @@ HixIO.Router = can.Control.extend({
 });
 
 /******************************************************************************/
-// Entry point.
+// Application entry point.
 /******************************************************************************/
 
 /*
  * Start up the main router.
  */
 $(document).ready(function() {
-	HixIO.router = new HixIO.Router(document.body);
-	HixIO.menu = new HixIO.MenuControl('#menu');
-	HixIO.message_control = new HixIO.MessageControl('#messages');
+	var main_element = '#main';
 
-	/*
-	 * Convenience method for notifications. HMmmm.
-	 */
-	HixIO.notify = function (m,c,t) {
-		HixIO.message_control.notify({
-			message: m,
-			message_class: c,
-			timeout: t
-		});
-	};
+	HixIO.controls = [];
+	HixIO.controls.push(
+		new HixIO.SearchControl(main_element),
+		new HixIO.PostControl(main_element),
+		new HixIO.CodeControl(main_element),
+		new HixIO.URLControl(main_element)
+	);
+
+	HixIO.message_bar = new HixIO.MessageBar('#messages');
+
+	HixIO.menu = new HixIO.Menu('#menu', {
+		selected_class: 'pure-menu-selected'
+	});
+
+	HixIO.router = new HixIO.Router(document.body, {
+		default_route: 'posts',
+	});
+	
 });
 
