@@ -53,6 +53,7 @@ class HixIO::API < Strelka::App
 	get '/urls' do |req|
 		res = req.response
 		res.for( :json ) {{
+			:host => HixIO.host,
 			:top_urls => HixIO::URL.top.limit( 10 ).all,
 			:latest_urls => HixIO::URL.latest.limit( 10 ).all,
 		}}
@@ -62,6 +63,7 @@ class HixIO::API < Strelka::App
 	post '/urls' do |req|
 		req.params.add :url, :string
 
+		# TODO write an auth provider. :/
 		self.log.warn( '%p' % [self.auth_provider.allowed_netblocks] )
 
 		res = req.response

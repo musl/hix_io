@@ -120,10 +120,10 @@ module HixIO
 		return self.config.dev
 	end
 
-	# Return this app's domain
+	# Return this app's host.
 	#
-	def self::domain
-		return self.config.domain
+	def self::host
+		return self.config.host
 	end
 
 end

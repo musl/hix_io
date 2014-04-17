@@ -1,6 +1,6 @@
 
-datadir   = Pathname( Gem.datadir( 'hix_io' ) || 'data/hix_io' ).expand_path
-staticdir = datadir.relative_path_from( Pathname('/') ) + 'static/'
+data_dir   = Pathname( Gem.datadir( 'hix_io' ) || 'data/hix_io' ).expand_path
+static_dir = data_dir.relative_path_from( Pathname('/') ) + 'static/'
 
 server 'main' do
 
@@ -14,8 +14,9 @@ server 'main' do
     default_host 'main'
 
     host 'main' do
-        route '/', directory( staticdir )
-        route '/api/v1/', handler( 'tcp://127.0.0.1:61381', 'hixio-api' )
+		route '/',        handler( 'tcp://127.0.0.1:61381', 'hixio-frontend' )
+        route '/api/v1/', handler( 'tcp://127.0.0.1:61383', 'hixio-api' )
+		route '/static/', directory( static_dir )
     end
 
 end

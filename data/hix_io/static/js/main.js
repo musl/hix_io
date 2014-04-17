@@ -137,7 +137,7 @@ HixIO.PostControl = can.Control.extend({}, {
 		var params = this.pager.params();
 
 		HixIO.Post.list(params).success(function(data) {
-			self.element.html(can.view('/templates/posts.ejs', {
+			self.element.html(can.view('/static/templates/posts.ejs', {
 				posts: HixIO.Post.models(data.posts)
 			}));
 			self.pager.update(data.count);
@@ -155,7 +155,7 @@ HixIO.PostControl = can.Control.extend({}, {
 		var self = this;
 
 		HixIO.Post.findOne({ id: data.id }, function(post) {
-			self.element.html(can.view('/templates/post.ejs', {
+			self.element.html(can.view('/static/templates/post.ejs', {
 				post: post
 			}));
 			HixIO.highlightSyntax();
@@ -185,7 +185,7 @@ HixIO.SearchControl = can.Control.extend({}, {
 		var params = this.pager.params({ q: this.q });
 
 		HixIO.Search.list(params).success(function(data) {
-			self.element.html(can.view('/templates/search.ejs', {
+			self.element.html(can.view('/static/templates/search.ejs', {
 				posts: HixIO.Post.models(data.posts),
 				q: self.q
 			}));
@@ -206,7 +206,7 @@ HixIO.SearchControl = can.Control.extend({}, {
  */
 HixIO.CodeControl = can.Control.extend({
 	defaults: {
-		view: '/templates/code.ejs'
+		view: '/static/templates/code.ejs'
 	}
 }, {
 	init: function() {
@@ -230,7 +230,8 @@ HixIO.URLControl = can.Control.extend({}, {
 		var self = this;
 
 		HixIO.URL.list().success(function(data) {
-			self.element.html(can.view('/templates/urls.ejs', {
+			self.element.html(can.view('/static/templates/urls.ejs', {
+				host: HixIO.conf.host,
 				top_urls: HixIO.URL.models(data.top_urls),
 				latest_urls: HixIO.URL.models(data.latest_urls),
 				url: self.url
@@ -312,7 +313,7 @@ HixIO.URLControl = can.Control.extend({}, {
  */
 HixIO.Pager = can.Control.extend({
 	defaults: {
-		view: '/templates/pager.ejs',
+		view: '/static/templates/pager.ejs',
 	}
 },{
 	init: function(element, options) {
@@ -462,7 +463,7 @@ HixIO.MessageBar = can.Control.extend({
 	defaults: {
 		timeout: 10.0,
 		persist: false,
-		view: '/templates/message.ejs',
+		view: '/static/templates/message.ejs',
 		close: '.close-button'
 	}
 },{

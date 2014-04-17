@@ -1,9 +1,9 @@
 hix_io:
-    domain: 'hix.io'
+    host: 'localhost'
     dev: true
     db_uri: 'postgres://hix_io@localhost/hix_io_dev'
 mongrel2:
-    configdb: 'etc/api.sqlite'
+    configdb: 'etc/hixio.sqlite'
 auth:
     provider: 'hostaccess'
 hostaccess:

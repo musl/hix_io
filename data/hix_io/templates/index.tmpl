@@ -1,4 +1,4 @@
-<!doctype html>
+<!doctype html!>
 <html>
 	<head>
 		<meta charset="utf-8" />
@@ -15,17 +15,21 @@
 		<meta http-equiv="cache-control" content="no-cache" />
 		<meta http-equiv="pragma" content="no-cache" />
 
-		<link rel="stylesheet" href="/css/base-min.css" type="text/css" media="screen" charset="utf-8">
-		<link rel="stylesheet" href="/css/pure-min.css" type="text/css" media="screen" charset="utf-8">
-		<link rel="stylesheet" href="/css/style.css" type="text/css" media="screen" charset="utf-8">
-		<link rel="stylesheet" href="/css/highlight/googlecode.min.css" type="text/css" media="screen" charset="utf-8">
+		<link rel="stylesheet" href="/static/css/base-min.css" type="text/css" media="screen" charset="utf-8">
+		<link rel="stylesheet" href="/static/css/pure-min.css" type="text/css" media="screen" charset="utf-8">
+		<link rel="stylesheet" href="/static/css/style.css" type="text/css" media="screen" charset="utf-8">
+		<link rel="stylesheet" href="/static/css/highlight/googlecode.min.css" type="text/css" media="screen" charset="utf-8">
 
 		<!-- If all of our scripts are well-behaved, nothing needs to go in the body. -->
-		<script src="/js/jquery.min.js" type="text/javascript" charset="utf-8"></script>
-		<script src="/js/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
-		<script src="/js/can.js" type="text/javascript" charset="utf-8"></script>
-		<script src="/js/highlight.min.js" type="text/javascript" charset="utf-8"></script>
-		<script src="/js/main.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/static/js/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/static/js/can.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/static/js/highlight.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/static/js/main.js" type="text/javascript" charset="utf-8"></script>
+
+		<script type="text/javascript" charset="utf-8">
+			// App-supplied configuration.
+			HixIO.conf = <?attr conf ?>;
+		</script>
 
 	</head>
 	<body>

@@ -58,7 +58,7 @@ class HixIO::URL < Sequel::Model( :hix_io__urls )
 		url = URI( self.url )
 
 		return false unless url.scheme and url.host
-		return false if	url.host =~ /#{HixIO.domain}\.?$/i
+		return false if	url.host =~ /#{HixIO.host}\.?$/i
 		return true
 	rescue URI::InvalidURIError
 		return false

@@ -1,0 +1,60 @@
+# vim: set nosta noet ts=4 sw=4 ft=ruby:
+# encoding: UTF-8
+
+require 'strelka'
+require 'hix_io'
+
+# Provides REST resources for the application.
+#
+class HixIO::Frontend < Strelka::App
+
+	extend Loggability
+	log_to :hix_io
+
+	plugins \
+		:routing,
+		:parameters,
+		:templating
+
+	templates :index => 'index.tmpl'
+
+	param :short, /[a-z0-9]{1,7}/
+
+	default_type 'html'
+
+	get '/' do |req|
+		tmpl = template( :index )
+
+		tmpl.conf = {
+			:host => HixIO.host,
+			:stamp => Time.now,
+			:dev => HixIO.dev?
+		}
+
+		if HixIO.dev?
+			tmpl.conf[:req] = {
+				:env => ENV.to_hash,
+				:headers => req.headers.to_hash,
+				:ssl => req.ssl?,
+				:scheme => req.scheme,
+			}
+			tmpl.conf = JSON.pretty_generate( tmpl.conf )
+			return tmpl
+		end
+
+		tmpl.conf = tmpl.conf.to_json
+		return tmpl
+	end
+
+	get '/:short' do |req|
+		if url = HixIO::URL[:short => req.params[:short]]
+			url.hits += 1
+			url.save
+			finish_with( HTTP::REDIRECT, '', :location => url.url )
+		else
+			finish_with( HTTP::NOT_FOUND )
+		end
+	end
+
+end
+
