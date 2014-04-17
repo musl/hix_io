@@ -52,6 +52,7 @@ begin
 		s.executables           = %w[hix_io_migrate hix_io_configure]
 
 		s.add_dependency 'strelka', '~> 0.8'
+		s.add_dependency 'inversion', '~> 0.12'
 		s.add_dependency 'sequel', '~> 4.7'
 		s.add_dependency 'pg', '~> 1.17'
 		s.add_dependency 'loggability', '~> 0.10'
