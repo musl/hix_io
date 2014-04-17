@@ -4,9 +4,14 @@ hix_io:
     db_uri: 'postgres://hix_io@localhost/hix_io_dev'
 mongrel2:
     configdb: 'etc/api.sqlite'
+auth:
+    provider: 'hostaccess'
+hostaccess:
+    - '10.0.0.0/8'
 logging:
-    __default__: 'fatal (color)'
+    __default__: 'warn (color)'
     hix_io: 'info (color)'
     loggability: 'warn (color)'
-    configurability: 'warn (color)'
+    configurability: 'debug (color)'
+    strelka: 'warn (color)'
 

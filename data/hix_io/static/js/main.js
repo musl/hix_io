@@ -1,8 +1,21 @@
 /* vim: set nosta noet ts=4 sw=4 ft=javascript: */
 
 /******************************************************************************/
+// Namespace
+/******************************************************************************/
+
+HixIO = {};
+
+/******************************************************************************/
 // Utility functions
 /******************************************************************************/
+
+/*
+ * Display a notification.
+ */
+HixIO.notify = function(message, message_class, timeout) { 
+	HixIO.message_control.notify(message, message_class, timeout);
+}
 
 /*
  * For all 'code' elements nested within 'pre' elements:
@@ -13,7 +26,7 @@
  * - If the attribute 'data-language' is not defined, have Highlight.js guess
  *   at the language and highlight the element.
  */
-function highlightSyntax() {
+HixIO.highlightSyntax = function() {
 	$('pre code').each(function(i, e) {
 		var el = $(e);
 		var lang = el.attr('data-language');
@@ -29,7 +42,7 @@ function highlightSyntax() {
 /*
  * Perform an asynchronous HTTP request and return the deferred result.
  */
-function asyncReq(path, method, type) {
+HixIO.asyncReq = function(path, method, type) {
 	if(!method) { method = 'GET'; }
 	if(!type) { type = 'json'; }
 
@@ -50,24 +63,24 @@ function asyncReq(path, method, type) {
 /*
  * Posts for a blog.
  */
-var Post = can.Model.extend({
-	list:    asyncReq('/api/v1/posts'),
+HixIO.Post = can.Model.extend({
+	list:    HixIO.asyncReq('/api/v1/posts'),
 	findOne: 'GET /api/v1/posts/{id}',
 }, {});
 
 /*
  * Posts for a blog.
  */
-var URL = can.Model.extend({
-	list:    asyncReq('/api/v1/urls'),
-	shorten: asyncReq('/api/v1/urls', 'POST'),
+HixIO.URL = can.Model.extend({
+	list:    HixIO.asyncReq('/api/v1/urls'),
+	shorten: HixIO.asyncReq('/api/v1/urls', 'POST'),
 }, {});
 
 /*
  * Search across all objects in the database.
  */
-var Search = can.Model.extend({
-	list:    asyncReq('/api/v1/search'),
+HixIO.Search = can.Model.extend({
+	list:    HixIO.asyncReq('/api/v1/search'),
 }, {});
 
 /******************************************************************************/
@@ -91,7 +104,7 @@ var Search = can.Model.extend({
  *         pager.
  *
  */
-var Pager = can.Control.extend({
+HixIO.Pager = can.Control.extend({
 	defaults: {
 		view: '/templates/pager.ejs',
 		target: null,
@@ -165,11 +178,11 @@ var Pager = can.Control.extend({
 /*
  * Provide a list of posts or details on a single post.
  */
-var PostControl = can.Control.extend({}, {
+HixIO.PostControl = can.Control.extend({}, {
 	init: function(element, options) {
 		var self = this;
 
-		this.pager = new Pager(element, {
+		this.pager = new HixIO.Pager(element, {
 			per_page: 5,
 			on_change: function() { self.update(); },
 			target: '#posts_pager',
@@ -184,9 +197,9 @@ var PostControl = can.Control.extend({}, {
 
 		params = this.pager.params();
 
-		Post.list(params).success(function(data) {
+		HixIO.Post.list(params).success(function(data) {
 			self.element.html(can.view('/templates/posts.ejs', {
-				posts: Post.models(data.posts),
+				posts: HixIO.Post.models(data.posts),
 			}));
 			self.pager.update(data.count);
 			highlightSyntax();
@@ -202,7 +215,7 @@ var PostControl = can.Control.extend({}, {
 	'posts/:id route': function(data) {
 		var self = this;
 
-		Post.findOne({ id: data.id }, function(post) {
+		HixIO.Post.findOne({ id: data.id }, function(post) {
 			self.element.html(can.view('/templates/post.ejs', {
 				post: post
 			}));
@@ -214,12 +227,12 @@ var PostControl = can.Control.extend({}, {
 /*
  * Provide a control for displaying search results.
  */
-var SearchControl = can.Control.extend({}, {
+HixIO.SearchControl = can.Control.extend({}, {
 	init: function(element, options) {
 		var self = this;
 
 		this.q = null;
-		this.pager = new Pager(element, {
+		this.pager = new HixIO.Pager(element, {
 			per_page: 5,
 			on_change: function() { self.update(); },
 			target: '#search_pager',
@@ -233,9 +246,9 @@ var SearchControl = can.Control.extend({}, {
 
 		params = this.pager.params({ q: this.q });
 
-		Search.list(params).success(function(data) {
+		HixIO.Search.list(params).success(function(data) {
 			self.element.html(can.view('/templates/search.ejs', {
-				posts: Post.models(data.posts),
+				posts: HixIO.Post.models(data.posts),
 				q: self.q,
 			}));
 			self.pager.update(data.count);
@@ -253,7 +266,7 @@ var SearchControl = can.Control.extend({}, {
 /*
  * A control for listing and displaying projects.
  */
-var CodeControl = can.Control.extend({}, {
+HixIO.CodeControl = can.Control.extend({}, {
 	init: function() {
 		can.route('code');
 	},
@@ -266,7 +279,7 @@ var CodeControl = can.Control.extend({}, {
 /*
  * A control for shortening urls.
  */
-var URLControl = can.Control.extend({}, {
+HixIO.URLControl = can.Control.extend({}, {
 	init: function() {
 		can.route('urls');
 	},
@@ -274,10 +287,10 @@ var URLControl = can.Control.extend({}, {
 	update: function() {
 		var self = this;
 
-		URL.list().success(function(data) {
+		HixIO.URL.list().success(function(data) {
 			self.element.html(can.view('/templates/urls.ejs', {
-				top_urls: URL.models(data.top_urls),
-				latest_urls: URL.models(data.latest_urls),
+				top_urls: HixIO.URL.models(data.top_urls),
+				latest_urls: HixIO.URL.models(data.latest_urls),
 			}));
 		}).error(function(data) {
 			// FIXME Error handling.
@@ -293,10 +306,11 @@ var URLControl = can.Control.extend({}, {
 
 		if(e.keyCode == 13) {
 			console.log(e.target.value);
-			URL.shorten({url: e.target.value}).success(function(data) {
+			HixIO.URL.shorten({url: e.target.value}).success(function(data) {
 				self.update();
+				HixIO.notify('Shortened url: http://hix.io/' + data.short , 'success-message', 0);
 			}).error(function(data) {
-				// FIXME Error handling.
+				HixIO.notify('I wasn\'t able to shorten that.', 'warning-message');
 			});
 		}
 	},
@@ -305,7 +319,7 @@ var URLControl = can.Control.extend({}, {
 /*
  * A control to update the menu based on the hash.
  */
-var MenuControl = can.Control.extend({
+HixIO.MenuControl = can.Control.extend({
 	defaults: {
 		selected_class: 'pure-menu-selected',
 	},	
@@ -333,6 +347,72 @@ var MenuControl = can.Control.extend({
 });
 
 /*
+ * A message bar.
+ */
+HixIO.MessageControl = can.Control.extend({
+	defaults: {
+		timeout: 5000, // milliseconds
+	},
+},{
+	init: function(element, options) {
+		var self = this;
+
+		this.element.hide();
+
+		this.stack = new can.List();
+		this.stack.bind('add', function() {
+			if(self.stack.length == 0) { return; }
+			if(self.element.is(':visible')) { return; }
+			self.update();
+			self.element.slideDown('fast');
+		});
+	},
+
+	update: function() {
+		var self = this;
+		var obj = this.stack.shift();
+		var timeout = this.options.timeout;
+
+		this.element.html(can.view('/templates/message.ejs', obj));
+		
+		/*
+		if(obj.timeout) {
+			console.log(obj.timeout);
+			if(obj.timeout == 0) {
+				console.log('NO TIMEOUT');
+				while(this.stack.length > 0) {
+					this.stack.pop();
+				}
+				return;
+			} else {
+				timeout = obj.timeout;
+			}
+		}
+	    */
+
+		setTimeout( function() {
+			if(self.stack.length > 0 ){
+				self.element.fadeOut( 'fast', function() {
+					self.update();
+					self.element.fadeIn( 'fast' );
+				});
+			}else{
+				self.element.slideUp('slow');
+			}
+		}, timeout );
+	},
+
+	notify: function(message, message_class, timeout) {
+		console.log(timeout);
+		this.stack.push({
+			message: message,
+			message_class: message_class,
+			timeout: timeout,
+		});
+	},
+});
+
+/*
  * Setup the initial environment, route requests to control, and handle
  * events for the whole document.
  *
@@ -341,10 +421,9 @@ var MenuControl = can.Control.extend({
  * have to maintain the menu or list of controls.
  *
  */
-var Router = can.Control.extend({
+HixIO.Router = can.Control.extend({
 	defaults: {
 		main: '#main',
-		menu: '#menu',
 		default_route: 'posts',
 	},
 }, {
@@ -361,11 +440,11 @@ var Router = can.Control.extend({
 		 * stupid inside of init methods, like making http calls, writing to the main
 		 * element, etc.
 		 */
-		new MenuControl(this.options.menu);
-		new SearchControl(this.options.main);
-		new PostControl(this.options.main);
-		new CodeControl(this.options.main);
-		new URLControl(this.options.main);
+
+		new HixIO.SearchControl(this.options.main);
+		new HixIO.PostControl(this.options.main);
+		new HixIO.CodeControl(this.options.main);
+		new HixIO.URLControl(this.options.main);
 
 		/*
 		 * All routes get defined in each control's init method, all of the routes we
@@ -400,6 +479,8 @@ var Router = can.Control.extend({
  * Start up the main router.
  */
 $(document).ready(function() {
-	new Router(document.body);
+	HixIO.router = new HixIO.Router(document.body);
+	HixIO.menu = new HixIO.MenuControl('#menu');
+	HixIO.message_control = new HixIO.MessageControl('#messages');
 });
 

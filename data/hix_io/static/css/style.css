@@ -184,3 +184,29 @@ div#main > div.loading {
 	width: 100%;
 }
 
+.error-message,
+.info-message,
+.success-message,
+.warning-message {
+}
+
+.error-message {
+	background-color: #f0e0e0 !important;
+	color: #a00000;
+}
+
+.info-message {
+	background-color: #e6f6ff !important;
+	color: #00a0ff;
+}
+
+.success-message {
+	background-color: #e0f0e0 !important;
+	color: #00a000;
+}
+
+.warning-message {
+	background-color: #fff6e6 !important;
+	color: #e08000;
+}
+

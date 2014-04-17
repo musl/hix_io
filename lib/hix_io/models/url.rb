@@ -7,24 +7,11 @@ require 'uri'
 #
 class HixIO::URL < Sequel::Model( :hix_io__urls )
 
-	def self.shorten( params = {} )
-		url = URI( params[:url] )
+	plugin :validation_helpers
 
-		unless url.scheme and url.host
-			raise ArgumentError, 'Invalid URL.'
-		end
-
-		if url.host =~ /#{HixIO.domain}(\.)?$/i
-			raise ArgumentError, 'Unacceptable URL: %s' % [params[:url]]
-		end
-
-		short = Zlib::crc32( url.to_s ).to_s( 36 )
-
-		return self.find_or_create( :url => url.to_s ) { |u|
-			u.short = short
-			u.source_ip = params[:source_ip]
-		}
-	end
+	########################################################################
+	### D A T A S E T S
+	########################################################################
 
 	dataset_module do
 
@@ -36,6 +23,45 @@ class HixIO::URL < Sequel::Model( :hix_io__urls )
 			return self.order( Sequel.desc( :created_at ) )
 		end
 
+	end
+
+	########################################################################
+	### H O O K S
+	########################################################################
+
+	# Validates this model.
+	#
+	def validate
+		super
+		validates_presence [:url, :source_ip]
+		validates_unique [:url, :short]
+		errors.add( :url, "invalid" ) unless valid_url?
+	end
+
+	# Updates a dependent column.
+	#
+	def before_save
+		self.short = Zlib::crc32( self.url.to_s ).to_s( 36 )
+	end
+
+	########################################################################
+	### I N S T A N C E   M E T H O D S
+	########################################################################
+
+	#######
+	private
+	#######
+
+	# Validate the given URL.
+	#
+	def valid_url?
+		url = URI( self.url )
+
+		return false unless url.scheme and url.host
+		return false if	url.host =~ /#{HixIO.domain}\.?$/i
+		return true
+	rescue URI::InvalidURIError
+		return false
 	end
 
 end

@@ -6,19 +6,22 @@ require 'hix_io'
 
 # Provides REST resources for the application.
 #
-class API < Strelka::App
+class HixIO::API < Strelka::App
 
 	extend Loggability
 	log_to :hix_io
 
-	plugins :routing, :negotiation, :parameters
+	plugins :auth, :routing, :negotiation, :parameters
 	param :id, :integer
 
 	default_type :json
 
+	require_auth_for { |req| req.verb == :POST }
+	no_perms_for     { |req| true }
+
 	get '/posts' do |req|
-		req.params.add( :offset, :integer )
-		req.params.add( :limit, :integer )
+		req.params.add :offset, :integer
+		req.params.add :limit, :integer
 
 		res = req.response
 		res.for( :json ) {{
@@ -35,9 +38,9 @@ class API < Strelka::App
 	end
 
 	get '/search' do |req|
-		req.params.add( :q, :string )
-		req.params.add( :offset, :integer )
-		req.params.add( :limit, :integer )
+		req.params.add :q, :string
+		req.params.add :offset, :integer
+		req.params.add :limit, :integer
 
 		res = req.response
 		res.for( :json ) {{
@@ -56,22 +59,21 @@ class API < Strelka::App
 		return res
 	end
 
-	# TODO: host-based auth for this route.
 	post '/urls' do |req|
-		req.params.add( :url, :string )
+		req.params.add :url, :string
 
-		url = nil
-		begin
-			url = HixIO::URL.shorten(
-				:url => req.params[:url],
-				:source_ip => [req.headers.x_forwarded_for].flatten.first
-			)
-		rescue ArgumentError => e
-			finish_with( HTTP::UNPROCESSABLE_ENTITY, e.message )
-		end
+		self.log.warn( '%p' % [self.auth_provider.allowed_netblocks] )
 
 		res = req.response
-		res.for( :json ) { url }
+		res.for( :json ) do
+			begin
+				HixIO::URL.find_or_create( :url => req.params[:url] ) do |url|
+					url.source_ip = [req.headers.x_forwarded_for].flatten.first
+				end
+			rescue Sequel::ValidationFailed => e
+				finish_with( HTTP::UNPROCESSABLE_ENTITY, e )
+			end
+		end
 		return res
 	end
 

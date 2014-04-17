@@ -55,6 +55,7 @@ begin
 		s.add_dependency 'sequel', '~> 4.7'
 		s.add_dependency 'pg', '~> 1.17'
 		s.add_dependency 'loggability', '~> 0.10'
+		s.add_dependency 'trollop', '~> 2.0'
 
 		s.add_development_dependency 'pry', '~> 0.9'
 		s.add_development_dependency 'rdoc', '>= 4.1'
