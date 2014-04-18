@@ -1,5 +1,7 @@
 /* vim: set nosta noet ts=4 sw=4 ft=javascript: */
 
+'use strict';
+
 /******************************************************************************/
 // Namespace
 /******************************************************************************/
@@ -25,12 +27,14 @@ var HixIO = {};
  *
  */
 HixIO.highlightSyntax = function() {
-	$('pre code').each(function(i, el) {
-		var e = $(el);
-		var lang = e.attr('data-language');
+	$('pre code').each(function() {
+		var e, lang;
+		
+		e = $(this);
+		lang = e.attr('data-language');
 
 		if(!lang) {
-			hljs.highlightBlock(el);
+			hljs.highlightBlock(this);
 		} else if(hljs.getLanguage(lang)) {
 			e.html(hljs.highlight(lang, e.html(), true));
 		}
@@ -70,11 +74,11 @@ HixIO.ajax = function(path, method, type) {
 /*
  * Convenience method for notifications. HMmmm.
  */
-HixIO.notify = function (m,c,t) {
+HixIO.notify = function (message, message_class, timeout) {
 	HixIO.message_bar.notify({
-		message: m,
-		message_class: c,
-		timeout: t
+		message: message,
+		message_class: message_class,
+		timeout: timeout
 	});
 };
 
@@ -120,9 +124,11 @@ HixIO.Search = can.Model.extend({
  */
 HixIO.PostControl = can.Control.extend({}, {
 	init: function(element, options) {
-		var self = this;
+		var self;
+	   	
+		self = this;
 
-		this.pager = new HixIO.Pager(element, {
+		this.pager = new HixIO.Pager(this.element, {
 			per_page: 5,
 			on_change: function() { self.update(); },
 			target: '#posts_pager'
@@ -133,8 +139,10 @@ HixIO.PostControl = can.Control.extend({}, {
 	},
 
 	update: function() {
-		var self = this;
-		var params = this.pager.params();
+		var self, params;
+	   
+		self = this;
+		params = this.pager.params();
 
 		HixIO.Post.list(params).success(function(data) {
 			self.element.html(can.view('/static/templates/posts.ejs', {
@@ -147,7 +155,7 @@ HixIO.PostControl = can.Control.extend({}, {
 		});
 	},
 
-	'posts route': function() {
+	'posts route': function(data) {
 		this.update();
 	},
 
@@ -168,10 +176,12 @@ HixIO.PostControl = can.Control.extend({}, {
  */
 HixIO.SearchControl = can.Control.extend({}, {
 	init: function(element, options) {
-		var self = this;
+		var self;
+	   
+		self = this;
 
 		this.q = null;
-		this.pager = new HixIO.Pager(element, {
+		this.pager = new HixIO.Pager(this.element, {
 			per_page: 5,
 			on_change: function() { self.update(); },
 			target: '#search_pager'
@@ -181,8 +191,10 @@ HixIO.SearchControl = can.Control.extend({}, {
 	},
 
 	update: function() {
-		var self = this;
-		var params = this.pager.params({ q: this.q });
+		var self, params;
+	   
+		self = this;
+		params = this.pager.params({ q: this.q });
 
 		HixIO.Search.list(params).success(function(data) {
 			self.element.html(can.view('/static/templates/search.ejs', {
@@ -209,11 +221,11 @@ HixIO.CodeControl = can.Control.extend({
 		view: '/static/templates/code.ejs'
 	}
 }, {
-	init: function() {
+	init: function(element, options) {
 		can.route('code');
 	},
 
-	'code route': function() {
+	'code route': function(data) {
 		this.element.html(can.view(this.options.view, {}));
 	}
 });
@@ -222,16 +234,17 @@ HixIO.CodeControl = can.Control.extend({
  * A control for shortening urls.
  */
 HixIO.URLControl = can.Control.extend({}, {
-	init: function() {
+	init: function(element, options) {
 		can.route('urls');
 	},
 
 	update: function() {
 		var self = this;
-
+		
 		HixIO.URL.list().success(function(data) {
 			self.element.html(can.view('/static/templates/urls.ejs', {
-				host: HixIO.conf.host,
+				scheme: HixIO.meta.scheme,
+				host: HixIO.meta.host,
 				top_urls: HixIO.URL.models(data.top_urls),
 				latest_urls: HixIO.URL.models(data.latest_urls),
 				url: self.url
@@ -241,15 +254,15 @@ HixIO.URLControl = can.Control.extend({}, {
 		});
 	},
 
-	'urls route': function() {
+	'urls route': function(data) {
 		this.update();
 	},
 
-	'#shorten keyup': function(el,e) {
+	'#shorten keyup': function(element, event) {
 		var self = this;
 
-		if(e.keyCode === 13 && e.target.value !== '') {
-			HixIO.URL.shorten({url: e.target.value}).success(function(data) {
+		if(event.keyCode === 13 && event.target.value !== '') {
+			HixIO.URL.shorten({url: event.target.value}).success(function(data) {
 				self.url = data;
 				self.update();
 			}).error(function(data) {
@@ -370,8 +383,8 @@ HixIO.Pager = can.Control.extend({
 		return params;
 	},
 
-	'{target} a click': function(el, ev) {
-		var page = parseInt(el.attr('data-page'), 10);
+	'{target} a click': function(element, event) {
+		var page = parseInt(element.attr('data-page'), 10);
 
 		if(page >= 0 && page < this.state.pages) {
 			this.state.attr('page', page);
@@ -468,13 +481,12 @@ HixIO.MessageBar = can.Control.extend({
 	}
 },{
 	init: function(element, options) {
-		var i;
 		var self = this;
 
 		/*
 		 * Close this control on route changes, unless the persist option is set.
 		 */
-		can.route.bind('route', function(i,e) {
+		can.route.bind('route', function() {
 			if(!self.options.persist) { self.close(); }
 		});
 	},
@@ -509,8 +521,9 @@ HixIO.MessageBar = can.Control.extend({
 	 * Render the template and hook up the close timeout.
 	 */
 	update: function() {
-		var self = this;
-		var timeout,t;
+		var self, timeout, t;
+
+		self = this;
 
 		// Don't render the view if there's nothing to say.
 		if(!this.message) { return; }
@@ -544,7 +557,7 @@ HixIO.MessageBar = can.Control.extend({
 	},
 
 	// Hook up the close event.
-	'{close} click': function(el, ev) { this.close(); }
+	'{close} click': function(element, event) { this.close(); }
 });
 
 /*
@@ -582,9 +595,9 @@ HixIO.Router = can.Control.extend({
 	/*
 	 * Handle the search event globally.
 	 */
-	'{search} keyup': function(el,e) {
-		if(e.keyCode === 13) {
-			window.location.hash = can.route.url({route: 'search', q: e.target.value});
+	'{search} keyup': function(element, event) {
+		if(event.keyCode === 13) {
+			window.location.hash = can.route.url({route: 'search', q: event.target.value});
 		}
 	}
 });

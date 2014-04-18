@@ -21,15 +21,12 @@
 		<link rel="stylesheet" href="/static/css/highlight/googlecode.min.css" type="text/css" media="screen" charset="utf-8">
 
 		<!-- If all of our scripts are well-behaved, nothing needs to go in the body. -->
-		<script src="/static/js/jquery.min.js" type="text/javascript" charset="utf-8"></script>
-		<script src="/static/js/can.js" type="text/javascript" charset="utf-8"></script>
-		<script src="/static/js/highlight.min.js" type="text/javascript" charset="utf-8"></script>
-		<script src="/static/js/main.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/static/js/lib/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/static/js/lib/can.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/static/js/lib/highlight.min.js" type="text/javascript" charset="utf-8"></script>
 
-		<script type="text/javascript" charset="utf-8">
-			// App-supplied configuration.
-			HixIO.conf = <?attr conf ?>;
-		</script>
+		<script src="/static/js/main.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript" charset="utf-8">HixIO.meta = <?attr meta ?>;</script>
 
 	</head>
 	<body>

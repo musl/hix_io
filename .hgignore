@@ -2,3 +2,4 @@ pkg/.*
 data/hix_io/static/docs/.*
 .*.sqlite
 .*.vim
+node_modules/.*

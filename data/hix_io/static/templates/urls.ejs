@@ -13,7 +13,7 @@
 <% } else { %>
 	<div class="post">
 		<div class="l-box">
-			Short URL: <a href="http://<%= host %>/<%= url.short %>">http://<%= host %>/<%= url.short %></a><br>
+			Short URL: <a href="<%= scheme %>://<%= host %>/<%= url.short %>"><%= scheme %>://<%= host %>/<%= url.short %></a><br>
 			<small>Original URL: <a href="<%= url.url %>"><%= url.url %></a></small>
 		</div>
 	</div>
@@ -28,7 +28,7 @@
 				<ol>
 					<% latest_urls.each( function(u) { %>
 						<li>
-							<a href="http://<%= host %>/<%= u.short %>">http://<%= host %>/<%= u.short %></a>
+							<a href="<%= scheme %>://<%= host %>/<%= u.short %>"><%= scheme %>://<%= host %>/<%= u.short %></a>
 							<dd><%= u.created_at %></dd>
 							<dd><small><%= u.url %></small></dd>
 						</li>
@@ -40,7 +40,7 @@
 				<ol>
 					<% top_urls.each( function(u) { %>
 						<li>
-							<a href="http://<%= host %>/<%= u.short %>">http://<%= host %>/<%= u.short %></a>
+							<a href="<%= scheme %>://<%= host %>/<%= u.short %>"><%= scheme %>://<%= host %>/<%= u.short %></a>
 							<dd><%= u.hits %> hits</dd>
 							<dd><small><%= u.url %></small></dd>
 						</li>

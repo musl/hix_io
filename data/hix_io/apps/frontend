@@ -25,24 +25,24 @@ class HixIO::Frontend < Strelka::App
 	get '/' do |req|
 		tmpl = template( :index )
 
-		tmpl.conf = {
+		tmpl.meta = {
 			:host => HixIO.host,
 			:stamp => Time.now,
-			:dev => HixIO.dev?
+			:dev => HixIO.dev?,
+			:ssl => req.ssl?,
+			:scheme => req.scheme
 		}
 
 		if HixIO.dev?
-			tmpl.conf[:req] = {
+			tmpl.meta[:req] = {
 				:env => ENV.to_hash,
-				:headers => req.headers.to_hash,
-				:ssl => req.ssl?,
-				:scheme => req.scheme,
+				:headers => req.headers.to_hash
 			}
-			tmpl.conf = JSON.pretty_generate( tmpl.conf )
+			tmpl.meta = JSON.pretty_generate( tmpl.meta )
 			return tmpl
 		end
 
-		tmpl.conf = tmpl.conf.to_json
+		tmpl.meta = tmpl.meta.to_json
 		return tmpl
 	end
 

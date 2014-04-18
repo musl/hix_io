@@ -64,6 +64,7 @@ begin
 		s.add_development_dependency 'rspec', '~> 2.14'
 		s.add_development_dependency 'ruby-prof', '~> 0.14'
 		s.add_development_dependency 'simplecov', '~> 0.8'
+		s.add_development_dependency 'execjs', '~> 2.0'
 	end
 
 	Gem::PackageTask.new( spec ).define
@@ -115,6 +116,36 @@ begin
 
 rescue LoadError
 	$stderr.puts "Omitting testing tasks, rspec doesn't seem to be installed."
+end
+
+# Use JSLint to check the JavaScript application, for great justice. Try to
+# install JSLint if it's not installed in this project.
+#
+begin
+	desc 'Lint the JavaScript application.'
+	task :jslint do
+
+		# Check for jslint's node wrapper.
+		jslint = BASEDIR + 'node_modules/.bin/jslint'
+
+		# Install the module if the wrapper's not there.
+		system 'npm install jslint' unless jslint.exist?
+
+		cmd = [
+			jslint,
+			%w[
+				--browser
+				--predef $
+				--predef can
+				--predef hljs
+				--unparam
+				--white
+			],
+			Pathname.glob( DATADIR + 'static/js/*.js' )
+		]
+
+		system cmd.flatten.join( ' ' )
+	end
 end
 
 ########################################################################
