@@ -16,17 +16,11 @@ It's not done yet.
 
 == REQUIREMENTS:
 
-* ruby >= 2.0
-* mongrel2 devel branch (for foreground flag)
-* postgresql 9.x
-* gems:
-    * mongrel2
-    * strelka
-    * sequel
-    * pg
-    * rake
-    * rspec
-    * etc.
+* ruby ~> 2.0
+* mongrel2 ~> 1.9.0
+* postgresql >= 9.3
+* See the Rakefile for the full list of gem dependencies & development
+  dependencies.
 
 == DEVELOPERS:
 
