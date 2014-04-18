@@ -10,21 +10,20 @@ if ENV['COVERAGE']
 	require 'simplecov'
 	SimpleCov.start do
 		coverage_dir 'data/hix_io/static/docs/coverage'
+
 		add_filter 'spec'
-		#add_filter 'var'
-		#add_group "Strelka Extensions", "lib/strelka"
-		#add_group "Models" do |file|
-		#	file.lines.any?{|line| line.source =~ /< Sequel::Model\(/ }
-		#end
-		#add_group "Needing tests" do |file|
-		#	file.covered_percent < 90
-		#end
+		add_filter 'data/hix_io/migrations'
+
+		add_group( "Apps", 'data/hix_io/apps' )
+		add_group( "Models", 'lib/hix_io/models' )
+		add_group( "Not Fully Tested" ) { |file| file.covered_percent < 100 }
 	end
 end
 
 require 'hix_io'
 
 HixIO.load_config( 'etc/config.yml' )
+HixIO.log.level = :fatal
 
 def migrate!
 	raise "Hold on there, buddy. We're not in developer mode!" unless HixIO.dev?

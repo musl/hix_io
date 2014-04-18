@@ -10,8 +10,8 @@ hostaccess:
     - '10.0.0.0/8'
 logging:
     __default__: 'warn (color)'
-    hix_io: 'info (color)'
+    hix_io: 'warn (color)'
     loggability: 'warn (color)'
-    configurability: 'debug (color)'
+    configurability: 'warn (color)'
     strelka: 'warn (color)'
 

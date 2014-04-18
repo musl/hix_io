@@ -68,10 +68,9 @@ module HixIO
 			raise "We're in dev mode and the database name doesn't end in 'dev'."
 		end
 
-		self.log.level = :debug if self.dev?
-
-		@db ||= Sequel.connect( self.config.db_uri, :logger => self.log )
-		self.db.sql_log_level = :debug
+		@db ||= Sequel.connect( self.config.db_uri )
+		#@db ||= Sequel.connect( self.config.db_uri, :logger => self.log )
+		#self.db.sql_log_level = :debug
 
 		self.db.extension :pg_json
 		self.db.extension :null_dataset

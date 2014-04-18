@@ -11,11 +11,14 @@ module HixIO::Constants
 	# DVCS Revision Number
 	REVISION = %$Rev$
 
+	# The data dir for the gem or in a development directory
+	DATA_DIR = Pathname( __FILE__ ).parent.parent.parent + 'data/hix_io'
+
 	# The location for migrations, in the gem or in a development directory.
-	MIGRATION_DIR = Pathname( __FILE__ ).parent.parent.parent + 'data/hix_io/migrations'
+	MIGRATION_DIR = DATA_DIR + 'migrations'
 
 	# The location for models.
-	MODEL_DIR = Pathname( __FILE__ ).parent.parent + 'hix_io/models'
+	MODEL_DIR = Pathname( __FILE__ ).parent + 'models'
 
 end
 
