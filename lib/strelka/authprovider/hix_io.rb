@@ -28,15 +28,23 @@ class Strelka::AuthProvider::HixIO < Strelka::AuthProvider
 		self.log.debug( '%p: allowed_netblocks: %p' % [self, allowed_netblocks] )
 	end
 
+	def self::authorized_address?( request )
+		x_forwarded_for = request.header.x_forwarded_for or
+			raise "No X-Forwarded-For header?!"
+		ipaddr = IPAddr.new( x_forwarded_for )
+		return self.allowed_netblocks.any? {|b| b.include?(ipaddr) }
+	end
+
+	########################################################################
+	### A U T H   H O O K S
+	########################################################################
+
 	def authenticate( request )
 		return true
 	end
 
 	def authorize( credentials, request, perms )
-		x_forwarded_for = request.header.x_forwarded_for or
-			raise "No X-Forwarded-For header?!"
-		ipaddr = IPAddr.new( x_forwarded_for )
-		return true if self.class.allowed_netblocks.any? {|b| b.include?(ipaddr) }
+		return true if self.class.authorized_address?( request )
 		self.require_authorization
 	end
 

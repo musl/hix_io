@@ -29,8 +29,8 @@ require 'hix_io'
 
 include Mongrel2::Constants
 
+Loggability.output_to( File.open( File::NULL, 'w' ) )
 HixIO.load_config( 'etc/config.yml' )
-HixIO.log.level = :fatal
 
 def migrate!
 	raise "Hold on there, buddy. We're not in developer mode!" unless HixIO.dev?

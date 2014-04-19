@@ -30,7 +30,7 @@ class HixIO::Frontend < Strelka::App
 			:stamp => Time.now,
 			:dev => HixIO.dev?,
 			:ssl => req.ssl?,
-			:scheme => req.scheme
+			:scheme => req.scheme,
 		}
 
 		if HixIO.dev?
