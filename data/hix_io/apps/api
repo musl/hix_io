@@ -2,6 +2,7 @@
 # encoding: UTF-8
 
 require 'strelka'
+require 'strelka/authprovider/hix_io'
 require 'hix_io'
 
 # Provides REST resources for the application.
@@ -16,8 +17,7 @@ class HixIO::API < Strelka::App
 
 	default_type :json
 
-	require_auth_for { |req| req.verb == :POST }
-	no_perms_for     { |req| true }
+	no_perms_for { |req| req.verb == :GET }
 
 	get '/posts' do |req|
 		req.params.add :offset, :integer
@@ -62,9 +62,6 @@ class HixIO::API < Strelka::App
 
 	post '/urls' do |req|
 		req.params.add :url, :string
-
-		# TODO write an auth provider. :/
-		self.log.warn( '%p' % [self.auth_provider.allowed_netblocks] )
 
 		res = req.response
 		res.for( :json ) do
