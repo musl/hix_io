@@ -266,7 +266,11 @@ HixIO.URLControl = can.Control.extend({}, {
 				self.url = data;
 				self.update();
 			}).error(function(data) {
-				HixIO.notify('I wasn\'t able to shorten that.', 'warning-message');
+				if(data.status === 403) {
+					HixIO.notify('You aren\'t allowed to shorten urls.', 'error-message');
+				} else {
+					HixIO.notify('I wasn\'t able to shorten that.', 'warning-message');
+				}
 			});
 		}
 	}

@@ -9,7 +9,7 @@ auth:
 hix_io_auth:
     allowed_netblocks:
         - 127.0.0.1/32
-        #- 192.168.0.0/24
+        - 192.168.0.0/24
 logging:
     __default__: 'warn (color)'
     hix_io: 'warn (color)'

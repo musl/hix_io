@@ -17,6 +17,7 @@ class HixIO::API < Strelka::App
 
 	default_type :json
 
+	no_auth_for { |req| req.verb == :GET }
 	no_perms_for { |req| req.verb == :GET }
 
 	get '/posts' do |req|
