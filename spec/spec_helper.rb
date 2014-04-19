@@ -20,7 +20,14 @@ if ENV['COVERAGE']
 	end
 end
 
+TEST_APP_PARAMS =  %w[test-app tcp://127.0.0.1:9998 tcp://127.0.0.1:9999]
+
+require 'mongrel2'
+require 'mongrel2/testing'
+
 require 'hix_io'
+
+include Mongrel2::Constants
 
 HixIO.load_config( 'etc/config.yml' )
 HixIO.log.level = :fatal
