@@ -13,9 +13,7 @@ opts = Trollop.options do
 end
 
 HixIO.load_config( opts[:config], :skip_models => true )
-if apts[:debug]
-	HixIO.log.level = :debug
-end
+HixIO.log.level = opts[:debug] ? :debug : :info
 
 Sequel.extension :migration
 
