@@ -2,36 +2,14 @@
 # vim: set nosta noet ts=4 sw=4 ft=ruby:
 # encoding: UTF-8
 
-require 'rubygems'
-require 'fileutils'
-require 'mongrel2/config'
-require 'loggability'
+require 'trollop'
+require 'hix_io/tools/config_processor'
 
-extend Loggability,
-       FileUtils
-
-log_as :hix_io_configure
-self.log.level = $DEBUG ? :debug : :warn
-
-DATADIR = Pathname( Gem.datadir( 'hix_io' ) || 'data/hix_io' ).expand_path
-ETCDIR = DATADIR.parent.parent.expand_path + 'etc'
-
-Dir.glob( ETCDIR + '*.conf.rb' ).each do |conf|
-    Class.new do
-        extend Loggability,
-               Mongrel2::Config::DSL,
-               FileUtils
-
-        log_to :hix_io_configure
-
-        name = conf.sub( /.conf.rb$/, '' )
-        self.log.debug "Rebuilding: #{name}.sqlite"
-        Mongrel2::Config.configure(
-            :configdb => (ETCDIR + "#{name}.sqlite").to_s
-        )
-        Mongrel2::Config.init_database!
-
-        self.log.debug "Loading: #{conf}"
-        eval( File.read( conf ))
-    end
+opts = Trollop.options do
+	banner 'HixIO Configuration Tool'
+	opt :etc_dir, 'Required: The path to the mongrel2 etc directory.', :type => :string, :required => true
+	opt :debug, 'Force debug logging.', :default => false
 end
+
+HixIO::Tools::ConfigProcessor.run!( opts )
+

@@ -27,5 +27,3 @@ settings 'control_port'          => 'ipc://m2control',
          'upload.temp_store'     => '/tmp/mongrel2.upload.XXXXXXX',
          'zeromq.threads'        => 1
 
-mkdir_p '/var/log/mongrel2'
-
