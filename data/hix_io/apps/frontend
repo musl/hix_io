@@ -24,8 +24,21 @@ class HixIO::Frontend < Strelka::App
 
 	get '/' do |req|
 		tmpl = template( :index )
+		tmpl.meta = self.meta( req )
+		return tmpl
+	end
 
-		tmpl.meta = {
+	get '/:short' do |req|
+		if url = HixIO::URL[:short => req.params[:short]]
+			url.update( :hits => url.hits + 1 )
+			finish_with( HTTP::REDIRECT, '', :location => url.url )
+		end
+
+		finish_with( HTTP::NOT_FOUND )
+	end
+
+	def meta( req )
+		meta = {
 			:host => HixIO.host,
 			:stamp => Time.now,
 			:dev => HixIO.dev?,
@@ -34,26 +47,14 @@ class HixIO::Frontend < Strelka::App
 		}
 
 		if HixIO.dev?
-			tmpl.meta[:req] = {
+			meta[:req] = {
 				:env => ENV.to_hash,
 				:headers => req.headers.to_hash
 			}
-			tmpl.meta = JSON.pretty_generate( tmpl.meta )
-			return tmpl
+			return JSON.pretty_generate( meta )
 		end
 
-		tmpl.meta = tmpl.meta.to_json
-		return tmpl
-	end
-
-	get '/:short' do |req|
-		if url = HixIO::URL[:short => req.params[:short]]
-			url.hits += 1
-			url.save
-			finish_with( HTTP::REDIRECT, '', :location => url.url )
-		else
-			finish_with( HTTP::NOT_FOUND )
-		end
+		return meta.to_json
 	end
 
 end

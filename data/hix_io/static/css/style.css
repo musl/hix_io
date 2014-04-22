@@ -180,8 +180,9 @@ div#main > div.loading {
 
 /* Search Form */
 
-.search-q {
+.menu-input-text {
 	width: 100%;
+	margin-bottom: 0.25em;
 }
 
 .error-message,

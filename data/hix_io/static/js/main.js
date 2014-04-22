@@ -231,6 +231,24 @@ HixIO.CodeControl = can.Control.extend({
 });
 
 /*
+ * A control for a shared photo timeline.
+ */
+HixIO.PicsControl = can.Control.extend({
+	defaults: {
+		view: '/static/templates/pics.ejs'
+	}
+}, {
+	init: function(element, options) {
+		can.route('pics');
+	},
+
+	'pics route': function(data) {
+		this.element.html(can.view(this.options.view, {}));
+	}
+});
+
+
+/*
  * A control for shortening urls.
  */
 HixIO.URLControl = can.Control.extend({}, {
@@ -618,9 +636,10 @@ $(document).ready(function() {
 
 	HixIO.controls = [];
 	HixIO.controls.push(
-		new HixIO.SearchControl(main_element),
-		new HixIO.PostControl(main_element),
 		new HixIO.CodeControl(main_element),
+		new HixIO.PicsControl(main_element),
+		new HixIO.PostControl(main_element),
+		new HixIO.SearchControl(main_element),
 		new HixIO.URLControl(main_element)
 	);
 
