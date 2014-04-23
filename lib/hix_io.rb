@@ -68,13 +68,16 @@ module HixIO
 			raise "We're in dev mode and the database name doesn't end in 'dev'."
 		end
 
-		@db ||= Sequel.connect( self.config.db_uri )
-		#@db ||= Sequel.connect( self.config.db_uri, :logger => self.log )
-		#self.db.sql_log_level = :debug
+		if self.dev?
+			@db ||= Sequel.connect( self.config.db_uri, :logger => self.log )
+			self.db.sql_log_level = :debug
+		else
+			@db ||= Sequel.connect( self.config.db_uri )
+		end
 
-		self.db.extension :pg_json
 		self.db.extension :null_dataset
 		self.db.extension :pg_inet
+		self.db.extension :pg_json
 
 		# We may not want to load models at runtime. For example, if
 		# we're only interested in constants, utilities, or low-level
@@ -86,9 +89,6 @@ module HixIO
 		# the proper database handle for Sequel here, and all models loaded after
 		# this point will do the right thing.
 		Sequel::Model.db = self.db
-
-		Sequel::Model.plugin :json_serializer
-		Sequel::Model.plugin :timestamps, :update_on_create => true
 
 		self.load_models
 

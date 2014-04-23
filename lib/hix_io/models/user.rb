@@ -1,33 +1,25 @@
 # vim: set nosta noet ts=4 sw=4 ft=ruby:# encoding: UTF-8
 
-require 'zlib'
-require 'uri'
+require 'digest/sha2'
+require 'securerandom'
 
-# Class to describe a shortened URL.
+# Class to describe a user account.
 #
-class HixIO::URL < Sequel::Model( :hix_io__urls )
+class HixIO::User < Sequel::Model( :hix_io__users )
+
+	unrestrict_primary_key
 
 	plugin :validation_helpers
 	plugin :json_serializer
 
-	unrestrict_primary_key
-
-	many_to_one :user, :eager => [:user]
+	one_to_many :posts
+	one_to_many :urls, :class => HixIO::URL
 
 	########################################################################
 	### D A T A S E T S
 	########################################################################
 
 	dataset_module do
-
-		def top
-			return self.order( Sequel.desc( :hits ) )
-		end
-
-		def latest
-			return self.order( Sequel.desc( :ctime ) )
-		end
-
 	end
 
 	########################################################################
@@ -37,16 +29,15 @@ class HixIO::URL < Sequel::Model( :hix_io__urls )
 	# Validates this model.
 	#
 	def validate
-		super
-		validates_presence [:url, :source_ip]
-		validates_unique [:url, :short]
-		errors.add( :url, "invalid" ) unless valid_url?
+		validates_presence( :password )
 	end
 
-	# Updates a dependent column.
+	# Create identity information.
 	#
-	def before_save
-		self.short = Zlib::crc32( self.url.to_s ).to_s( 36 )
+	def before_create
+		self.api_secret = Digest::SHA512.hexdigest(
+			SecureRandom.random_bytes( 128 )
+		)
 		super
 	end
 
@@ -56,20 +47,13 @@ class HixIO::URL < Sequel::Model( :hix_io__urls )
 
 	# Validate the given URL.
 	#
-	def valid_url?
-		url = URI( self.url )
-
-		return false unless url.scheme and url.host
-		return false if	url.host =~ /#{HixIO.host}\.?$/i
-		return true
-	rescue URI::InvalidURIError
-		return false
+	def valid_user?
 	end
 
 	# Override & cripple to_json. There can only be one!
 	#
 	def to_json( *a )
-		return super( :include => :user )
+		return super( :except => [:password, :api_secret] )
 	end
 
 end

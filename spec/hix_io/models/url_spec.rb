@@ -10,15 +10,25 @@ describe( HixIO::URL ) do
 
 	before( :all ) { migrate! }
 	after( :each ) { described_class.dataset.delete }
+	after( :all ) { migrate! }
+
+	let( :user ) do
+		HixIO::User.find_or_create( :email => 'test@example.com' ) { |u|
+			u.password = Digest::SHA512.hexdigest( 'test' ),
+			u.disable_on = Time.now() + 86400
+		}
+	end
 
 	context 'dataset methods' do
 
+		subject { described_class }
+
 		let( :urls ) do
 			10.times do |i|
-				described_class.create({
+				user.add_url({
 					:url => 'http://example.com/%d' % [i],
 					:source_ip => '127.0.0.1',
-					:created_at => Time.now + i,
+					:ctime => Time.now + i,
 					:hits => i
 				})
 			end
@@ -37,28 +47,32 @@ describe( HixIO::URL ) do
 
 	context 'instance methods' do
 
-		let( :url ) do
-			described_class.create({
+		subject do
+			user.add_url({
 				:url => 'http://example.com/',
 				:source_ip => '127.0.0.1',
 			})
 		end
 
 		it 'create short hashes' do
-			expect( url.short ).to match( /^[0-9a-z]{1,7}$/ )
+			expect( subject.short ).to match( /^[0-9a-z]{1,7}$/ )
 		end
 
 		it 'reject invalid URLs' do
 			%w[:// http:// foo].each do |u|
-				url.url = u
-				expect { url.save }.to raise_error( /url invalid/i )
+				subject.url = u
+				expect { subject.save }.to raise_error( /url invalid/i )
 			end
 
 		end
 
 		it 'will not shorten URLs that match our host' do
-			url.url = 'http://%s' % [HixIO.host]
-			expect { url.save }.to raise_error( /url invalid/i )
+			subject.url = 'http://%s' % [HixIO.host]
+			expect { subject.save }.to raise_error( /url invalid/i )
+		end
+
+		it 'updates its own timestamps' do
+			expect( subject.ctime ).to be_a( Time )
 		end
 
 	end

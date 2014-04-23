@@ -2,7 +2,7 @@
 	<div class="post">
 		<h2><%== can.route.link(post.attr('title'), {id: post.attr('id')}, {}); %></h2>
 		<hr>
-		<p class="post-meta">Updated: <%= post.attr('updated_at') %></p>
+		<p class="post-meta">Updated <%= post.attr('mtime'); %></p>
 		<p><%== post.attr("body"); %></p>
 	</div>
 <% }); %>

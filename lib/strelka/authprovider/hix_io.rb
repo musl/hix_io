@@ -10,29 +10,10 @@ class Strelka::AuthProvider::HixIO < Strelka::AuthProvider
 
 	config_key :hix_io_auth
 
-	class << self
-		attr_reader :allowed_netblocks
-	end
-
-	DEFAULT_CONFIG = {
-		:allowed_netblocks => '127.0.0.1/32'
-	}
-
-	def self::allowed_netblocks=( newblocks )
-		@allowed_netblocks = Array( newblocks ).map {|addr| IPAddr.new(addr) }
-	end
+	DEFAULT_CONFIG = {}
 
 	def self::configure( section )
 		super( section )
-		self.allowed_netblocks = section[:allowed_netblocks]
-		self.log.debug( '%p: allowed_netblocks: %p' % [self, allowed_netblocks] )
-	end
-
-	def self::authorized_address?( request )
-		x_forwarded_for = request.header.x_forwarded_for or
-			raise "No X-Forwarded-For header?!"
-		ipaddr = IPAddr.new( x_forwarded_for )
-		return self.allowed_netblocks.any? {|b| b.include?(ipaddr) }
 	end
 
 	########################################################################
@@ -40,12 +21,39 @@ class Strelka::AuthProvider::HixIO < Strelka::AuthProvider
 	########################################################################
 
 	def authenticate( request )
-		return true
 	end
 
 	def authorize( credentials, request, perms )
-		return true if self.class.authorized_address?( request )
-		self.require_authorization
+	end
+
+
+	########################################################################
+	### I N S T A N C E   M E T H O D S
+	########################################################################
+
+	def valid_api_token?( request )
+		email = request.headers[:email]
+		token = request.headers[:token]
+		user = HixIO::User[email]
+
+		return true if user and token == make_token( user, request )
+
+		self.log_failure "Invalid API request."
+	end
+
+	def valid_login?( request )
+		email = request.headers[:email]
+		password = request.headers[:password]
+		user = HixIO::User[email]
+
+		return true if user and password == user.password
+
+		self.log_failure "Invalid login."
+	end
+
+	def make_token( user, request )
+		# TODO figure out what to hash.
+		return ''
 	end
 
 end

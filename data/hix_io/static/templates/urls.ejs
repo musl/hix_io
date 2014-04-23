@@ -26,7 +26,7 @@
 					<% latest_urls.each( function(u) { %>
 						<li>
 							<a href="<%= scheme %>://<%= host %>/<%= u.short %>"><%= scheme %>://<%= host %>/<%= u.short %></a>
-							<dd><%= u.created_at %></dd>
+							<dd><%= u.ctime %></dd>
 							<dd><small><%= u.url %></small></dd>
 						</li>
 					<% }); %>

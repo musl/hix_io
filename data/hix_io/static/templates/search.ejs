@@ -5,7 +5,7 @@
 	<% posts.each( function(post) { %>
 		<li>
 		<%== can.route.link(post.attr('title'), {id: post.attr('id')}, {}); %><br>
-		<%= post.attr('updated_at') %>
+		<%= post.attr('mtime') %>
 		</li>
 	<% }); %>
 	</ul>

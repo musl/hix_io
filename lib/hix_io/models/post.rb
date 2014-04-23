@@ -4,6 +4,15 @@
 #
 class HixIO::Post < Sequel::Model( :hix_io__posts )
 
+	plugin :validation_helpers
+	plugin :json_serializer
+
+	many_to_one :user, :eager => [:user]
+
+	########################################################################
+	### D A T A S E T S
+	########################################################################
+
 	dataset_module do
 
 		# Fetch a list of published posts.
@@ -14,9 +23,10 @@ class HixIO::Post < Sequel::Model( :hix_io__posts )
 		# :limit  => Passed to the limit SQL clause.
 		#
 		def published( params = {} )
-			set = self.where( :published => true ).order( :updated_at )
+			set = self.where( :published => true ).order( :mtime )
 			set = set.offset( params[:offset] ) unless params[:offset].nil?
 			set = set.limit( params[:limit] ) unless params[:limit].nil?
+
 			return set
 		end
 
@@ -50,7 +60,29 @@ class HixIO::Post < Sequel::Model( :hix_io__posts )
 
 			return set
 		end
+	end
 
+	########################################################################
+	### H O O K S
+	########################################################################
+
+	def before_save
+		super
+	end
+
+	def validate
+		validates_presence( :title )
+		validates_presence( :body )
+	end
+
+	########################################################################
+	### I N S T A N C E   M E T H O D S
+	########################################################################
+
+	# Override & cripple to_json. There can only be one!
+	#
+	def to_json( *a )
+		return super( :include => :user )
 	end
 
 end
