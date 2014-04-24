@@ -10,13 +10,12 @@ describe( HixIO::URL ) do
 
 	before( :all ) { migrate! }
 	after( :each ) { described_class.dataset.delete }
-	after( :all ) { migrate! }
 
 	let( :user ) do
-		HixIO::User.find_or_create( :email => 'test@example.com' ) { |u|
-			u.password = Digest::SHA512.hexdigest( 'test' ),
-			u.disable_on = Time.now() + 86400
-		}
+		HixIO::User.find_or_create( :email => 'test@example.com' ) do |u|
+			password = Digest::SHA512.hexdigest( 'test' )
+			disable_on = Time.now() + 86400
+		end
 	end
 
 	context 'dataset methods' do

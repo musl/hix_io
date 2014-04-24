@@ -35,9 +35,7 @@ class HixIO::User < Sequel::Model( :hix_io__users )
 	# Create identity information.
 	#
 	def before_create
-		self.api_secret = Digest::SHA512.hexdigest(
-			SecureRandom.random_bytes( 128 )
-		)
+		self.api_secret = Digest::SHA512.hexdigest( SecureRandom.random_bytes( 128 ))
 		super
 	end
 

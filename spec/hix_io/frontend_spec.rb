@@ -8,14 +8,21 @@ load HixIO::DATA_DIR + 'apps/frontend'
 
 describe( HixIO::Frontend ) do
 
-	before( :all ) {}
+	before( :all ) { migrate! }
 
 	let( :factory ) do
 		Mongrel2::RequestFactory.new( :route => '/' )
 	end
 
+	let( :user ) do
+		HixIO::User.find_or_create( :email => 'test@example.com' ) do |user|
+			user.password = Digest::SHA512.hexdigest( 'test' )
+			user.disable_on = Time.now() + 86400
+		end
+	end
+
 	let( :short_url ) do
-		HixIO::URL.create({
+		user.add_url({
 			:url => 'http://example.com',
 			:source_ip => '127.0.0.1'
 		})

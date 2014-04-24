@@ -7,12 +7,11 @@ require 'spec_helper'
 describe( HixIO::Post ) do
 
 	before( :all ) { migrate! }
-	after( :all ) { migrate! }
 
 	let( :user ) do
-		HixIO::User.find_or_create( :email => 'test@example.com' ) do |u|
-			u.password = Digest::SHA512.hexdigest( 'test' ),
-			u.disable_on = Time.now() + 86400
+		HixIO::User.find_or_create( :email => 'test@example.com' ) do |user|
+			user.password = Digest::SHA512.hexdigest( 'test' )
+			user.disable_on = Time.now() + 86400
 		end
 	end
 

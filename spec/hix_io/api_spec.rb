@@ -7,6 +7,8 @@ load HixIO::DATA_DIR + 'apps/api'
 
 describe( HixIO::API ) do
 
+	before( :all ) { migrate! }
+
 	subject do
 		described_class.new( *TEST_APP_PARAMS )
 	end
@@ -15,8 +17,16 @@ describe( HixIO::API ) do
 		Mongrel2::RequestFactory.new( :route => '/' )
 	end
 
+	let( :user ) do
+		HixIO::User.create({
+			:email => 'test@example.com',
+			:password => Digest::SHA512.hexdigest( 'test' ),
+			:disable_on => Time.now() + 86400
+		})
+	end
+
 	let( :post ) do
-		HixIO::Post.create({
+		user.add_post({
 			:title => 'RSPEC ROCKS',
 			:body => 'Yes, it certainly does.',
 			:published => true
@@ -24,7 +34,7 @@ describe( HixIO::API ) do
 	end
 
 	let( :url ) do
-		HixIO::URL.create({
+		user.add_url({
 			:url => 'http://example.org/',
 			:source_ip => '127.0.0.1'
 		});
