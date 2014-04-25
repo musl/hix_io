@@ -14,7 +14,10 @@ class HixIO::Frontend < Strelka::App
 	plugins \
 		:routing,
 		:parameters,
+		:sessions,
 		:templating
+
+	session_namespace = :hix_io
 
 	templates :index => 'index.tmpl'
 

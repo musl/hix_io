@@ -18,11 +18,10 @@ describe( HixIO::API ) do
 	end
 
 	let( :user ) do
-		HixIO::User.create({
-			:email => 'test@example.com',
-			:password => Digest::SHA512.hexdigest( 'test' ),
-			:disable_on => Time.now() + 86400
-		})
+		HixIO::User.find_or_create( :email => 'test@example.com' ) do |user|
+			user.password = Digest::SHA512.hexdigest( 'test' )
+			user.disable_on = Time.now() + 86400
+		end
 	end
 
 	let( :post ) do
