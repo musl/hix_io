@@ -21,24 +21,31 @@ class Strelka::AuthProvider::HixIO < Strelka::AuthProvider
 	########################################################################
 
 	def authenticate( request )
+		return true if valid_session? or valid_login? or valid_api_token?
+		self.log_failure 'Not authentic.'
 	end
 
 	def authorize( credentials, request, perms )
+		return true
 	end
-
 
 	########################################################################
 	### I N S T A N C E   M E T H O D S
 	########################################################################
+
+	def valid_session?( request )
+	end
 
 	def valid_api_token?( request )
 		email = request.headers[:email]
 		token = request.headers[:token]
 		user = HixIO::User[email]
 
-		return true if user and token == make_token( user, request )
+		return false if user.nil?
 
-		self.log_failure "Invalid API request."
+		return true if token == make_token( user, request )
+
+		return false
 	end
 
 	def valid_login?( request )
@@ -46,14 +53,23 @@ class Strelka::AuthProvider::HixIO < Strelka::AuthProvider
 		password = request.headers[:password]
 		user = HixIO::User[email]
 
-		return true if user and password == user.password
+		return false if user.nil?
 
-		self.log_failure "Invalid login."
+		if password == user.password
+			make_session
+			return true
+		end
+
+		return false
 	end
 
 	def make_token( user, request )
 		# TODO figure out what to hash.
 		return ''
+	end
+
+	def make_session( user, request )
+		req.session[:user_id] = user.id
 	end
 
 end
