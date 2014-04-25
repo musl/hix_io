@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby
+# vim: set nosta noet ts=4 sw=4 ft=ruby:
+# encoding: UTF-8
+
+require 'trollop'
+require 'hix_io'
+
+opts = Trollop.options do
+	banner 'HixIO Application Launcher'
+	opt :config, 'Required: The path to the HixIO config.', :type => :string, :required => true
+	opt :app, 'Required: The app to launch.', :type => :string, :required => true
+	opt :debug, 'Force debug logging.', :default => false
+end
+
+app = HixIO::DATA_DIR + 'apps' + opts[:app]
+snap = HixIO.constants
+load app
+handler = HixIO.const_get( (HixIO.constants - snap).first )
+
+HixIO.load_config( opts[:config] )
+Loggability.level = opts[:debug] ? :debug : :info
+
+handler.run
+

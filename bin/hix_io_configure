@@ -11,5 +11,22 @@ opts = Trollop.options do
 	opt :debug, 'Force debug logging.', :default => false
 end
 
-HixIO::Tools::ConfigProcessor.run!( opts )
+debug = opts[:debug]
+Loggability.level = debug ? :debug : :info
+
+etc_dir = Pathname( opts[:etc_dir] ).expand_path
+self.log.info 'Entering: %s' % [etc_dir]
+
+Pathname.glob( etc_dir + '*.conf.rb' ).each do |conf|
+	db_file = Pathname( conf.sub( /.conf.rb$/, '.sqlite' ) )
+
+	self.log.info 'Rebuilding: %s' % [db_file.basename]
+	rm_rf( db_file ) if db_file.exist?
+	Mongrel2::Config.configure( :configdb => db_file.to_s )
+	Mongrel2::Config.init_database!
+
+	self.log.info 'Loading %s' % [conf.basename]
+	# FIXME Is this safe in this context?
+	eval( File.read( conf ) )
+end
 

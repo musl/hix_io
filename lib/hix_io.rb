@@ -24,8 +24,11 @@ module HixIO
 	#####################################################################
 
 	class << self
-		# The loaded config.
+		# The loaded config for the namespace.
 		attr_reader :config
+
+		# The entire loaded config.
+		attr_reader :global_config
 
 		# The database handle.
 		attr_reader :db
@@ -41,6 +44,7 @@ module HixIO
 			:db_uri => 'postgres://hix_io@localhost/hix_io',
 			:skip_models => false,
 			:dev => false,
+			:log_sql => false,
 		}
 	}.freeze
 
@@ -51,7 +55,14 @@ module HixIO
 	def self::load_config( path, opts = {} )
 		defaults = DEFAULT_CONFIG
 		defaults[self.config_key].merge!( opts )
-		Configurability::Config.load( path, defaults ).install
+		@global_config = Configurability::Config.load( path, defaults )
+		self.global_config.install
+
+		if Object.const_defined?( :RSpec )
+			Loggability.level = :fatal
+		end
+
+		return self.global_config
 	end
 
 	# Configurability hook. This is called with this class's +section+ of the config
@@ -68,7 +79,7 @@ module HixIO
 			raise "We're in dev mode and the database name doesn't end in 'dev'."
 		end
 
-		if self.dev?
+		if self.config.log_sql
 			@db ||= Sequel.connect( self.config.db_uri, :logger => self.log )
 			self.db.sql_log_level = :debug
 		else
@@ -79,20 +90,18 @@ module HixIO
 		self.db.extension :pg_inet
 		self.db.extension :pg_json
 
+		# If we don't need to set the database handle at runtime, we can simply set
+		# the proper database handle for Sequel here, and all models loaded after
+		# this point will do the right thing.
+		Sequel::Model.db = self.db
+
 		# We may not want to load models at runtime. For example, if
 		# we're only interested in constants, utilities, or low-level
 		# database access, if we're migrating, etc.
 		#
 		return if self.config.skip_models
 
-		# If we don't need to set the database handle at runtime, we can simply set
-		# the proper database handle for Sequel here, and all models loaded after
-		# this point will do the right thing.
-		Sequel::Model.db = self.db
-
 		self.load_models
-
-		return
 	end
 
 	# Require all of the models present in this gem and keep track of the classes
@@ -109,8 +118,6 @@ module HixIO
 			rescue NameError, TypeError
 			end
 		end
-
-		return @models
 	end
 
 	# Are we in development mode?

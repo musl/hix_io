@@ -3,11 +3,15 @@
 # encoding: UTF-8
 
 require 'spec_helper'
+
 load HixIO::DATA_DIR + 'apps/api'
 
 describe( HixIO::API ) do
 
-	before( :all ) { migrate! }
+	before( :all ) do
+		migrate!
+		Strelka::App::Auth.configure( HixIO.global_config.auth )
+	end
 
 	subject do
 		described_class.new( *TEST_APP_PARAMS )
@@ -38,6 +42,10 @@ describe( HixIO::API ) do
 			:source_ip => '127.0.0.1'
 		});
 	end
+
+	########################################################################
+	### S P E C S
+	########################################################################
 
 	it 'provides a list of posts' do
 		req = factory.get( '/posts' )
@@ -110,6 +118,7 @@ describe( HixIO::API ) do
 	end
 
 	it 'refuses to shorten an invalid URL' do
+		Loggability.with_level( :debug ) do
 		req = factory.post( '/urls' )
 		req.content_type = 'application/x-www-form-urlencoded'
 		req.body = 'url=crap'
@@ -117,6 +126,7 @@ describe( HixIO::API ) do
 		res = subject.handle( req )
 
 		expect( res.status ).to eq( HTTP::UNPROCESSABLE_ENTITY )
+		end
 	end
 
 end

@@ -8,7 +8,10 @@ load HixIO::DATA_DIR + 'apps/frontend'
 
 describe( HixIO::Frontend ) do
 
-	before( :all ) { migrate! }
+	before( :all ) do
+		migrate!
+		Strelka::App::Auth.configure( HixIO.global_config.auth )
+	end
 
 	let( :factory ) do
 		Mongrel2::RequestFactory.new( :route => '/' )
@@ -31,6 +34,10 @@ describe( HixIO::Frontend ) do
 	subject do
 		described_class.new( *TEST_APP_PARAMS )
 	end
+
+	########################################################################
+	### S P E C S
+	########################################################################
 
 	it 'rejects unknown methods' do
 		req = factory.put( '/' )

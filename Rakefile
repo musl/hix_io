@@ -25,7 +25,7 @@ end
 
 MANIFEST = File.read( __FILE__ ).split( /^__END__/, 2 ).last.split
 
-task :default => [ :docs, :coverage ]
+task :default => [ :clobber, :docs, :coverage ]
 
 ########################################################################
 ### P A C K A G I N G

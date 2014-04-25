@@ -1,24 +1,28 @@
 ---
-
-
 hix_io:
     host: 'localhost'
-    dev: true
     db_uri: 'postgres://hix_io@localhost/hix_io_dev'
+    dev: true
+    log_sql: false
+
 mongrel2:
     configdb: 'etc/hixio.sqlite'
+
 sessions:
     session_class: 'db'
+
 dbsession:
     connect: 'postgres://hix_io@localhost/hix_io_dev'
     table_name: 'sessions'
     cookie_name: 'hix_io_session'
     expires: '+1d'
+
 auth:
     provider: 'hixio'
+
 logging:
     __default__: 'warn (color)'
     hix_io: 'debug (color)'
     loggability: 'warn (color)'
     configurability: 'warn (color)'
-    strelka: 'warn (color)'
+    strelka: 'fatal (color)'

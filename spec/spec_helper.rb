@@ -25,12 +25,12 @@ TEST_APP_PARAMS =  %w[test-app tcp://127.0.0.1:9998 tcp://127.0.0.1:9999]
 
 require 'mongrel2'
 require 'mongrel2/testing'
+require 'pathname'
 
 require 'hix_io'
 
 include Mongrel2::Constants
 
-Loggability.output_to( File.open( File::NULL, 'w' ) )
 HixIO.load_config( 'etc/config.yml' )
 
 def migrate!

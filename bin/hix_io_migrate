@@ -6,11 +6,22 @@ require 'hix_io/tools/migrator'
 require 'trollop'
 
 opts = Trollop.options do
-	banner 'HixIO Migration Tool'
-	opt :config, 'Required: The path to the HixIO config.', :type => :string, :required => true
-	opt :debug, 'Force debug logging.', :default => false
-	opt :target, 'Migration target. Omit to migrate to the latest available migration.', :default => nil, :type => :int
+    banner 'HixIO Migration Tool'
+    opt :config, 'Required: The path to the HixIO config.', :type => :string, :required => true
+    opt :debug, 'Force debug logging.', :default => false
+    opt :target, 'Migration target. Omit to migrate to the latest available migration.', :default => nil, :type => :int
 end
 
-HixIO::Tools::Migrator.run!( opts )
+HixIO.load_config( opts[:config], :skip_models => true )
+Loggability.level = opts[:debug] ? :debug : :info
+
+Sequel.extension :migration
+
+klass = Sequel::Migrator.migrator_class( HixIO::MIGRATION_DIR )
+
+migrator = klass.new( HixIO.db, HixIO::MIGRATION_DIR, :target => opts[:target] )
+migrator.run
+
+migrator = klass.new( HixIO.db, HixIO::MIGRATION_DIR )
+self.log.info "At version %d." % [migrator.current]
 
