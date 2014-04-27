@@ -30,6 +30,7 @@ class Strelka::AuthProvider::HixIO < Strelka::AuthProvider
 	end
 
 	def authorize( credentials, request, perms )
+		return true
 	end
 
 	########################################################################
@@ -52,16 +53,12 @@ class Strelka::AuthProvider::HixIO < Strelka::AuthProvider
 		user = ::HixIO::User[email] || return
 
 		if password == user.password
-			make_session
+			request.session[:user_id] = user.id
+			request.session[:src_ip] = request.headers[:x_forwarded_for]
 			return user
 		end
 
 		return
-	end
-
-	def make_session( user, request )
-		request.session[:user_id] = user.id
-		request.session[:src_ip] = request.headers[:x_forwarded_for]
 	end
 
 end

@@ -8,10 +8,7 @@ load HixIO::DATA_DIR + 'apps/api'
 
 describe( HixIO::API ) do
 
-	before( :all ) do
-		migrate!
-		Strelka::App::Auth.configure( HixIO.global_config.auth )
-	end
+	before( :all ) { migrate! }
 
 	subject do
 		described_class.new( *TEST_APP_PARAMS )
@@ -47,86 +44,103 @@ describe( HixIO::API ) do
 	### S P E C S
 	########################################################################
 
-	it 'provides a list of posts' do
-		req = factory.get( '/posts' )
+	context 'unauthenticated requests' do
 
-		res = subject.handle( req )
-		res.body.rewind
-
-		expect( res.status ).to eq( HTTP::OK )
-		expect( res.content_type ).to eq( 'application/json' )
-		expect {
-			JSON.parse( res.body.read )
-		}.not_to raise_error
-	end
-
-	it 'provides a detail on a post' do
-		req = factory.get( '/posts/%d' % [post.id] )
-
-		res = subject.handle( req )
-		res.body.rewind
-
-		expect( res.status ).to eq( HTTP::OK )
-		expect( res.content_type ).to eq( 'application/json' )
-		expect {
-			obj = JSON.parse( res.body.read )
-			expect( obj['title'] ).to eq( post.title )
-		}.not_to raise_error
-	end
-
-	it 'provides a post search' do
-		req = factory.get( '/search' )
-
-		res = subject.handle( req )
-		res.body.rewind
-
-		expect( res.status ).to eq( HTTP::OK )
-		expect( res.content_type ).to eq( 'application/json' )
-		expect {
-			JSON.parse( res.body.read )
-		}.not_to raise_error
-	end
-
-	it 'provides lists of top and latest shortened URLs' do
-		req = factory.get( '/urls' )
-
-		res = subject.handle( req )
-		res.body.rewind
-
-		expect( res.status ).to eq( HTTP::OK )
-		expect {
-			obj = JSON.parse( res.body.read )
-			expect( obj['top_urls'] ).to be_a( Array )
-			expect( obj['latest_urls'] ).to be_a( Array )
-		}.not_to raise_error
-	end
-
-	it 'allows one to shorten a URL' do
-		req = factory.post( '/urls' )
-		req.content_type = 'application/x-www-form-urlencoded'
-		req.body = 'url=http%3A%2F%2Fexample.com%2Ftest'
-
-		res = subject.handle( req )
-		res.body.rewind
-
-		expect( res.status ).to eq( HTTP::OK )
-		expect {
-			obj = JSON.parse( res.body.read )
-			expect( obj['short'] ).to match( /[0-9a-f]{1,7}/ )
-			expect( obj['url'] ).to eq( 'http://example.com/test' )
-		}.not_to raise_error
-	end
-
-	it 'refuses to shorten an invalid URL' do
-		Loggability.with_level( :debug ) do
-		req = factory.post( '/urls' )
-		req.content_type = 'application/x-www-form-urlencoded'
-		req.body = 'url=crap'
-
-		res = subject.handle( req )
-
-		expect( res.status ).to eq( HTTP::UNPROCESSABLE_ENTITY )
+		before( :each ) do
+			subject.auth_provider.stub( :authenticate ).and_return( nil )
+			subject.auth_provider.stub( :authenticated_user ).and_return( nil )
 		end
+
+		it 'provides a list of posts' do
+			req = factory.get( '/posts' )
+
+			res = subject.handle( req )
+			res.body.rewind
+
+			expect( res.status ).to eq( HTTP::OK )
+			expect( res.content_type ).to eq( 'application/json' )
+			expect {
+				JSON.parse( res.body.read )
+			}.not_to raise_error
+		end
+
+		it 'provides a detail on a post' do
+			req = factory.get( '/posts/%d' % [post.id] )
+
+			res = subject.handle( req )
+			res.body.rewind
+
+			expect( res.status ).to eq( HTTP::OK )
+			expect( res.content_type ).to eq( 'application/json' )
+			expect {
+				obj = JSON.parse( res.body.read )
+				expect( obj['title'] ).to eq( post.title )
+			}.not_to raise_error
+		end
+
+		it 'provides a post search' do
+			req = factory.get( '/search' )
+
+			res = subject.handle( req )
+			res.body.rewind
+
+			expect( res.status ).to eq( HTTP::OK )
+			expect( res.content_type ).to eq( 'application/json' )
+			expect {
+				JSON.parse( res.body.read )
+			}.not_to raise_error
+		end
+
+		it 'provides lists of top and latest shortened URLs' do
+			req = factory.get( '/urls' )
+
+			res = subject.handle( req )
+			res.body.rewind
+
+			expect( res.status ).to eq( HTTP::OK )
+			expect {
+				obj = JSON.parse( res.body.read )
+				expect( obj['top_urls'] ).to be_a( Array )
+				expect( obj['latest_urls'] ).to be_a( Array )
+			}.not_to raise_error
+		end
+
+	end
+
+	context 'authenticated requests' do
+
+		before( :each ) do
+			subject.auth_provider.stub( :authenticate ).and_return( user )
+			subject.auth_provider.stub( :authenticated_user ).and_return( user )
+		end
+
+		it 'allows one to shorten a URL' do
+			req = factory.post( '/urls' )
+			req.content_type = 'application/x-www-form-urlencoded'
+			req.body = 'url=http%3A%2F%2Fexample.com%2Ftest'
+
+			res = subject.handle( req )
+			res.body.rewind
+
+			expect( res.status ).to eq( HTTP::OK )
+			expect {
+				obj = JSON.parse( res.body.read )
+				expect( obj['short'] ).to match( /[0-9a-f]{1,7}/ )
+				expect( obj['url'] ).to eq( 'http://example.com/test' )
+			}.not_to raise_error
+		end
+
+		it 'refuses to shorten an invalid URL' do
+			req = factory.post( '/urls' )
+
+			req.content_type = 'application/x-www-form-urlencoded'
+			req.body = 'url=crap'
+
+			res = subject.handle( req )
+
+			expect( res.status ).to eq( HTTP::UNPROCESSABLE_ENTITY )
+		end
+
 	end
 
 end
