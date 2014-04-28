@@ -1,6 +1,7 @@
 # vim: set nosta noet ts=4 sw=4 ft=ruby:
 # encoding: UTF-8
 
+require 'hix_io' unless defined?( HixIO )
 require 'strelka/authprovider'
 require 'strelka/mixins'
 
@@ -21,7 +22,7 @@ class Strelka::AuthProvider::HixIO < Strelka::AuthProvider
 	########################################################################
 
 	def authenticate( request )
-		if user = check_session( request ) or check_login( request )
+		if user = check_session( request ) || check_login( request )
 			self.auth_succeeded( request, user )
 			return user
 		end
@@ -40,25 +41,30 @@ class Strelka::AuthProvider::HixIO < Strelka::AuthProvider
 	def check_session( request )
 		return nil unless request.session?
 
-		session_ip = request.session[:src_ip] || return
-		req_ip = request.headers[:x_forwarded_for] || return
-		user = ::HixIO::User[request.session[:user_id]] || return
+		req_ip = request.headers[:x_forwarded_for]
+		session_ip = request.session[:src_ip]
+		user = ::HixIO::User[request.session[:email]]
 
-		return user if req_ip == session_ip
+		return user if user and req_ip == session_ip
 	end
 
 	def check_login( request )
-		email = request.headers[:email] || return
-		password = request.headers[:password] || return
-		user = ::HixIO::User[email] || return
+		request.body.rewind
 
-		if password == user.password
-			request.session[:user_id] = user.id
-			request.session[:src_ip] = request.headers[:x_forwarded_for]
+		form = Hash[URI.decode_www_form( request.body.read )]
+		user = ::HixIO::User[form['email']]
+
+		if user and form['password'] == user.password
+			make_session( user, request )
 			return user
 		end
 
 		return
+	end
+
+	def make_session( user, request )
+		request.session[:email] = user.email
+		request.session[:src_ip] = request.headers[:x_forwarded_for]
 	end
 
 end

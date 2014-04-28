@@ -40,10 +40,6 @@ describe( HixIO::API ) do
 		});
 	end
 
-	########################################################################
-	### S P E C S
-	########################################################################
-
 	context 'unauthenticated requests' do
 
 		before( :each ) do
@@ -115,9 +111,11 @@ describe( HixIO::API ) do
 		end
 
 		it 'allows one to shorten a URL' do
+			url = 'http://example.com/test'
+
 			req = factory.post( '/urls' )
 			req.content_type = 'application/x-www-form-urlencoded'
-			req.body = 'url=http%3A%2F%2Fexample.com%2Ftest'
+			req.body = URI.encode_www_form({ :url => url })
 
 			res = subject.handle( req )
 			res.body.rewind
@@ -126,7 +124,7 @@ describe( HixIO::API ) do
 			expect {
 				obj = JSON.parse( res.body.read )
 				expect( obj['short'] ).to match( /[0-9a-f]{1,7}/ )
-				expect( obj['url'] ).to eq( 'http://example.com/test' )
+				expect( obj['url'] ).to eq( url )
 			}.not_to raise_error
 		end
 
@@ -134,7 +132,7 @@ describe( HixIO::API ) do
 			req = factory.post( '/urls' )
 
 			req.content_type = 'application/x-www-form-urlencoded'
-			req.body = 'url=crap'
+			req.body = URI.encode_www_form({ :url => 'flerp? blfoop!' })
 
 			res = subject.handle( req )
 

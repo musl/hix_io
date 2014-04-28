@@ -44,7 +44,6 @@ module HixIO
 			:db_uri => 'postgres://hix_io@localhost/hix_io',
 			:skip_models => false,
 			:dev => false,
-			:log_sql => false,
 		}
 	}.freeze
 
@@ -79,12 +78,7 @@ module HixIO
 			raise "We're in dev mode and the database name doesn't end in 'dev'."
 		end
 
-		if self.config.log_sql
-			@db ||= Sequel.connect( self.config.db_uri, :logger => self.log )
-			self.db.sql_log_level = :debug
-		else
-			@db ||= Sequel.connect( self.config.db_uri )
-		end
+		@db ||= Sequel.connect( self.config.db_uri )
 
 		self.db.extension :null_dataset
 		self.db.extension :pg_inet

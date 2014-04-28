@@ -35,10 +35,6 @@ describe( HixIO::Frontend ) do
 		described_class.new( *TEST_APP_PARAMS )
 	end
 
-	########################################################################
-	### S P E C S
-	########################################################################
-
 	it 'rejects unknown methods' do
 		req = factory.put( '/' )
 		req.content_type = 'application/x-www-form-encoded'
