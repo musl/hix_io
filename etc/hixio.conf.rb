@@ -15,7 +15,8 @@ server 'main' do
 
     host 'main' do
 		route '/',        handler( 'tcp://127.0.0.1:61381', 'hixio-frontend' )
-        route '/api/v1/', handler( 'tcp://127.0.0.1:61383', 'hixio-api' )
+        route '/auth/',   handler( 'tcp://127.0.0.1:61383', 'hixio-auth' )
+        route '/api/v1/', handler( 'tcp://127.0.0.1:61385', 'hixio-api' )
 		route '/static/', directory( static_dir )
     end
 

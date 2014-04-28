@@ -3,7 +3,7 @@
 # encoding: UTF-8
 
 require 'spec_helper'
-require 'strelka/authprovider/hix_io'
+require 'strelka/authprovider/hixio'
 
 describe( Strelka::AuthProvider::HixIO ) do
 

@@ -286,6 +286,8 @@ HixIO.URLControl = can.Control.extend({}, {
 			}).error(function(data) {
 				if(data.status === 403) {
 					HixIO.notify('You aren\'t allowed to shorten urls.', 'error-message');
+				} else if(data.status === 401) {
+					HixIO.notify('You need to log in to shorten URLs.', 'info-message');
 				} else {
 					HixIO.notify('I wasn\'t able to shorten that.', 'warning-message');
 				}

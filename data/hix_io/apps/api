@@ -2,7 +2,6 @@
 # encoding: UTF-8
 
 require 'strelka'
-require 'strelka/authprovider/hix_io'
 require 'hix_io'
 
 # Provides REST resources for the application.
@@ -19,7 +18,7 @@ class HixIO::API < Strelka::App
 		:parameters,
 		:sessions
 
-	session_namespace = :hix_io
+	session_namespace :hix_io
 
 	param :id, :integer
 
@@ -27,6 +26,10 @@ class HixIO::API < Strelka::App
 
 	no_auth_for { |req| req.verb == :GET }
 	no_perms_for { |req| req.verb == :GET }
+
+	########################################################################
+	### R O U T E S
+	########################################################################
 
 	get '/posts' do |req|
 		req.params.add :offset, :integer

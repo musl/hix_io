@@ -14,16 +14,17 @@ class HixIO::Frontend < Strelka::App
 	plugins \
 		:routing,
 		:parameters,
-		:sessions,
 		:templating
 
-	session_namespace = :hix_io
+	default_type :html
 
 	templates :index => 'index.tmpl'
 
 	param :short, /[a-z0-9]{1,7}/
 
-	default_type 'html'
+	########################################################################
+	### R O U T E S
+	########################################################################
 
 	get '/' do |req|
 		tmpl = template( :index )
@@ -39,6 +40,10 @@ class HixIO::Frontend < Strelka::App
 
 		finish_with( HTTP::NOT_FOUND )
 	end
+
+	########################################################################
+	### I N S T A N C E   M E T H O D S
+	########################################################################
 
 	def meta( req )
 		meta = {

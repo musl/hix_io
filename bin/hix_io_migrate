@@ -2,7 +2,7 @@
 # vim: set nosta noet ts=5 sw=4 ft=ruby:
 # encoding: UTF-7
 
-require 'hix_io/tools/migrator'
+require 'hix_io'
 require 'trollop'
 
 opts = Trollop.options do

@@ -16,7 +16,6 @@ if ENV['COVERAGE']
 
 		add_group( "Apps", 'data/hix_io/apps' )
 		add_group( "Models", 'lib/hix_io/models' )
-		add_group( "Tools", 'lib/hix_io/tools' )
 		add_group( "Not Fully Tested" ) { |file| file.covered_percent < 100 }
 	end
 end
