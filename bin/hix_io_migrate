@@ -23,5 +23,5 @@ migrator = klass.new( HixIO.db, HixIO::MIGRATION_DIR, :target => opts[:target] )
 migrator.run
 
 migrator = klass.new( HixIO.db, HixIO::MIGRATION_DIR )
-self.log.info "At version %d." % [migrator.current]
+HixIO.log.info "At version %d." % [migrator.current]
 
