@@ -109,11 +109,25 @@ HixIO.URL = can.Model.extend({
 }, {});
 
 /*
- * Search across all models.
+ * Big arse search.
  */
 HixIO.Search = can.Model.extend({
 	list: HixIO.ajax('/api/v1/search')
 }, {});
+
+/*
+ * Session Management
+ */
+HixIO.Session = can.Model.extend({
+	user: HixIO.ajax( '/auth' ),
+	log_in: HixIO.ajax( '/auth', 'POST' ),
+	log_out: HixIO.ajax( '/auth', 'DELETE' )
+}, {});
+
+/*
+ * User accounts.
+ */
+HixIO.User = can.Model.extend({}, {});
 
 /******************************************************************************/
 // Controls
@@ -519,12 +533,14 @@ HixIO.MessageBar = can.Control.extend({
 	 * Show a new message or interrupt the currently displayed message.
 	 */
 	notify: function(message) {
-		var self = this;
+		var self;
 	
 		// Don't speak unless you've got something to say.	
 		if(!message) { return; }
 
 		this.message = message;
+		// Wait to copy this to self so that messages don't get replayed.
+		self = this;
 		
 		// Interrupt the current message.
 		if(this.element.is(':visible')) {
@@ -582,6 +598,82 @@ HixIO.MessageBar = can.Control.extend({
 
 	// Hook up the close event.
 	'{close} click': function(element, event) { this.close(); }
+});
+
+/*
+ *
+ */
+HixIO.LoginForm = can.Control.extend({
+	defaults: {
+		view: '/static/templates/login_form.ejs',
+		log_out_button: '#log-out-button',
+		log_in_email: '#log-in-email',
+		log_in_password: '#log-in-password',
+		hash_algorithm: 'SHA-512'
+	}
+},{
+	init: function(element, options) {
+		var self;
+
+		self = this;
+
+		if(!HixIO.current_user) {
+			HixIO.Session.user().success(function(data) {
+				HixIO.current_user = data;
+				self.update();
+			}).error(function() {
+				self.update();
+			});
+		}
+	},
+
+	update: function() {
+		this.element.html(can.view(this.options.view, {
+			user: HixIO.User.model(HixIO.current_user)
+		}));
+	},
+
+	'{log_out_button} click': function(element, event) {
+		var self;
+
+		self = this;
+
+		HixIO.Session.log_out().success(function(data) {
+			HixIO.current_user = null;
+			HixIO.notify('You have signed out.', 'success-message');
+			self.update();
+		}).error(function(data) {
+			HixIO.notify('Woah. There was a problem signing out.', 'error-message');
+		});
+	},
+
+	'{log_in_password} keyup': function(element, event) {
+		var creds, self, email_field, password_field, sha;
+
+		self = this;
+
+		if(event.keyCode === 13) {
+			email_field = $(this.options.log_in_email);
+			password_field = $(this.options.log_in_password);
+
+			if(email_field.val() === '' || password_field.val() == '') { return; } 
+
+			sha = new jsSHA( password_field.val(), "TEXT" );
+			creds = {email: email_field.val(), password: sha.getHash('SHA-512', "HEX")};
+
+			HixIO.Session.log_in(creds).success(function(data) {
+				HixIO.current_user = data;
+				HixIO.notify('You have signed in.', 'success-message');
+				self.update();
+			}).error(function(data) {
+				if(data.status === 401) {
+					HixIO.notify('Invalid email or password.', 'warning-message');
+				} else {
+					HixIO.notify('Woah, there was a problem signing you in.', 'error-message');
+				}
+			});
+		}
+	}
 });
 
 /*
@@ -644,6 +736,8 @@ $(document).ready(function() {
 		new HixIO.SearchControl(main_element),
 		new HixIO.URLControl(main_element)
 	);
+
+	HixIO.login_form = new HixIO.LoginForm('#login-form');
 
 	HixIO.message_bar = new HixIO.MessageBar('#messages');
 

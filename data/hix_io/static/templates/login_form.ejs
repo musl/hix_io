@@ -1,0 +1,14 @@
+<% if(!user) { %>
+	<a class="pure-menu-heading">sign in</a>
+	<ul>
+		<li class="pure-form l-box">
+		<input type="email" id="log-in-email" class="menu-input-text" placeholder="you@example.com" />
+		<input type="password" id="log-in-password" class="menu-input-text" placeholder="***" />
+		</li>
+	</ul>
+<% } else { %>
+	<a class="pure-menu-heading"><%= user.email %></a>
+	<ul>
+		<li class="pure-form l-box"><button id='log-out-button' class="pure-button">sign out</button></li>
+	</ul>
+<% } %>

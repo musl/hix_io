@@ -17,6 +17,8 @@ class HixIO::Auth < Strelka::App
 		:negotiation,
 		:sessions
 
+	default_type 'application/json'
+
 	session_namespace :hix_io
 
 	require_auth_for { |r| %i[GET DELETE].include?( r.verb ) }
@@ -28,7 +30,7 @@ class HixIO::Auth < Strelka::App
 
 	get '/' do |req|
 		res = req.response
-		res.for( :json ) { self.auth_provider.authenticated_user }
+		res.for( :json ) { req.authenticated_user }
 		return res
 	end
 
@@ -42,7 +44,7 @@ class HixIO::Auth < Strelka::App
 
 	delete '/' do |req|
 		res = req.response
-		req.session.delete( req.session.id ) if req.session?
+		res.destroy_session if res.session?
 		finish_with( HTTP::NO_CONTENT )
 	end
 

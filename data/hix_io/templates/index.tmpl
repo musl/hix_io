@@ -23,6 +23,7 @@
 		<!-- If all of our scripts are well-behaved, nothing needs to go in the body. -->
 		<script src="/static/js/lib/jquery.min.js" type="text/javascript" charset="utf-8"></script>
 		<script src="/static/js/lib/can.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/static/js/lib/sha512.js" type="text/javascript" charset="utf-8"></script>
 		<script src="/static/js/lib/highlight.min.js" type="text/javascript" charset="utf-8"></script>
 
 		<script src="/static/js/main.js" type="text/javascript" charset="utf-8"></script>
@@ -43,33 +44,16 @@
 							<li><a href="#!pics">pics</a></li>
 							<li><a href="#!urls">urls</a></li>
 						</ul>
+					</div>
+					<div id="search" class="pure-menu pure-menu-open">
 						<a class="pure-menu-heading">search</a>
 						<ul>
 							<li class="pure-form l-box">
 								<input type="text" id="search" name="q" class="menu-input-text" />
 							</li>
 						</ul>
-						
-						<!--
-							TODO:
-							This login form and user info block are a mock-up. We need to control
-							these from the handler based on whether or not there's an authenticated
-							user.
-						-->
-						<a class="pure-menu-heading">sign in</a>
-						<ul>
-							<li class="pure-form l-box">
-								<input type="text" id="login-username" name="q" class="menu-input-text" placeholder="you@example.com" />
-								<input type="password" id="login-password" name="q" class="menu-input-text" placeholder="***" />
-							</li>
-						</ul>
-
-						<a class="pure-menu-heading">User Name</a>
-						<ul>
-							<li><a>sign out</a></li>
-						</ul>
-
 					</div>
+					<div id="login-form" class="pure-menu pure-menu-open"></div>
 				</div>
 			</div>
 

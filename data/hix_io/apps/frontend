@@ -16,7 +16,7 @@ class HixIO::Frontend < Strelka::App
 		:parameters,
 		:templating
 
-	default_type :html
+	default_type 'text/html'
 
 	templates :index => 'index.tmpl'
 

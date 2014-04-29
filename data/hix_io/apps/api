@@ -22,7 +22,7 @@ class HixIO::API < Strelka::App
 
 	param :id, :integer
 
-	default_type :json
+	default_type 'application/json'
 
 	no_auth_for { |req| req.verb == :GET }
 	no_perms_for { |req| req.verb == :GET }
