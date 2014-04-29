@@ -6,7 +6,7 @@
 // Namespace
 /******************************************************************************/
 
-var HixIO = {};
+var HixIO = new can.Map({});
 
 /******************************************************************************/
 // Utility functions
@@ -71,14 +71,33 @@ HixIO.ajax = function(path, method, type) {
 	};
 };
 
-/*
- * Convenience method for notifications. HMmmm.
- */
-HixIO.notify = function (message, message_class, timeout) {
-	HixIO.message_bar.notify({
-		message: message,
-		message_class: message_class,
-		timeout: timeout
+/******************************************************************************/
+// Auth
+/******************************************************************************/
+
+HixIO.on_auth_change = function(callback) {
+	HixIO.bind('current_user', callback);
+};
+
+HixIO.log_in = function(params) {
+	HixIO.ajax('/auth', 'POST')(params).success(function(data) {
+		HixIO.attr('current_user', data);
+		HixIO.notify('You have signed in.', 'success-message');
+	}).error(function(data) {
+		if(data.status === 401) {
+			HixIO.notify('Invalid email or password.', 'warning-message');
+		} else {
+			HixIO.notify('Woah, there was a problem signing you in.', 'error-message');
+		}
+	});
+};
+
+HixIO.log_out = function() {
+	HixIO.ajax('/auth', 'DELETE')().success(function(data) {
+		HixIO.attr('current_user', null);
+		HixIO.notify('You have signed out.', 'success-message');
+	}).error(function(data) {
+		HixIO.notify('Woah. There was a problem signing out.', 'error-message');
 	});
 };
 
@@ -113,15 +132,6 @@ HixIO.URL = can.Model.extend({
  */
 HixIO.Search = can.Model.extend({
 	list: HixIO.ajax('/api/v1/search')
-}, {});
-
-/*
- * Session Management
- */
-HixIO.Session = can.Model.extend({
-	user: HixIO.ajax( '/auth' ),
-	log_in: HixIO.ajax( '/auth', 'POST' ),
-	log_out: HixIO.ajax( '/auth', 'DELETE' )
 }, {});
 
 /*
@@ -267,7 +277,15 @@ HixIO.PicsControl = can.Control.extend({
  */
 HixIO.URLControl = can.Control.extend({}, {
 	init: function(element, options) {
+		var self;
+
+		self = this;
+
 		can.route('urls');
+
+		HixIO.on_auth_change(function() {
+			if(can.attr('route') === 'urls') { self.update(); }
+		});
 	},
 
 	update: function() {
@@ -512,14 +530,44 @@ HixIO.Menu = can.Control.extend({},
  */
 HixIO.MessageBar = can.Control.extend({
 	defaults: {
-		timeout: 10.0,
+		timeout: 10,
 		persist: false,
 		view: '/static/templates/message.ejs',
-		close: '.close-button'
+		close: '.close-button',
+		default_class: 'info-message'
 	}
 },{
 	init: function(element, options) {
-		var self = this;
+		var self;
+
+		self = this;
+
+		this.data = new can.Map({
+			message: '',
+			message_class: '',
+			timeout: this.options.timeout
+		});
+
+		/*
+		 * Bind to message changes to update the view.
+		 */
+		this.data.bind('message', function(event, new_value, old_value) {
+			if(new_value && new_value !== '' && new_value !== old_value) {
+				if(self.element.is(':visible')) {
+					// Interrupt the current message.
+					clearTimeout(self.timeout);
+					self.timeout = null;
+
+					self.element.fadeOut('fast', function() {
+						self.update();
+						self.element.fadeIn('fast');
+					});
+				} else {
+					self.update();
+					self.element.slideDown('fast');	
+				}
+			}
+		});
 
 		/*
 		 * Close this control on route changes, unless the persist option is set.
@@ -529,55 +577,29 @@ HixIO.MessageBar = can.Control.extend({
 		});
 	},
 
-	/*
-	 * Show a new message or interrupt the currently displayed message.
-	 */
-	notify: function(message) {
-		var self;
-	
-		// Don't speak unless you've got something to say.	
-		if(!message) { return; }
-
-		this.message = message;
-		// Wait to copy this to self so that messages don't get replayed.
-		self = this;
-		
-		// Interrupt the current message.
-		if(this.element.is(':visible')) {
-			clearTimeout(this.timeout);
-
-			this.element.fadeOut('fast', function() {
-				self.update();
-				self.element.fadeIn('fast');
-			});
-			return;
-		}
-
-		this.update();
-		this.element.slideDown('fast');	
-	},
-
-	/*
-	 * Render the template and hook up the close timeout.
-	 */
-	update: function() {
-		var self, timeout, t;
-
-		self = this;
-
-		// Don't render the view if there's nothing to say.
-		if(!this.message) { return; }
-
-		// Don't update the view if it's visible.
-		if(this.timeout || this.element.is(':visible')) { return; }
-
-		timeout = parseInt(this.options.timeout, 10);
-		t = parseInt(this.message.timeout, 10);
-		if( t > 0 ) { timeout = t; }
+	notify: function(message, message_class, timeout) {
+		if(!message_class) { message_class = this.options.default_class; }
+		if(!timeout) { timeout = this.options.timeout; }
 		timeout = Math.floor(timeout * 1000);
 
-		this.element.html(can.view(this.options.view, this.message));
-		this.timeout = setTimeout(function() { self.close(); }, timeout);
+		this.data.attr('message_class', message_class);
+		this.data.attr('timeout', timeout);
+		this.data.attr('message', message);
+	},
+	
+	update: function() {
+		var self;
+
+		self = this;
+
+		// Don't update the view if it's visible.
+		if(this.element.is(':visible')) { return; }
+
+		this.element.html(can.view(this.options.view, this.data));
+
+		this.timeout = setTimeout(function() {
+			self.close();
+		}, this.data.attr('timeout'));
 	},
 
 	/*
@@ -592,7 +614,7 @@ HixIO.MessageBar = can.Control.extend({
 		this.element.slideUp('slow', function() {
 			self.element.clearQueue();
 			self.element.empty();
-			self.message = null;
+			self.data.attr('message', '');
 		});
 	},
 
@@ -618,33 +640,23 @@ HixIO.LoginForm = can.Control.extend({
 		self = this;
 
 		if(!HixIO.current_user) {
-			HixIO.Session.user().success(function(data) {
-				HixIO.current_user = data;
-				self.update();
-			}).error(function() {
-				self.update();
+			HixIO.ajax('/auth', 'GET')().success(function(data) {
+				HixIO.attr('current_user', data); 
+				this.update();
 			});
 		}
+
+		HixIO.on_auth_change(function() { self.update(); });
 	},
 
 	update: function() {
 		this.element.html(can.view(this.options.view, {
-			user: HixIO.User.model(HixIO.current_user)
+			user: HixIO.attr('current_user')
 		}));
 	},
 
 	'{log_out_button} click': function(element, event) {
-		var self;
-
-		self = this;
-
-		HixIO.Session.log_out().success(function(data) {
-			HixIO.current_user = null;
-			HixIO.notify('You have signed out.', 'success-message');
-			self.update();
-		}).error(function(data) {
-			HixIO.notify('Woah. There was a problem signing out.', 'error-message');
-		});
+		HixIO.log_out();	
 	},
 
 	'{log_in_password} keyup': function(element, event) {
@@ -661,17 +673,7 @@ HixIO.LoginForm = can.Control.extend({
 			sha = new jsSHA( password_field.val(), "TEXT" );
 			creds = {email: email_field.val(), password: sha.getHash('SHA-512', "HEX")};
 
-			HixIO.Session.log_in(creds).success(function(data) {
-				HixIO.current_user = data;
-				HixIO.notify('You have signed in.', 'success-message');
-				self.update();
-			}).error(function(data) {
-				if(data.status === 401) {
-					HixIO.notify('Invalid email or password.', 'warning-message');
-				} else {
-					HixIO.notify('Woah, there was a problem signing you in.', 'error-message');
-				}
-			});
+			HixIO.log_in(creds);
 		}
 	}
 });
@@ -721,29 +723,34 @@ HixIO.Router = can.Control.extend({
 /******************************************************************************/
 // Application entry point.
 /******************************************************************************/
-
 /*
  * Start up the main router.
  */
 $(document).ready(function() {
 	var main_element = '#main';
 
-	HixIO.controls = [];
-	HixIO.controls.push(
+	HixIO.routed_controls = [
 		new HixIO.CodeControl(main_element),
 		new HixIO.PicsControl(main_element),
 		new HixIO.PostControl(main_element),
 		new HixIO.SearchControl(main_element),
 		new HixIO.URLControl(main_element)
-	);
-
-	HixIO.login_form = new HixIO.LoginForm('#login-form');
+	];
 
 	HixIO.message_bar = new HixIO.MessageBar('#messages');
+
+	/*
+	 * Convenience method for notifications. HMmmm.
+	 */
+	HixIO.notify = function (message, message_class, timeout) {
+		HixIO.message_bar.notify(message, message_class, timeout);
+	};
 
 	HixIO.menu = new HixIO.Menu('#menu', {
 		selected_class: 'pure-menu-selected'
 	});
+
+	HixIO.login_form = new HixIO.LoginForm('#login-form');
 
 	HixIO.router = new HixIO.Router(document.body, {
 		default_route: 'posts',
