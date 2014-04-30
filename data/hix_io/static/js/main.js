@@ -283,6 +283,7 @@ HixIO.URLControl = can.Control.extend({}, {
 
 		can.route('urls');
 
+		// TODO investigate if it's worth making on_auth_change aware of routes.
 		HixIO.on_auth_change(function() {
 			if(can.route.attr('route') === 'urls') { self.update(); }
 		});
@@ -639,6 +640,7 @@ HixIO.LoginForm = can.Control.extend({
 
 		self = this;
 
+		// TODO - Gotta factor this out to functions on HixIO.
 		if(!HixIO.attr('current_user')) {
 			HixIO.ajax('/auth', 'GET')().success(function(data) {
 				HixIO.attr('current_user', data); 
