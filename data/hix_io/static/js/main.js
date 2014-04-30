@@ -284,7 +284,7 @@ HixIO.URLControl = can.Control.extend({}, {
 		can.route('urls');
 
 		HixIO.on_auth_change(function() {
-			if(can.attr('route') === 'urls') { self.update(); }
+			if(can.route.attr('route') === 'urls') { self.update(); }
 		});
 	},
 
@@ -639,10 +639,12 @@ HixIO.LoginForm = can.Control.extend({
 
 		self = this;
 
-		if(!HixIO.current_user) {
+		if(!HixIO.attr('current_user')) {
 			HixIO.ajax('/auth', 'GET')().success(function(data) {
 				HixIO.attr('current_user', data); 
-				this.update();
+				self.update();
+			}).error(function() {
+				self.update();
 			});
 		}
 
