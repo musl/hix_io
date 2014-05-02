@@ -23,25 +23,25 @@
 	<div class="l-box">
 		<div class="pure-form pure-g">
 			<div class="pure-u-1-2">
-				<h1>Latest <%= latest_urls.length %> URLs</h1>
+				<h1>Latest</h1>
 				<ol>
 					<% latest_urls.each( function(u) { %>
 						<li>
 							<a href="<%= scheme %>://<%= host %>/<%= u.short %>"><%= scheme %>://<%= host %>/<%= u.short %></a>
-							<dd><%= u.ctime %></dd>
-							<dd><small><%= u.url %></small></dd>
+							<br>
+							<small><%= relative_date(u.ctime); %> ago &middot; <%= u.url %></small>
 						</li>
 					<% }); %>
 				</ol>
 			</div>
 			<div class="pure-u-1-2">
-				<h1>Top <%= top_urls.length %> URLs</h1>
+				<h1>Most Visited</h1>
 				<ol>
 					<% top_urls.each( function(u) { %>
 						<li>
 							<a href="<%= scheme %>://<%= host %>/<%= u.short %>"><%= scheme %>://<%= host %>/<%= u.short %></a>
-							<dd><%= u.hits %> hits</dd>
-							<dd><small><%= u.url %></small></dd>
+							<br>
+							<small><%= u.hits %> hits &middot; <%= u.url %></small>
 						</li>
 					<% }); %>
 				</ol>

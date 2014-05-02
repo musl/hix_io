@@ -12,7 +12,8 @@ sessions:
     session_class: 'db'
 
 dbsession:
-    connect: 'postgres://hix_io@localhost/hix_io_dev'
+    #connect: 'postgres://hix_io@localhost/hix_io_dev'
+    connect: 'sqlite:/'
     table_name: 'sessions'
     cookie_name: 'hix_io_session'
     expires: '+1d'

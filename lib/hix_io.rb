@@ -6,6 +6,8 @@ require 'loggability'
 require 'configurability'
 require 'sequel'
 
+require 'hix_io/core_extensions'
+
 # Top-level Application Namespace
 #
 module HixIO

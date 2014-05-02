@@ -71,6 +71,62 @@ HixIO.highlightSyntax = function() {
 	});
 };
 
+/*
+ * Helpers for views. Pass this to can.view.
+ */
+HixIO.view_helpers = {
+	short_date: function(date_arg) {
+		return (new Date(date_arg)).toISOString();
+	},
+
+	relative_date: function(date_arg) {
+		var minute,
+			hour,
+			day,
+			now,
+			date,
+			delta,
+			last_night,
+			the_other_night,
+			ago;
+
+		minute = 60000;
+		hour = 60 * minute;
+		day = 24 * hour;
+
+		date = new Date(date_arg).getTime();
+		if(date <= 0 || isNaN(date)) { return date_arg }
+
+		now = new Date().getTime();
+		delta = now - date;
+
+		if(delta < 0) { return date_arg; }
+
+		if(delta === 0) { return 'now'; }
+
+		if(delta < 2 * minute) { return 'seconds'; }
+
+		if(delta < 2 * hour) {
+			ago = Math.ceil(delta / minute);
+			return ago + ' minutes';
+		}
+
+		if(delta < 2 * day) {
+			ago = Math.ceil(delta / hour);
+			return ago + ' hours';
+		}
+
+		last_night = new Date(now - now % day).getTime();
+		if(date > last_night) { return 'today'; }
+
+		the_other_night = last_night - day;
+		if(date > the_other_night) { return 'yesterday'; }
+
+		ago = Math.ceil(delta / day);
+		return ago + ' days';
+	}
+};
+
 /******************************************************************************/
 // Auth
 /******************************************************************************/
@@ -231,7 +287,7 @@ HixIO.SearchControl = can.Control.extend({}, {
 
 		HixIO.Search.list(params).success(function(data) {
 			self.element.html(can.view('/static/templates/search.ejs', {
-				posts: HixIO.Post.models(data.posts),
+				matches: data.matches,
 				q: self.q
 			}));
 			self.pager.update(data.count);
@@ -301,7 +357,8 @@ HixIO.URLControl = can.Control.extend({}, {
 				top_urls: HixIO.URL.models(data.top_urls),
 				latest_urls: HixIO.URL.models(data.latest_urls),
 				url: self.url
-			}));
+			},
+			HixIO.view_helpers));
 		}).error(function(data) {
 			HixIO.notify("Woah! Where'd my URLs go?", 'error-message');
 		});
@@ -411,8 +468,12 @@ HixIO.Pager = can.Control.extend({
 	update: function(count) {
 		var a, c, p, ds, de;
 
+		if(this.state.attr('count') < this.state.attr('per_page')) { return; }
+
 		this.state.attr('count', count);
-		this.state.attr('pages', Math.ceil(this.state.count / this.state.per_page));
+		this.state.attr('pages',
+			Math.ceil(this.state.attr('state.count') / this.state.attr('per_page')
+		));
 
 		p = this.state.attr('page');
 		c = this.state.attr('pages');
@@ -437,15 +498,15 @@ HixIO.Pager = can.Control.extend({
 
 	params: function(params) {
 		if(!params) { params = {}; }
-		params.offset = this.state.page * this.state.per_page;
-		params.limit = this.state.per_page;
+		params.offset = this.state.attr('page') * this.state.attr('per_page');
+		params.limit = this.state.attr('per_page');
 		return params;
 	},
 
 	'{target} a click': function(element, event) {
 		var page = parseInt(element.attr('data-page'), 10);
 
-		if(page >= 0 && page < this.state.pages) {
+		if(page >= 0 && page < this.state.attr('pages')) {
 			this.state.attr('page', page);
 		}
 	}
@@ -701,35 +762,10 @@ HixIO.SearchForm = can.Control.extend({},{
 	}
 });
 
-/*
- * An application router.
- * 
- * This router provides a 'default route' by redirecting an empty route to the
- * configured default.
- * 
- * Options for creating this control:
- * (See the code for the defaults.)
- *
- *     default_route: (optional)
- *         The hash string to redirect to if the route is empty.
- *
- */
-HixIO.Router = can.Control.extend({},{
-	init: function(element, options) {
-		can.route.ready();
-		if(!can.route.attr('route') ||
-		   can.route.attr('route') === '') {
-			can.route.attr('route', this.options.default_route);
-		}
-	},
-});
-
 /******************************************************************************/
 // Application entry point.
 /******************************************************************************/
-/*
- * Start up the main router.
- */
+
 $(document).ready(function() {
 	var main_element = '#main';
 
@@ -753,9 +789,14 @@ $(document).ready(function() {
 	HixIO.search_form = new HixIO.SearchForm('#search-form');
 	HixIO.login_form = new HixIO.LoginForm('#login-form');
 
-	HixIO.router = new HixIO.Router(document.body, {
-		default_route: 'posts',
-	});
+	HixIO.default_route = 'posts';
+
+	can.route.ready();
+
+	if(!can.route.attr('route') ||
+	   can.route.attr('route') === '') {
+		can.route.attr('route', HixIO.default_route);
+	}
 	
 	HixIO.check_auth();
 });
