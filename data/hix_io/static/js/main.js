@@ -13,35 +13,6 @@ var HixIO = new can.Map({});
 /******************************************************************************/
 
 /*
- * Attempt to syntax-highlight all 'code' elements nested within 'pre'
- * elements.
- *
- * If the attribute 'data-language' is defined and Highlight.js recognizes
- * the given value as a language, highlight the element as the given language.
- *
- * If the 'data-language' attribute is missing, guess at the language and
- * highlight.
- *
- * If the 'data-language' attribute is defined but not recognized, no
- * highlighting is performed.
- *
- */
-HixIO.highlightSyntax = function() {
-	$('pre code').each(function() {
-		var e, lang;
-		
-		e = $(this);
-		lang = e.attr('data-language');
-
-		if(!lang) {
-			hljs.highlightBlock(this);
-		} else if(hljs.getLanguage(lang)) {
-			e.html(hljs.highlight(lang, e.html(), true));
-		}
-	});
-};
-
-/*
  * Perform an asynchronous HTTP request and return the deferred result. See
  * can.ajax() and JQuery.ajax() for more information. I created this to help
  * keep the model definitions nice and clean and free of duplicated code.
@@ -71,12 +42,53 @@ HixIO.ajax = function(path, method, type) {
 	};
 };
 
+/*
+ * Attempt to syntax-highlight all 'code' elements nested within 'pre'
+ * elements.
+ *
+ * If the attribute 'data-language' is defined and Highlight.js recognizes
+ * the given value as a language, highlight the element as the given language.
+ *
+ * If the 'data-language' attribute is missing, guess at the language and
+ * highlight.
+ *
+ * If the 'data-language' attribute is defined but not recognized, no
+ * highlighting is performed.
+ *
+ */
+HixIO.highlightSyntax = function() {
+	$('pre code').each(function() {
+		var e, lang;
+		
+		e = $(this);
+		lang = e.attr('data-language');
+
+		if(!lang) {
+			hljs.highlightBlock(this);
+		} else if(hljs.getLanguage(lang)) {
+			e.html(hljs.highlight(lang, e.html(), true));
+		}
+	});
+};
+
 /******************************************************************************/
 // Auth
 /******************************************************************************/
 
 HixIO.on_auth_change = function(callback) {
 	HixIO.bind('current_user', callback);
+};
+
+HixIO.check_auth = function() {
+	if(!HixIO.attr('current_user')) {
+		HixIO.ajax('/auth', 'GET')().success(function(data) {
+			HixIO.attr('current_user', data); 
+		}).error(function(data) {
+			if(data.status >= 400 && data.status < 500) {
+				HixIO.attr('current_user', null);
+			}
+		});
+	}
 };
 
 HixIO.log_in = function(params) {
@@ -158,7 +170,6 @@ HixIO.PostControl = can.Control.extend({}, {
 			target: '#posts_pager'
 		});
 
-		can.route('posts');
 		can.route('post/:id');
 	},
 
@@ -210,8 +221,6 @@ HixIO.SearchControl = can.Control.extend({}, {
 			on_change: function() { self.update(); },
 			target: '#search_pager'
 		});
-
-		can.route('search');
 	},
 
 	update: function() {
@@ -245,9 +254,7 @@ HixIO.CodeControl = can.Control.extend({
 		view: '/static/templates/code.ejs'
 	}
 }, {
-	init: function(element, options) {
-		can.route('code');
-	},
+	init: function(element, options) {},
 
 	'code route': function(data) {
 		this.element.html(can.view(this.options.view, {}));
@@ -262,10 +269,7 @@ HixIO.PicsControl = can.Control.extend({
 		view: '/static/templates/pics.ejs'
 	}
 }, {
-	init: function(element, options) {
-		can.route('pics');
-	},
-
+	init: function(element, options) {}, 
 	'pics route': function(data) {
 		this.element.html(can.view(this.options.view, {}));
 	}
@@ -280,8 +284,6 @@ HixIO.URLControl = can.Control.extend({}, {
 		var self;
 
 		self = this;
-
-		can.route('urls');
 
 		// TODO investigate if it's worth making on_auth_change aware of routes.
 		HixIO.on_auth_change(function() {
@@ -624,7 +626,7 @@ HixIO.MessageBar = can.Control.extend({
 });
 
 /*
- *
+ * An auth control.
  */
 HixIO.LoginForm = can.Control.extend({
 	defaults: {
@@ -640,23 +642,29 @@ HixIO.LoginForm = can.Control.extend({
 
 		self = this;
 
-		// TODO - Gotta factor this out to functions on HixIO.
-		if(!HixIO.attr('current_user')) {
-			HixIO.ajax('/auth', 'GET')().success(function(data) {
-				HixIO.attr('current_user', data); 
-				self.update();
-			}).error(function() {
-				self.update();
-			});
-		}
-
 		HixIO.on_auth_change(function() { self.update(); });
+		this.element.hide();
 	},
 
 	update: function() {
-		this.element.html(can.view(this.options.view, {
-			user: HixIO.attr('current_user')
-		}));
+		var self,render;
+	
+		self = this;
+		render = function() {
+			self.element.html(can.view(self.options.view, {
+				user: HixIO.attr('current_user')
+			}));
+			self.element.fadeIn('fast');
+		};
+
+		if(this.element.is(':visible')) {
+			this.element.fadeOut('fast', function() {
+				render();
+			});
+			return;
+		}
+
+		render();
 	},
 
 	'{log_out_button} click': function(element, event) {
@@ -675,9 +683,20 @@ HixIO.LoginForm = can.Control.extend({
 			if(email_field.val() === '' || password_field.val() == '') { return; } 
 
 			sha = new jsSHA( password_field.val(), "TEXT" );
-			creds = {email: email_field.val(), password: sha.getHash('SHA-512', "HEX")};
+			creds = {email: email_field.val(), password: sha.getHash(this.options.hash_algorithm, "HEX")};
 
 			HixIO.log_in(creds);
+		}
+	}
+});
+
+/*
+ * A Search Form
+ */
+HixIO.SearchForm = can.Control.extend({},{
+	'input keyup': function(element, event) {
+		if(event.keyCode === 13) {
+			window.location.hash = can.route.url({route: 'search', q: event.target.value});
 		}
 	}
 });
@@ -694,34 +713,15 @@ HixIO.LoginForm = can.Control.extend({
  *     default_route: (optional)
  *         The hash string to redirect to if the route is empty.
  *
- *     main: (optional)
- *         The element to use when creating controls. The router should be
- *         created with document.body or a suitable top-level tag so that it
- *         can handle app-wide events.
- *
  */
-HixIO.Router = can.Control.extend({
-	defaults: {
-		search: '#search'
-	}
-},{
+HixIO.Router = can.Control.extend({},{
 	init: function(element, options) {
 		can.route.ready();
-
 		if(!can.route.attr('route') ||
 		   can.route.attr('route') === '') {
 			can.route.attr('route', this.options.default_route);
 		}
 	},
-
-	/*
-	 * Handle the search event globally.
-	 */
-	'{search} keyup': function(element, event) {
-		if(event.keyCode === 13) {
-			window.location.hash = can.route.url({route: 'search', q: event.target.value});
-		}
-	}
 });
 
 /******************************************************************************/
@@ -733,19 +733,15 @@ HixIO.Router = can.Control.extend({
 $(document).ready(function() {
 	var main_element = '#main';
 
-	HixIO.routed_controls = [
-		new HixIO.CodeControl(main_element),
-		new HixIO.PicsControl(main_element),
-		new HixIO.PostControl(main_element),
-		new HixIO.SearchControl(main_element),
-		new HixIO.URLControl(main_element)
-	];
+	HixIO.routes = {
+		code:   new HixIO.CodeControl(main_element),
+		pics:   new HixIO.PicsControl(main_element),
+		posts:  new HixIO.PostControl(main_element),
+		search: new HixIO.SearchControl(main_element),
+		urls:   new HixIO.URLControl(main_element)
+	};
 
 	HixIO.message_bar = new HixIO.MessageBar('#messages');
-
-	/*
-	 * Convenience method for notifications. HMmmm.
-	 */
 	HixIO.notify = function (message, message_class, timeout) {
 		HixIO.message_bar.notify(message, message_class, timeout);
 	};
@@ -754,11 +750,13 @@ $(document).ready(function() {
 		selected_class: 'pure-menu-selected'
 	});
 
+	HixIO.search_form = new HixIO.SearchForm('#search-form');
 	HixIO.login_form = new HixIO.LoginForm('#login-form');
 
 	HixIO.router = new HixIO.Router(document.body, {
 		default_route: 'posts',
 	});
 	
+	HixIO.check_auth();
 });
 
