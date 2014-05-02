@@ -54,15 +54,10 @@ class HixIO::API < Strelka::App
 		req.params.add :offset, :integer
 		req.params.add :limit, :integer
 
-		r = []
-		r << HixIO::Post.search( req.params ).all
-		r << HixIO::URL.search( req.params ).all
-		r = Array.new( r.map( &:length ).max ).zip( *r ).flatten.compact
-
 		res = req.response
 		res.for( :json ) {{
 			:count => HixIO::Post.search( :q => req.params[:q] ).count,
-			:results => r,
+			:posts => HixIO::Post.search( req.params ).all,
 		}}
 		return res
 	end
