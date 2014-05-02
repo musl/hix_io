@@ -287,7 +287,7 @@ HixIO.SearchControl = can.Control.extend({}, {
 
 		HixIO.Search.list(params).success(function(data) {
 			self.element.html(can.view('/static/templates/search.ejs', {
-				matches: data.matches,
+				posts: HixIO.Post.models(data.posts),
 				q: self.q
 			}));
 			self.pager.update(data.count);
