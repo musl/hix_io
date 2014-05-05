@@ -13,6 +13,23 @@ var HixIO = new can.Map({});
 /******************************************************************************/
 
 /*
+ * Delegate a method on our namespace to another object.
+ * 
+ * Arguments:
+ *     name: (required)
+ *         The name of the function to create on this namespace.
+ *
+ *     object: (required)
+ *         The object to delegate the function to.
+ *
+ */
+HixIO.delegate = function(name, object) {
+	HixIO[name] = function() {
+		object[name].apply(object, arguments);
+	};
+};
+
+/*
  * Perform an asynchronous HTTP request and return the deferred result. See
  * can.ajax() and JQuery.ajax() for more information. I created this to help
  * keep the model definitions nice and clean and free of duplicated code.
@@ -341,7 +358,6 @@ HixIO.URLControl = can.Control.extend({}, {
 
 		self = this;
 
-		// TODO investigate if it's worth making on_auth_change aware of routes.
 		HixIO.on_auth_change(function() {
 			if(can.route.attr('route') === 'urls') { self.update(); }
 		});
@@ -587,6 +603,9 @@ HixIO.Menu = can.Control.extend({},
  *         This control will close on click events on child elements that match
  *         this selector.
  *
+ *     default_class: (optional)
+ *         The class name to use if one isn't given to the notify() function.
+ *
  * Ideas:
  *     - per-message persist option
  *     - options to disable or change FX
@@ -616,20 +635,35 @@ HixIO.MessageBar = can.Control.extend({
 		 * Bind to message changes to update the view.
 		 */
 		this.data.bind('message', function(event, new_value, old_value) {
+
+			/*
+			 * Only notify if the message is not null, not empty, and isn't the message
+			 * that's currently displayed.
+			 */
 			if(new_value && new_value !== '' && new_value !== old_value) {
+
+				/*
+				 * Fade if we're interrupting, slide down if we're displaying 
+				 * a message when there isn't one currently visible.
+				 */
 				if(self.element.is(':visible')) {
-					// Interrupt the current message.
 					clearTimeout(self.timeout);
 					self.timeout = null;
-
 					self.element.fadeOut('fast', function() {
-						self.update();
+						self.element.html(can.view(self.options.view, self.data));
 						self.element.fadeIn('fast');
 					});
 				} else {
-					self.update();
+					self.element.html(can.view(self.options.view, self.data));
 					self.element.slideDown('fast');	
 				}
+
+				/*
+				 * Close this control after the given timeout.
+				 */
+				self.timeout = setTimeout(function() {
+					self.close()
+				}, self.data.attr('timeout'));
 			}
 		});
 
@@ -641,29 +675,24 @@ HixIO.MessageBar = can.Control.extend({
 		});
 	},
 
+	/*
+	 * This is the canonical function to use when we need to display a
+	 * notification.
+	 */
 	notify: function(message, message_class, timeout) {
+
+		/*
+		 * Validate & apply defaults before displaying a message.
+		 */
 		if(!message_class) { message_class = this.options.default_class; }
 		if(!timeout) { timeout = this.options.timeout; }
 		timeout = Math.floor(timeout * 1000);
 
-		this.data.attr('message_class', message_class);
-		this.data.attr('timeout', timeout);
-		this.data.attr('message', message);
-	},
-	
-	update: function() {
-		var self;
-
-		self = this;
-
-		// Don't update the view if it's visible.
-		if(this.element.is(':visible')) { return; }
-
-		this.element.html(can.view(this.options.view, this.data));
-
-		this.timeout = setTimeout(function() {
-			self.close();
-		}, this.data.attr('timeout'));
+		this.data.attr({
+			message: message,
+		   	timeout: timeout,
+			message_class: message_class
+		});
 	},
 
 	/*
@@ -672,13 +701,17 @@ HixIO.MessageBar = can.Control.extend({
 	close: function() {
 		var self = this;
 
+		this.element.clearQueue();
 		clearTimeout(this.timeout);
 		this.timeout = null;
 
 		this.element.slideUp('slow', function() {
-			self.element.clearQueue();
 			self.element.empty();
-			self.data.attr('message', '');
+			self.data.attr({
+				message: null,
+				timeout: null,
+				message_class: null
+			});
 		});
 	},
 
@@ -778,9 +811,7 @@ $(document).ready(function() {
 	};
 
 	HixIO.message_bar = new HixIO.MessageBar('#messages');
-	HixIO.notify = function (message, message_class, timeout) {
-		HixIO.message_bar.notify(message, message_class, timeout);
-	};
+	HixIO.delegate('notify', HixIO.message_bar);
 
 	HixIO.menu = new HixIO.Menu('#menu', {
 		selected_class: 'pure-menu-selected'

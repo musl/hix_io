@@ -1,24 +1,23 @@
 <% if(HixIO.current_user) { %>
-<div class="post">
-	<div class="l-box">
-		<div class="pure-form pure-g">
-			<label for="shorten" class="pure-u-1">Shorten a URL:</label>
-			<input type="text" id="shorten" name="shorten" class="pure-input pure-u-1" placeholder="http://example.com">
-		</div>
-	</div>
-</div>
-<% } %>
-
-<% if(!url) { %>
-<% } else { %>
 	<div class="post">
 		<div class="l-box">
-			Short URL: <a href="<%= scheme %>://<%= host %>/<%= url.short %>"><%= scheme %>://<%= host %>/<%= url.short %></a><br>
-			<small>Original URL: <a href="<%= url.url %>"><%= url.url %></a></small>
+			<div class="pure-form pure-g">
+				<label for="shorten" class="pure-u-1">Shorten a URL:</label>
+				<input type="text" id="shorten" name="shorten" class="pure-input pure-u-1" placeholder="http://example.com">
+			</div>
 		</div>
 	</div>
-<% } %>
 
+	<% if(!url) { %>
+	<% } else { %>
+		<div class="post">
+			<div class="l-box">
+				Short URL: <a href="<%= scheme %>://<%= host %>/<%= url.short %>"><%= scheme %>://<%= host %>/<%= url.short %></a><br>
+				<small>Original URL: <a href="<%= url.url %>"><%= url.url %></a></small>
+			</div>
+		</div>
+	<% } %>
+<% } %>
 <div class="post">
 	<div class="l-box">
 		<div class="pure-form pure-g">
