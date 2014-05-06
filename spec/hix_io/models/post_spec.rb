@@ -6,7 +6,7 @@ require 'spec_helper'
 
 describe( HixIO::Post ) do
 
-	before( :all ) { migrate! }
+	before( :all ) { prep_db! }
 
 	let( :user ) do
 		HixIO::User.find_or_create( :email => 'test@example.com' ) do |user|

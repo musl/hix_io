@@ -32,27 +32,15 @@ include Mongrel2::Constants
 
 HixIO.load_config( 'etc/config.yml' )
 
-def migrate!
+def prep_db!
 	raise "Hold on there, buddy. We're not in developer mode!" unless HixIO.dev?
-
-	Sequel.extension :migration
-
-	klass = Sequel::Migrator.migrator_class( HixIO::MIGRATION_DIR )
-
-	# Ground Zero
-	migrator = klass.new( HixIO.db, HixIO::MIGRATION_DIR, :target => 0 )
-	migrator.run
-
-	# Latest Migration
-	migrator = klass.new( HixIO.db, HixIO::MIGRATION_DIR, :target => nil )
-	migrator.run
-
+	HixIO.models.each { |model| model.dataset.delete }
+	HixIO.db[:sessions].delete
 	return nil
 end
 
 RSpec.configure do |config|
   config.formatter = :documentation # :progress, :html, :textmate
   config.color_enabled = true
-  #config.tty = true
 end
 

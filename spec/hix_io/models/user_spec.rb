@@ -8,7 +8,7 @@ require 'pry'
 
 describe( HixIO::User ) do
 
-	before( :all ) { migrate! }
+	before( :all ) { prep_db! }
 	after( :each ) { described_class.dataset.delete }
 
 	context 'dataset methods' do

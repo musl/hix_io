@@ -8,7 +8,7 @@ require 'pry'
 
 describe( HixIO::URL ) do
 
-	before( :all ) { migrate! }
+	before( :all ) { prep_db! }
 	after( :each ) { described_class.dataset.delete }
 
 	let( :user ) do

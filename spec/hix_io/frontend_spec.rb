@@ -9,7 +9,7 @@ load HixIO::DATA_DIR + 'apps/frontend'
 describe( HixIO::Frontend ) do
 
 	before( :all ) do
-		migrate!
+		prep_db!
 		Strelka::App::Auth.configure( HixIO.global_config.auth )
 	end
 

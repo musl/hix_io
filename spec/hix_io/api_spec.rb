@@ -8,7 +8,7 @@ load HixIO::DATA_DIR + 'apps/api'
 
 describe( HixIO::API ) do
 
-	before( :all ) { migrate! }
+	before( :all ) { prep_db! }
 
 	subject do
 		described_class.new( *TEST_APP_PARAMS )

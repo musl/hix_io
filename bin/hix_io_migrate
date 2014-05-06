@@ -13,15 +13,8 @@ opts = Trollop.options do
 end
 
 HixIO.load_config( opts[:config], :skip_models => true )
-Loggability.level = opts[:debug] ? :debug : :info
+Loggability.level = opts[:debug] ? :debug : :fatal
 
 Sequel.extension :migration
-
-klass = Sequel::Migrator.migrator_class( HixIO::MIGRATION_DIR )
-
-migrator = klass.new( HixIO.db, HixIO::MIGRATION_DIR, :target => opts[:target] )
-migrator.run
-
-migrator = klass.new( HixIO.db, HixIO::MIGRATION_DIR )
-HixIO.log.info "At version %d." % [migrator.current]
+Sequel::Migrator.apply( HixIO.db, HixIO::MIGRATION_DIR, opts[:target] )
 

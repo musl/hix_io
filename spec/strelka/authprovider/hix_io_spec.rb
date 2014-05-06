@@ -7,7 +7,7 @@ require 'strelka/authprovider/hixio'
 
 describe( Strelka::AuthProvider::HixIO ) do
 
-	before( :all ) { migrate! }
+	before( :all ) { prep_db! }
 
 	subject { described_class.new( nil ) }
 
