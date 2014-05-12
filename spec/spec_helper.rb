@@ -14,7 +14,7 @@ if ENV['COVERAGE']
 		add_filter 'spec'
 		add_filter 'data/hix_io/migrations'
 
-		add_group( "Apps", 'data/hix_io/apps' )
+		add_group( "Handlers", 'lib/hix_io/handlers' )
 		add_group( "Models", 'lib/hix_io/models' )
 		add_group( "Not Fully Tested" ) { |file| file.covered_percent < 100 }
 	end
