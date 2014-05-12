@@ -4,8 +4,7 @@
 # encoding: UTF-8
 
 require 'spec_helper'
-
-load HixIO::DATA_DIR + 'apps/auth'
+require 'hix_io/handlers/auth'
 
 describe( HixIO::Auth ) do
 

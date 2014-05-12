@@ -12,9 +12,8 @@ opts = Trollop.options do
 	opt :debug, 'Force debug logging.', :default => false
 end
 
-app = HixIO::DATA_DIR + 'apps' + opts[:app]
 snap = HixIO.constants
-load app
+require "hix_io/handlers/#{opts[:app]}"
 handler = HixIO.const_get( (HixIO.constants - snap).first )
 
 HixIO.load_config( opts[:config] )

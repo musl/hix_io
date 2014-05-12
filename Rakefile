@@ -50,7 +50,7 @@ begin
 		s.require_path          = 'lib'
 		s.files                 = MANIFEST
 		s.required_ruby_version = '>= 2.0.0'
-		s.executables           = %w[hix_io_migrate hix_io_configure]
+		s.executables           = %w[hix_io_configure hix_io_migrate hix_io_run]
 
 		s.add_dependency 'strelka', '~> 0.8'
 		s.add_dependency 'inversion', '~> 0.12'
@@ -215,21 +215,50 @@ end
 __END__
 LICENSE
 README.rdoc
+TODO.rdoc
 bin/hix_io_configure
 bin/hix_io_migrate
-data/hix_io/apps/api
+bin/hix_io_run
 data/hix_io/migrations/001_base.rb
-data/hix_io/migrations/002_post.rb
+data/hix_io/migrations/002_user.rb
+data/hix_io/migrations/003_post.rb
+data/hix_io/migrations/004_url.rb
+data/hix_io/static/css/base-min.css
+data/hix_io/static/css/highlight/googlecode.min.css
+data/hix_io/static/css/pure-min.css
 data/hix_io/static/css/reset.css
 data/hix_io/static/css/style.css
-data/hix_io/static/index.html
-data/hix_io/static/js/can.js
-data/hix_io/static/js/jquery.min.js
+data/hix_io/static/js/lib/can.js
+data/hix_io/static/js/lib/highlight.min.js
+data/hix_io/static/js/lib/jquery.min.js
+data/hix_io/static/js/lib/sha512.js
 data/hix_io/static/js/main.js
+data/hix_io/static/templates/code.ejs
+data/hix_io/static/templates/login_form.ejs
+data/hix_io/static/templates/message.ejs
+data/hix_io/static/templates/pager.ejs
+data/hix_io/static/templates/pics.ejs
+data/hix_io/static/templates/post.ejs
 data/hix_io/static/templates/posts.ejs
+data/hix_io/static/templates/urls.ejs
+data/hix_io/templates/index.tmpl
+etc/hixio.conf.rb
 lib/hix_io.rb
 lib/hix_io/constants.rb
+lib/hix_io/core_extensions.rb
+lib/hix_io/handlers/api.rb
+lib/hix_io/handlers/auth.rb
+lib/hix_io/handlers/frontend.rb
 lib/hix_io/models/post.rb
-spec/hix_io_spec.rb
-spec/models/post_spec.rb
+lib/hix_io/models/url.rb
+lib/hix_io/models/user.rb
+lib/strelka/authprovider/hixio.rb
+spec/hix_io/api_spec.rb
+spec/hix_io/auth_spec.rb
+spec/hix_io/frontend_spec.rb
+spec/hix_io/hix_io_spec.rb
+spec/hix_io/models/post_spec.rb
+spec/hix_io/models/url_spec.rb
+spec/hix_io/models/user_spec.rb
 spec/spec_helper.rb
+spec/strelka/authprovider/hix_io_spec.rb

@@ -3,8 +3,7 @@
 # encoding: UTF-8
 
 require 'spec_helper'
-
-load HixIO::DATA_DIR + 'apps/api'
+require 'hix_io/handlers/api'
 
 describe( HixIO::API ) do
 
