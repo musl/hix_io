@@ -62,7 +62,6 @@ begin
 		s.add_development_dependency 'pry', '~> 0.9'
 		s.add_development_dependency 'rdoc', '>= 4.1'
 		s.add_development_dependency 'rdoc-generator-fivefish', '>= 0.1'
-		s.add_development_dependency 'pdoc', '>= 0.2'
 		s.add_development_dependency 'rspec', '~> 2.14'
 		s.add_development_dependency 'ruby-prof', '~> 0.14'
 		s.add_development_dependency 'simplecov', '~> 0.8'
@@ -176,37 +175,6 @@ begin require 'rdoc/task'
 rescue LoadError
 	$stderr.puts "Omitting 'docs' tasks, rdoc doesn't seem to be installed."
 end
-
-begin require 'pdoc'
-
-	desc 'Generate pdoc documention'
-	task :pdoc do
-		PDoc.run({
-			:source_files => Dir.glob( (DATADIR + 'static/js/*.js').to_s ),
-			:destination => (DOCSDIR + 'js').to_s,
-			:version => HixIO::VERSION,
-			:syntax_highlighter => :pygments,
-			:markdown_parser => :bluecloth,
-			:src_code_href => proc { |file, line|
-				"http://code.hix.io/projects/hix_io/file/#{HixIO::REVISION}/#{file}#l#{line}"
-			},
-			:pretty_urls => false,
-			:bust_cache => true,
-			:name => 'HixIO Web Appt',
-			:short_name => 'HixIO',
-			:copyright_notice => ''
-		})
-	end
-
-	desc 'Clobber pdoc docs'
-	task :clobber_pdoc do
-		rm_rf (DOCSDIR + 'js').to_s
-	end
-
-rescue LoadError
-	$stderr.puts "Omitting 'pdoc' tasks, pdoc doesn't seem to be installed."
-end
-
 
 ########################################################################
 ### M A N I F E S T
