@@ -4,7 +4,7 @@
 require 'strelka'
 require 'hix_io'
 
-# Provides REST resources for the application.
+# Provides routes for authentication and session management.
 #
 class HixIO::Auth < Strelka::App
 

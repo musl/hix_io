@@ -4,7 +4,7 @@
 require 'strelka'
 require 'hix_io'
 
-# Provides REST resources for the application.
+# Provides a REST-like API for the application.
 #
 class HixIO::API < Strelka::App
 

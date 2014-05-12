@@ -4,7 +4,7 @@
 require 'strelka'
 require 'hix_io'
 
-# Provides REST resources for the application.
+# Provides routes for the application's templates and non-api resources.
 #
 class HixIO::Frontend < Strelka::App
 
@@ -45,6 +45,8 @@ class HixIO::Frontend < Strelka::App
 	### I N S T A N C E   M E T H O D S
 	########################################################################
 
+	# Provide metadata to ship along with the response for +req+.
+	#
 	def meta( req )
 		meta = {
 			:host => HixIO.host,

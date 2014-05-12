@@ -19,8 +19,10 @@ class HixIO::Post < Sequel::Model( :hix_io__posts )
 		#
 		# Recognized keys in +params+:
 		#
-		# :offset => Passed to the offset SQL clause.
-		# :limit  => Passed to the limit SQL clause.
+		# - +:offset+
+		#   Passed to the offset SQL clause.
+		# - +:limit+
+		#   Passed to the limit SQL clause.
 		#
 		def published( params = {} )
 			set = self.where( :published => true ).order( :mtime )
@@ -40,12 +42,16 @@ class HixIO::Post < Sequel::Model( :hix_io__posts )
 		#
 		# Recognized keys in +params+:
 		#
-		# :q          => The query string.
-		# :offset     => Passed to the offset SQL clause.
-		# :limit      => Passed to the limit SQL clause.
-		# :language   => Language. defaults to 'english'
-		# :max_length => Queries longer than this will be truncated to this many
-		#                characters. defaults to 100
+		# - +:q+
+		#   The query string.
+		# - +:offset+
+		#   Passed to the offset SQL clause.
+		# - +:limit+
+		#   Passed to the limit SQL clause.
+		# - +:language+
+		#   Language. defaults to 'english'
+		# - +:max_length+
+		#   Queries longer than this will be truncated to this many characters. defaults to 100
 		#
 		def search( params = {} )
 			qmax = params[:max_length] || 100
@@ -66,10 +72,8 @@ class HixIO::Post < Sequel::Model( :hix_io__posts )
 	### H O O K S
 	########################################################################
 
-	def before_save
-		super
-	end
-
+	# Validation hook for Sequel.
+	#
 	def validate
 		validates_presence( :title )
 		validates_presence( :body )
@@ -81,7 +85,7 @@ class HixIO::Post < Sequel::Model( :hix_io__posts )
 
 	# Override & cripple to_json. There can only be one!
 	#
-	def to_json( *a )
+	def to_json( *a ) #:nodoc:
 		return super( :include => :user )
 	end
 

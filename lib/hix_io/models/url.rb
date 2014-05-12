@@ -20,10 +20,14 @@ class HixIO::URL < Sequel::Model( :hix_io__urls )
 
 	dataset_module do
 
+		# Return a dataset that will yield the top URLs by hit.
+		#
 		def top
 			return self.order( Sequel.desc( :hits ) )
 		end
 
+		# Returns a dataset that will yield the top URLs by creation time.
+		#
 		def latest
 			return self.order( Sequel.desc( :ctime ) )
 		end
@@ -34,7 +38,7 @@ class HixIO::URL < Sequel::Model( :hix_io__urls )
 	### H O O K S
 	########################################################################
 
-	# Validates this model.
+	# Sequel validation hook.
 	#
 	def validate
 		super
@@ -43,7 +47,7 @@ class HixIO::URL < Sequel::Model( :hix_io__urls )
 		errors.add( :url, "invalid" ) unless valid_url?
 	end
 
-	# Updates a dependent column.
+	# Sequel hook. Updates a dependent column.
 	#
 	def before_save
 		self.short = Zlib::crc32( self.url.to_s ).to_s( 36 )
@@ -54,7 +58,7 @@ class HixIO::URL < Sequel::Model( :hix_io__urls )
 	### I N S T A N C E   M E T H O D S
 	########################################################################
 
-	# Validate the given URL.
+	# Validate the value of this instance's +url+ column.
 	#
 	def valid_url?
 		url = URI( self.url )
@@ -68,7 +72,7 @@ class HixIO::URL < Sequel::Model( :hix_io__urls )
 
 	# Override & cripple to_json. There can only be one!
 	#
-	def to_json( *a )
+	def to_json( *a ) #:nodoc:
 		return super( :include => :user )
 	end
 

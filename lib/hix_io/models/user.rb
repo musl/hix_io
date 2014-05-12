@@ -20,6 +20,7 @@ class HixIO::User < Sequel::Model( :hix_io__users )
 	########################################################################
 
 	dataset_module do
+		# TODO - create datasets for user management.
 	end
 
 	########################################################################
@@ -50,7 +51,7 @@ class HixIO::User < Sequel::Model( :hix_io__users )
 
 	# Override & cripple to_json. There can only be one!
 	#
-	def to_json( *a )
+	def to_json( *a ) #:nodoc:
 		return super( :except => [:password, :api_secret] )
 	end
 
