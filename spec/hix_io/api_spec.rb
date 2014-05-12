@@ -74,19 +74,6 @@ describe( HixIO::API ) do
 			}.not_to raise_error
 		end
 
-		it 'provides a post search' do
-			req = factory.get( '/search' )
-
-			res = subject.handle( req )
-			res.body.rewind
-
-			expect( res.status ).to eq( HTTP::OK )
-			expect( res.content_type ).to eq( 'application/json' )
-			expect {
-				JSON.parse( res.body.read )
-			}.not_to raise_error
-		end
-
 		it 'provides lists of top and latest shortened URLs' do
 			req = factory.get( '/urls' )
 

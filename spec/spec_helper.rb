@@ -34,7 +34,7 @@ HixIO.load_config( 'etc/config.yml' )
 
 def prep_db!
 	raise "Hold on there, buddy. We're not in developer mode!" unless HixIO.dev?
-	HixIO.models.each { |model| model.dataset.delete }
+	HixIO.models.values.each { |model| model.dataset.delete }
 	HixIO.db[:sessions].delete
 	return nil
 end

@@ -9,6 +9,7 @@ require 'pathname'
 BASEDIR = Pathname.new( __FILE__ ).expand_path.dirname.relative_path_from( Pathname.getwd )
 LIBDIR  = BASEDIR + 'lib'
 DATADIR = BASEDIR + 'data/hix_io'
+DOCSDIR = DATADIR + 'static/docs'
 
 $LOAD_PATH.unshift( LIBDIR.to_s )
 
@@ -61,6 +62,7 @@ begin
 		s.add_development_dependency 'pry', '~> 0.9'
 		s.add_development_dependency 'rdoc', '>= 4.1'
 		s.add_development_dependency 'rdoc-generator-fivefish', '>= 0.1'
+		s.add_development_dependency 'pdoc', '>= 0.2'
 		s.add_development_dependency 'rspec', '~> 2.14'
 		s.add_development_dependency 'ruby-prof', '~> 0.14'
 		s.add_development_dependency 'simplecov', '~> 0.8'
@@ -156,7 +158,7 @@ begin require 'rdoc/task'
 	desc 'Generate rdoc documentation'
 	RDoc::Task.new do |rdoc|
 		rdoc.name       = :docs
-		rdoc.rdoc_dir   = 'data/hix_io/static/docs'
+		rdoc.rdoc_dir   = DOCSDIR.to_s
 		rdoc.title      = "hix_io - #{HixIO::VERSION} - Developer Documentation"
 		rdoc.generator  = 'fivefish'
 		rdoc.main       = "README.rdoc"
@@ -166,7 +168,7 @@ begin require 'rdoc/task'
 	desc 'Generate rdoc coverage information'
 	RDoc::Task.new do |rdoc|
 		rdoc.name       = :docs_coverage
-		rdoc.rdoc_dir   = 'data/hix_io/docs/coverage'
+		rdoc.rdoc_dir   = (DOCSDIR + 'coverage').to_s
 		rdoc.options    = [ '-C1' ]
 		rdoc.rdoc_files = [ 'lib', *FileList['*.rdoc'] ]
 	end
@@ -174,6 +176,37 @@ begin require 'rdoc/task'
 rescue LoadError
 	$stderr.puts "Omitting 'docs' tasks, rdoc doesn't seem to be installed."
 end
+
+begin require 'pdoc'
+
+	desc 'Generate pdoc documention'
+	task :pdoc do
+		PDoc.run({
+			:source_files => Dir.glob( (DATADIR + 'static/js/*.js').to_s ),
+			:destination => (DOCSDIR + 'js').to_s,
+			:version => HixIO::VERSION,
+			:syntax_highlighter => :pygments,
+			:markdown_parser => :bluecloth,
+			:src_code_href => proc { |file, line|
+				"http://code.hix.io/projects/hix_io/file/#{HixIO::REVISION}/#{file}#l#{line}"
+			},
+			:pretty_urls => false,
+			:bust_cache => true,
+			:name => 'HixIO Web Appt',
+			:short_name => 'HixIO',
+			:copyright_notice => ''
+		})
+	end
+
+	desc 'Clobber pdoc docs'
+	task :clobber_pdoc do
+		rm_rf (DOCSDIR + 'js').to_s
+	end
+
+rescue LoadError
+	$stderr.puts "Omitting 'pdoc' tasks, pdoc doesn't seem to be installed."
+end
+
 
 ########################################################################
 ### M A N I F E S T

@@ -2,15 +2,15 @@
 
 'use strict';
 
-/******************************************************************************/
-// Namespace
-/******************************************************************************/
+/* ****************************************************************************
+ * Namespace
+ ******************************************************************************/
 
 var HixIO = new can.Map({});
 
-/******************************************************************************/
-// Utility functions
-/******************************************************************************/
+/* ****************************************************************************
+ * Utility Functions
+ ******************************************************************************/
 
 /*
  * Delegate a method on our namespace to another object.
@@ -144,9 +144,9 @@ HixIO.view_helpers = {
 	}
 };
 
-/******************************************************************************/
-// Auth
-/******************************************************************************/
+/* ****************************************************************************
+ * Auth
+ ******************************************************************************/
 
 HixIO.on_auth_change = function(callback) {
 	HixIO.bind('current_user', callback);
@@ -186,9 +186,9 @@ HixIO.log_out = function() {
 	});
 };
 
-/******************************************************************************/
-// Models
-/******************************************************************************/
+/* ****************************************************************************
+ * Models
+ ******************************************************************************/
 
 /*
  * I chose to keep the models as limited in functionality as possible. I use
@@ -213,20 +213,13 @@ HixIO.URL = can.Model.extend({
 }, {});
 
 /*
- * Big arse search.
- */
-HixIO.Search = can.Model.extend({
-	list: HixIO.ajax('/api/v1/search')
-}, {});
-
-/*
  * User accounts.
  */
 HixIO.User = can.Model.extend({}, {});
 
-/******************************************************************************/
-// Controls
-/******************************************************************************/
+/* ****************************************************************************
+ * Routed Controls
+ ******************************************************************************/
 
 /*
  * Provide a list of posts or details on a single post.
@@ -276,46 +269,6 @@ HixIO.PostControl = can.Control.extend({}, {
 			}));
 			HixIO.highlightSyntax();
 		});
-	}
-});
-
-/*
- * Provide a control for displaying search results.
- */
-HixIO.SearchControl = can.Control.extend({}, {
-	init: function(element, options) {
-		var self;
-	   
-		self = this;
-
-		this.q = null;
-		this.pager = new HixIO.Pager(this.element, {
-			per_page: 5,
-			on_change: function() { self.update(); },
-			target: '#search_pager'
-		});
-	},
-
-	update: function() {
-		var self, params;
-	   
-		self = this;
-		params = this.pager.params({ q: this.q });
-
-		HixIO.Search.list(params).success(function(data) {
-			self.element.html(can.view('/static/templates/search.ejs', {
-				posts: HixIO.Post.models(data.posts),
-				q: self.q
-			}));
-			self.pager.update(data.count);
-		}).error(function(data) {
-			HixIO.notify('Unable to load search results.', 'error-message');
-		});
-	},
-
-	'search route': function(data) {
-		this.q = data.q;
-		this.update();
 	}
 });
 
@@ -404,9 +357,9 @@ HixIO.URLControl = can.Control.extend({}, {
 	}
 });
 
-/******************************************************************************/
-// Re-usable Controls
-/******************************************************************************/
+/* ****************************************************************************
+ * Re-usable Controls
+ ******************************************************************************/
 
 /*
  * A pager.
@@ -784,20 +737,9 @@ HixIO.LoginForm = can.Control.extend({
 	}
 });
 
-/*
- * A Search Form
- */
-HixIO.SearchForm = can.Control.extend({},{
-	'input keyup': function(element, event) {
-		if(event.keyCode === 13) {
-			window.location.hash = can.route.url({route: 'search', q: event.target.value});
-		}
-	}
-});
-
-/******************************************************************************/
-// Application entry point.
-/******************************************************************************/
+/* ****************************************************************************
+ * Application entry point.
+ ******************************************************************************/
 
 $(document).ready(function() {
 	var main_element = '#main';
@@ -806,7 +748,6 @@ $(document).ready(function() {
 		code:   new HixIO.CodeControl(main_element),
 		pics:   new HixIO.PicsControl(main_element),
 		posts:  new HixIO.PostControl(main_element),
-		search: new HixIO.SearchControl(main_element),
 		urls:   new HixIO.URLControl(main_element)
 	};
 
@@ -817,7 +758,6 @@ $(document).ready(function() {
 		selected_class: 'pure-menu-selected'
 	});
 
-	HixIO.search_form = new HixIO.SearchForm('#search-form');
 	HixIO.login_form = new HixIO.LoginForm('#login-form');
 
 	HixIO.default_route = 'posts';

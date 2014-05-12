@@ -15,11 +15,11 @@ describe( HixIO ) do
 	end
 
 	it 'loads at least one model' do
-		expect( subject.models ).to have_at_least( 1 ).things
+		expect( subject.models.values ).to have_at_least( 1 ).things
 	end
 
 	it 'propigates the database handle to all loaded models' do
-		subject.models.each do |model|
+		subject.models.values.each do |model|
 			expect( model.db ).to equal subject.db
 		end
 	end

@@ -104,16 +104,21 @@ module HixIO
 	# that were added to the namespace.
 	#
 	def self::load_models
-		@models ||= []
+		@models ||= {}
+		new_models = {}
 
 		Dir[MODEL_DIR + '*.rb'].each do |f|
 			snap = constants
 			next unless require f
 			begin
-				@models << const_get( (constants - snap).first )
+				(constants - snap).each do|sym|
+					new_models[sym] = const_get( sym )
+				end
 			rescue NameError, TypeError
 			end
 		end
+
+		@models.merge!( new_models )
 	end
 
 	# Are we in development mode?

@@ -21,6 +21,7 @@ class HixIO::API < Strelka::App
 	session_namespace :hix_io
 
 	param :id, :integer
+	param :class_name, :string
 
 	default_type 'application/json'
 
@@ -46,19 +47,6 @@ class HixIO::API < Strelka::App
 	get '/posts/:id' do |req|
 		res = req.response
 		res.for( :json ) { HixIO::Post.detail( req.params[:id] ).first }
-		return res
-	end
-
-	get '/search' do |req|
-		req.params.add :q, :string
-		req.params.add :offset, :integer
-		req.params.add :limit, :integer
-
-		res = req.response
-		res.for( :json ) {{
-			:count => HixIO::Post.search( :q => req.params[:q] ).count,
-			:posts => HixIO::Post.search( req.params ).all,
-		}}
 		return res
 	end
 
