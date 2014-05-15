@@ -1,4 +1,4 @@
-/**vim: set nosta noet ts=4 sw=4 ft=javascript: */
+/* vim: set nosta noet ts=4 sw=4 ft=javascript: */
 
 'use strict';
 
@@ -235,8 +235,6 @@ HixIO.PostControl = can.Control.extend({}, {
 			on_change: function() { self.update(); },
 			target: '#posts_pager'
 		});
-
-		can.route('post/:id');
 	},
 
 	update: function() {
@@ -737,19 +735,52 @@ HixIO.LoginForm = can.Control.extend({
 	}
 });
 
+/*
+ * Provide routes for the main content.
+ *
+ * Options for creating this control:
+ * (See the code for the defaults.)
+ *
+ *     routes: (required)
+ *         An object that maps route names to controls.
+ *
+ *     default_route: (required)
+ *         The route to use if no hash is present in the current location.
+ *     
+ */
+HixIO.Router = can.Control.extend({},{
+	init: function(element, options) {
+		var self;
+
+		self = this;
+
+		this.controls = {};
+		can.each(this.options.routes, function(control, route) {
+			self.controls[route] = control.newInstance(self.element);
+		});
+
+		can.route.ready();
+
+		if(!can.route.attr('route') || can.route.attr('route') === '') {
+			can.route.attr('route', this.options.default_route);
+		}
+	},
+});
+
 /******************************************************************************
  * Application entry point.
  ******************************************************************************/
 
 $(document).ready(function() {
-	var main_element = '#main';
-
-	HixIO.routes = {
-		code:   new HixIO.CodeControl(main_element),
-		pics:   new HixIO.PicsControl(main_element),
-		posts:  new HixIO.PostControl(main_element),
-		urls:   new HixIO.URLControl(main_element)
-	};
+	HixIO.router = new HixIO.Router('#main', {
+		routes: {
+			code: HixIO.CodeControl,
+			pics: HixIO.PicsControl,
+			posts: HixIO.PostControl,
+			urls: HixIO.URLControl
+		},
+		default_route: 'posts'
+	});
 
 	HixIO.message_bar = new HixIO.MessageBar('#messages');
 	HixIO.delegate('notify', HixIO.message_bar);
@@ -759,16 +790,6 @@ $(document).ready(function() {
 	});
 
 	HixIO.login_form = new HixIO.LoginForm('#login-form');
-
-	HixIO.default_route = 'posts';
-
-	can.route.ready();
-
-	if(!can.route.attr('route') ||
-	   can.route.attr('route') === '') {
-		can.route.attr('route', HixIO.default_route);
-	}
-	
 	HixIO.check_auth();
 });
 
