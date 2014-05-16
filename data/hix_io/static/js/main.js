@@ -94,7 +94,7 @@ HixIO.highlightSyntax = function() {
 HixIO.view_helpers = {
 
 	capitalize: function(string) {
-		string.charAt(0).toUpperCase() + string.slice(1);
+		return string.charAt(0).toUpperCase() + string.slice(1);
 	},
 
 	short_date: function(date_arg) {
@@ -530,7 +530,12 @@ HixIO.Menu = can.Control.extend({},
 		var self = this;
 
 		$(this.element).find('a').each(function(i,e) {
-			if(e.href.match(new RegExp(can.route.attr('route') + '$'))){ 
+			var route, regex;
+
+			route = can.route.attr('route').split('/')[0];
+			regex = new RegExp(route + '(\/|$)');
+
+			if(e.href.match(regex)){
 				$(e).parent().addClass(self.options.selected_class);
 			} else {
 				$(e).parent().removeClass(self.options.selected_class);
