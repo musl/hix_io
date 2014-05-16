@@ -753,8 +753,8 @@ HixIO.Router = can.Control.extend({},{
 		var self;
 
 		self = this;
-
 		this.controls = {};
+
 		can.each(this.options.routes, function(control, route) {
 			self.controls[route] = control.newInstance(self.element);
 		});
@@ -772,15 +772,6 @@ HixIO.Router = can.Control.extend({},{
  ******************************************************************************/
 
 $(document).ready(function() {
-	HixIO.router = new HixIO.Router('#main', {
-		routes: {
-			code: HixIO.CodeControl,
-			pics: HixIO.PicsControl,
-			posts: HixIO.PostControl,
-			urls: HixIO.URLControl
-		},
-		default_route: 'posts'
-	});
 
 	HixIO.message_bar = new HixIO.MessageBar('#messages');
 	HixIO.delegate('notify', HixIO.message_bar);
@@ -791,5 +782,16 @@ $(document).ready(function() {
 
 	HixIO.login_form = new HixIO.LoginForm('#login-form');
 	HixIO.check_auth();
+
+	HixIO.router = new HixIO.Router('#main', {
+		routes: {
+			code: HixIO.CodeControl,
+			pics: HixIO.PicsControl,
+			posts: HixIO.PostControl,
+			urls: HixIO.URLControl
+		},
+		default_route: 'posts'
+	});
+
 });
 
