@@ -112,7 +112,7 @@ HixIO.view_helpers = {
 		day = 24 * hour;
 
 		date = new Date(date_arg).getTime();
-		if(date <= 0 || isNaN(date)) { return date_arg }
+		if(date <= 0 || isNaN(date)) { return date_arg; }
 
 		now = new Date().getTime();
 		delta = now - date;
@@ -271,21 +271,6 @@ HixIO.PostControl = can.Control.extend({}, {
 });
 
 /*
- * A control for listing and displaying projects.
- */
-HixIO.CodeControl = can.Control.extend({
-	defaults: {
-		view: '/static/templates/code.ejs'
-	}
-}, {
-	init: function(element, options) {},
-
-	'code route': function(data) {
-		this.element.html(can.view(this.options.view, {}));
-	}
-});
-
-/*
  * A control for a shared photo timeline.
  */
 HixIO.PicsControl = can.Control.extend({
@@ -293,7 +278,6 @@ HixIO.PicsControl = can.Control.extend({
 		view: '/static/templates/pics.ejs'
 	}
 }, {
-	init: function(element, options) {}, 
 	'pics route': function(data) {
 		this.element.html(can.view(this.options.view, {}));
 	}
@@ -613,7 +597,7 @@ HixIO.MessageBar = can.Control.extend({
 				 * Close this control after the given timeout.
 				 */
 				self.timeout = setTimeout(function() {
-					self.close()
+					self.close();
 				}, self.data.attr('timeout'));
 			}
 		});
@@ -717,15 +701,13 @@ HixIO.LoginForm = can.Control.extend({
 	},
 
 	'{log_in_password} keyup': function(element, event) {
-		var creds, self, email_field, password_field, sha;
-
-		self = this;
+		var creds, email_field, password_field, sha;
 
 		if(event.keyCode === 13) {
 			email_field = $(this.options.log_in_email);
 			password_field = $(this.options.log_in_password);
 
-			if(email_field.val() === '' || password_field.val() == '') { return; } 
+			if(email_field.val() === '' || password_field.val() === '') { return; } 
 
 			sha = new jsSHA( password_field.val(), "TEXT" );
 			creds = {email: email_field.val(), password: sha.getHash(this.options.hash_algorithm, "HEX")};
@@ -785,7 +767,6 @@ $(document).ready(function() {
 
 	HixIO.router = new HixIO.Router('#main', {
 		routes: {
-			code: HixIO.CodeControl,
 			pics: HixIO.PicsControl,
 			posts: HixIO.PostControl,
 			urls: HixIO.URLControl

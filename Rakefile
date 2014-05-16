@@ -138,6 +138,7 @@ begin
 				--predef $
 				--predef can
 				--predef hljs
+				--predef jsSHA
 				--unparam
 				--white
 			],
