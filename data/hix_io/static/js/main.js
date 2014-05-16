@@ -148,18 +148,36 @@ HixIO.view_helpers = {
  * Auth
  ******************************************************************************/
 
+HixIO.authorized = function() {
+	return HixIO.attr('current_user') !== null;
+};
+
 HixIO.on_auth_change = function(callback) {
 	HixIO.bind('current_user', callback);
 };
 
-HixIO.check_auth = function() {
+HixIO.auth_redirect = function(route) {
+	if(!HixIO.authorized()) {
+		if(route) {
+			can.route.attr('route', route);
+		} else {
+			HixIO.router.default_route();
+		}
+		return true;
+	}
+	return false;
+};
+
+HixIO.check_auth = function(callback) {
 	if(!HixIO.attr('current_user')) {
 		HixIO.ajax('/auth', 'GET')().success(function(data) {
 			HixIO.attr('current_user', data); 
+			if(callback) { callback(); }
 		}).error(function(data) {
 			if(data.status >= 400 && data.status < 500) {
 				HixIO.attr('current_user', null);
 			}
+			if(callback) { callback(); }
 		});
 	}
 };
@@ -246,7 +264,8 @@ HixIO.PostControl = can.Control.extend({}, {
 		HixIO.Post.list(params).success(function(data) {
 			self.element.html(can.view('/static/templates/posts.ejs', {
 				posts: HixIO.Post.models(data.posts)
-			}));
+			},
+			HixIO.view_helpers));
 			self.pager.update(data.count);
 			HixIO.highlightSyntax();
 		}).error(function(data) {
@@ -302,10 +321,7 @@ HixIO.ProfileControl = can.Control.extend({
 	},
 
 	update: function() {
-		if(!HixIO.attr('current_user')) {
-			HixIO.default_route();
-			return;
-		}
+		if(HixIO.auth_redirect()) { return; }
 		this.element.html(can.view(this.options.view, {
 			user: HixIO.attr('current_user')
 		}));
@@ -734,7 +750,7 @@ HixIO.LoginForm = can.Control.extend({
 	},
 
 	'{log_in_password} keyup': function(element, event) {
-		var creds, email_field, password_field, sha;
+		var creds, email_field, password_field, sha, SHA;
 
 		if(event.keyCode === 13) {
 			email_field = $(this.options.log_in_email);
@@ -742,7 +758,8 @@ HixIO.LoginForm = can.Control.extend({
 
 			if(email_field.val() === '' || password_field.val() === '') { return; } 
 
-			sha = new jsSHA( password_field.val(), "TEXT" );
+			SHA = jsSHA;
+			sha = new SHA( password_field.val(), "TEXT" );
 			creds = {email: email_field.val(), password: sha.getHash(this.options.hash_algorithm, "HEX")};
 
 			HixIO.log_in(creds);
@@ -764,7 +781,19 @@ HixIO.LoginForm = can.Control.extend({
  *     
  */
 HixIO.Router = can.Control.extend({},{
+
 	init: function(element, options) {
+		var self;
+
+		self = this;
+
+		// Add auth requirement support to routes?
+		HixIO.check_auth(function() {
+			self.route();
+		});
+	},
+
+	route: function() {
 		var self;
 
 		self = this;
@@ -784,6 +813,7 @@ HixIO.Router = can.Control.extend({},{
 	default_route: function() {
 		can.route.attr('route', this.options.default_route);
 	}
+
 });
 
 /******************************************************************************
@@ -800,7 +830,6 @@ $(document).ready(function() {
 	});
 
 	HixIO.login_form = new HixIO.LoginForm('#login-form');
-	HixIO.check_auth();
 
 	HixIO.router = new HixIO.Router('#main', {
 		routes: {
@@ -811,6 +840,6 @@ $(document).ready(function() {
 		},
 		default_route: 'posts'
 	});
-	HixIO.delegate('default_route', HixIO.router);
+
 });
 

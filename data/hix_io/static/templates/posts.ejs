@@ -1,9 +1,9 @@
 <% posts.each( function(post) { %>
 	<div class="post">
-		<h2><%== can.route.link(post.attr('title'), {id: post.attr('id')}, {}); %></h2>
+		<h2><%== can.route.link(post.title, {id: post.id}, {}); %></h2>
 		<hr>
-		<p class="post-meta">Updated <%= post.attr('mtime'); %></p>
-		<p><%== post.attr("body"); %></p>
+		<p class="post-meta">Updated by <%= post.user_id %> <%= relative_date(post.mtime) %> ago.</p>
+		<p><%== post.body %></p>
 	</div>
 <% }); %>
 <div id="posts_pager"></div>
