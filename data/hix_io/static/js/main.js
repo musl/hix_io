@@ -92,6 +92,11 @@ HixIO.highlightSyntax = function() {
  * Helpers for views. Pass this to can.view.
  */
 HixIO.view_helpers = {
+
+	capitalize: function(string) {
+		string.charAt(0).toUpperCase() + string.slice(1);
+	},
+
 	short_date: function(date_arg) {
 		return (new Date(date_arg)).toISOString();
 	},
@@ -271,7 +276,8 @@ HixIO.PostControl = can.Control.extend({}, {
 		HixIO.Post.findOne({ id: data.id }, function(post) {
 			self.element.html(can.view('/static/templates/post.ejs', {
 				post: post
-			}));
+			},
+			HixIO.view_helpers));
 			HixIO.highlightSyntax();
 		});
 	}
