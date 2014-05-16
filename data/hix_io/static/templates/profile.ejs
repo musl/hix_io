@@ -1,24 +1,28 @@
 <div class="post">
-	<h2><%= user.email %></h2>
-	<form id="profile-form" class="pure-form pure-form-aligned l-box">
-		<fieldset id="profile_information" class="">
-			<legend>Profile Information</legend>
+	<% if(!user) { %>
+		<p>Please sign in to view your profile.</p>
+	<% } else { %>
+		<h2><%= user.email %></h2>
+		<form id="profile-form" class="pure-form pure-form-aligned l-box">
+			<fieldset id="profile_information" class="">
+				<legend>Profile Information</legend>
 
-			<div class="pure-control-group">
-				<label for="email">email</label><input type="email" name="email" value="<%= user.email %>" id="email">
-			</div>
+				<div class="pure-control-group">
+					<label for="email">email</label><input type="email" name="email" value="<%= user.email %>" id="email">
+				</div>
 
-			<div class="pure-control-group">
-				<label for="password">password</label><input type="password" name="password" value="" placeholder="********" id="password">
-			</div>
-			<div class="pure-control-group">
-				<label for="verify_password">verify password</label><input type="password" name="verify_password" value="" placeholder="********" id="verify_password">
-			</div>
+				<div class="pure-control-group">
+					<label for="password">password</label><input type="password" name="password" value="" placeholder="********" id="password">
+				</div>
+				<div class="pure-control-group">
+					<label for="verify_password">verify password</label><input type="password" name="verify_password" value="" placeholder="********" id="verify_password">
+				</div>
 
-			<div class="pure-controls">
-				<input type="submit" class="pure-button pure-button-primary" value="save">
-				<input type="reset" class="pure-button button-error" value="reset">
-			</div>
-		</fieldset>
-	</form>
+				<div class="pure-controls">
+					<input type="submit" class="pure-button pure-button-primary" value="save">
+					<input type="reset" class="pure-button button-error" value="reset">
+				</div>
+			</fieldset>
+		</form>
+	<% } %>
 </div>

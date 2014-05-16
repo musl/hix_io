@@ -156,18 +156,6 @@ HixIO.on_auth_change = function(callback) {
 	HixIO.bind('current_user', callback);
 };
 
-HixIO.auth_redirect = function(route) {
-	if(!HixIO.authorized()) {
-		if(route) {
-			can.route.attr('route', route);
-		} else {
-			HixIO.router.default_route();
-		}
-		return true;
-	}
-	return false;
-};
-
 HixIO.check_auth = function(callback) {
 	if(!HixIO.attr('current_user')) {
 		HixIO.ajax('/auth', 'GET')().success(function(data) {
@@ -321,7 +309,6 @@ HixIO.ProfileControl = can.Control.extend({
 	},
 
 	update: function() {
-		if(HixIO.auth_redirect()) { return; }
 		this.element.html(can.view(this.options.view, {
 			user: HixIO.attr('current_user')
 		}));
@@ -809,10 +796,6 @@ HixIO.Router = can.Control.extend({},{
 			this.default_route();
 		}
 	},
-
-	default_route: function() {
-		can.route.attr('route', this.options.default_route);
-	}
 
 });
 
