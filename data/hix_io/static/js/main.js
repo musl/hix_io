@@ -414,17 +414,19 @@ HixIO.Pager = can.Control.extend({
 
 		p = parseInt(options.pad, 10);
 		if(p > 0) { this.options.pad = p; }
+
+		console.log('pager:init()');
 	},
 
 	update: function(count) {
 		var a, c, p, ds, de;
 
-		if(this.state.attr('count') < this.state.attr('per_page')) { return; }
-
 		this.state.attr('count', count);
 		this.state.attr('pages',
-			Math.ceil(this.state.attr('state.count') / this.state.attr('per_page')
+			Math.ceil(this.state.attr('count') / this.state.attr('per_page')
 		));
+
+		if(this.state.attr('count') < this.state.attr('per_page')) { return; }
 
 		p = this.state.attr('page');
 		c = this.state.attr('pages');
@@ -445,6 +447,7 @@ HixIO.Pager = can.Control.extend({
 		this.state.attr('window_end', Math.min(c, p + a + de));
 
 		$(this.options.target).html(can.view(this.options.view, this.state));
+
 	},
 
 	params: function(params) {
