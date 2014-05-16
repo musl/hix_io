@@ -283,6 +283,38 @@ HixIO.PicsControl = can.Control.extend({
 	}
 });
 
+/*
+ * A control for a shared photo timeline.
+ */
+HixIO.ProfileControl = can.Control.extend({
+	defaults: {
+		view: '/static/templates/profile.ejs'
+	}
+}, {
+	init: function(element, options) {
+		var self;
+
+		self = this;
+
+		HixIO.on_auth_change(function() {
+			if(can.route.attr('route') === 'profile') { self.update(); }
+		});
+	},
+
+	update: function() {
+		if(!HixIO.attr('current_user')) {
+			HixIO.default_route();
+			return;
+		}
+		this.element.html(can.view(this.options.view, {
+			user: HixIO.attr('current_user')
+		}));
+	},
+
+	'profile route': function(data) {
+		this.update();
+	}
+});
 
 /*
  * A control for shortening urls.
@@ -414,8 +446,6 @@ HixIO.Pager = can.Control.extend({
 
 		p = parseInt(options.pad, 10);
 		if(p > 0) { this.options.pad = p; }
-
-		console.log('pager:init()');
 	},
 
 	update: function(count) {
@@ -747,9 +777,13 @@ HixIO.Router = can.Control.extend({},{
 		can.route.ready();
 
 		if(!can.route.attr('route') || can.route.attr('route') === '') {
-			can.route.attr('route', this.options.default_route);
+			this.default_route();
 		}
 	},
+
+	default_route: function() {
+		can.route.attr('route', this.options.default_route);
+	}
 });
 
 /******************************************************************************
@@ -772,10 +806,11 @@ $(document).ready(function() {
 		routes: {
 			pics: HixIO.PicsControl,
 			posts: HixIO.PostControl,
+			profile: HixIO.ProfileControl,
 			urls: HixIO.URLControl
 		},
 		default_route: 'posts'
 	});
-
+	HixIO.delegate('default_route', HixIO.router);
 });
 
