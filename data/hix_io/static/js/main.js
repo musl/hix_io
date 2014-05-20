@@ -532,6 +532,8 @@ HixIO.Menu = can.Control.extend({},
 		$(this.element).find('a').each(function(i,e) {
 			var route, regex;
 
+			if(!can.route.attr('route')) { return; }
+
 			route = can.route.attr('route').split('/')[0];
 			regex = new RegExp(route + '(\/|$)');
 
@@ -785,28 +787,43 @@ HixIO.Router = can.Control.extend({},{
 
 		self = this;
 
-		// Add auth requirement support to routes?
-		HixIO.check_auth(function() {
-			self.route();
-		});
-	},
-
-	route: function() {
-		var self;
-
-		self = this;
+		this.count = 0;
+		this.control = null;
 		this.controls = {};
+		this.builder = function() {
+			self.build_control();
+		};
 
-		can.each(this.options.routes, function(control, route) {
-			self.controls[route] = control.newInstance(self.element);
+		HixIO.check_auth(function() {
+			self.build_control();
+			can.route.ready();
+			can.route.bind('route', self.builder);
 		});
-
-		can.route.ready();
-
-		if(!can.route.attr('route') || can.route.attr('route') === '') {
-			this.default_route();
-		}
 	},
+
+	build_control: function() {
+		var klass, matches, route, can_route;
+		
+		console.log('build_control count: ' + ++this.count);
+
+		route = this.options.default_route;
+		matches = window.location.href.match(/#!(\w+)/);
+		if(can.isArray(matches)) {
+			route = matches[1];
+		} 
+
+		klass = this.options.routes[route];
+		this.control = new (klass)(this.element);
+		//can.route.ready();
+	
+		can_route = can.route.attr('route');
+		console.log('route: ' + route + ' can.route: ' + can_route);
+		if(!can_route || can_route.indexOf(route) != 0) {
+			can.route.unbind('route', this.builder);
+			can.route.attr('route', route);
+			can.route.bind('route', this.builder);
+		}
+	}
 
 });
 
@@ -815,7 +832,6 @@ HixIO.Router = can.Control.extend({},{
  ******************************************************************************/
 
 $(document).ready(function() {
-
 	HixIO.message_bar = new HixIO.MessageBar('#messages');
 	HixIO.delegate('notify', HixIO.message_bar);
 
