@@ -3,7 +3,7 @@
 		<p>Please sign in to view your profile.</p>
 	<% } else { %>
 		<h2><%= user.email %></h2>
-		<form id="profile-form" class="pure-form pure-form-aligned l-box">
+		<form id="profile-form" class="pure-form pure-form-aligned">
 			<fieldset id="profile_information" class="">
 				<legend>Profile Information</legend>
 
@@ -20,7 +20,7 @@
 
 				<div class="pure-controls">
 					<input type="submit" class="pure-button pure-button-primary" value="save">
-					<input type="reset" class="pure-button button-error" value="reset">
+					<input type="reset" class="pure-button" value="reset">
 				</div>
 			</fieldset>
 		</form>

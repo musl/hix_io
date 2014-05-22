@@ -1,27 +1,29 @@
-<% if(HixIO.authenticated()) { %>
-	<div class="post">
+<div class="post">
+	<% if(HixIO.authenticated()) { %>
 		<div class="l-box">
 			<div class="pure-form pure-g">
 				<label for="shorten" class="pure-u-1">Shorten a URL:</label>
 				<input type="text" id="shorten" name="shorten" class="pure-input pure-u-1" placeholder="http://example.com">
 			</div>
 		</div>
-	</div>
-
-	<% if(!url) { %>
 	<% } else { %>
-		<div class="post">
-			<div class="l-box">
-				Short URL: <a href="<%= scheme %>://<%= host %>/<%= url.short %>"><%= scheme %>://<%= host %>/<%= url.short %></a><br>
-				<small>Original URL: <a href="<%= url.url %>"><%= url.url %></a></small>
-			</div>
-		</div>
+		<h1>Shortened URLs</h1>
 	<% } %>
+</div>
+
+<% if(url) { %>
+	<div class="post">
+		<div class="l-box">
+			Short URL: <a href="<%= scheme %>://<%= host %>/<%= url.short %>"><%= scheme %>://<%= host %>/<%= url.short %></a><br>
+			<small>Original URL: <a href="<%= url.url %>"><%= url.url %></a></small>
+		</div>
+	</div>
 <% } %>
+
 <div class="post">
 	<div class="pure-form pure-g">
 		<div class="pure-u-1-2">
-			<h1>Latest</h1>
+			<h2>Latest</h2>
 			<% if( latest_urls.length == 0 ) { %>
 				<p><i class="fa fa-large fa-exclamation-triangle"></i>Nothing to see here.</p>
 			<% } else { %>
@@ -37,7 +39,7 @@
 			<% } %>
 		</div>
 		<div class="pure-u-1-2">
-			<h1>Most Visited</h1>
+			<h2>Most Visited</h2>
 			<% if( latest_urls.length == 0 ) { %>
 				<p><i class="fa fa-large fa-exclamation-triangle"></i>Nothing to see here.</p>
 			<% } else { %>

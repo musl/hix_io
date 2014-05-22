@@ -67,7 +67,7 @@ div#main > div.loading {
 }
 
 .l-box {
-	padding: 1em;
+	padding: 1em 0.5em;
 }
 
 .pure-menu {

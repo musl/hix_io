@@ -717,6 +717,7 @@ HixIO.MessageBar = can.Control.extend({
 HixIO.LoginForm = can.Control.extend({
 	defaults: {
 		view: '/static/templates/login_form.ejs',
+		log_in_button: '#log-in-button',
 		log_out_button: '#log-out-button',
 		log_in_email: '#log-in-email',
 		log_in_password: '#log-in-password',
@@ -730,6 +731,21 @@ HixIO.LoginForm = can.Control.extend({
 
 		HixIO.on_auth_change(function() { self.update(); });
 		this.element.hide();
+
+		this.submit = function() {
+			var creds, email_field, password_field, sha, SHA;
+
+			email_field = $(this.options.log_in_email);
+			password_field = $(this.options.log_in_password);
+
+			if(email_field.val() === '' || password_field.val() === '') { return; } 
+
+			SHA = jsSHA;
+			sha = new SHA( password_field.val(), "TEXT" );
+			creds = {email: email_field.val(), password: sha.getHash(this.options.hash_algorithm, "HEX")};
+
+			HixIO.log_in(creds);
+		}
 	},
 
 	update: function() {
@@ -753,26 +769,18 @@ HixIO.LoginForm = can.Control.extend({
 		render();
 	},
 
-	'{log_out_button} click': function(element, event) {
-		HixIO.log_out();	
+	'{log_in_button} click': function(element, event) {
+		this.submit();
 	},
 
 	'{log_in_password} keyup': function(element, event) {
-		var creds, email_field, password_field, sha, SHA;
+		if(event.keyCode === 13) { this.submit(); }
+	},
 
-		if(event.keyCode === 13) {
-			email_field = $(this.options.log_in_email);
-			password_field = $(this.options.log_in_password);
-
-			if(email_field.val() === '' || password_field.val() === '') { return; } 
-
-			SHA = jsSHA;
-			sha = new SHA( password_field.val(), "TEXT" );
-			creds = {email: email_field.val(), password: sha.getHash(this.options.hash_algorithm, "HEX")};
-
-			HixIO.log_in(creds);
-		}
+	'{log_out_button} click': function(element, event) {
+		HixIO.log_out();	
 	}
+
 });
 
 /*
