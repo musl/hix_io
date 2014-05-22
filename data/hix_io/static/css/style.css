@@ -247,3 +247,9 @@ div#main > div.loading {
 	margin-top: -9px;
 }
 
+p i.fa,
+li > a > i.fa {
+	margin: 0 0.5em;
+}
+
+

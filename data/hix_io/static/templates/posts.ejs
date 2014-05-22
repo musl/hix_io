@@ -1,9 +1,15 @@
-<% posts.each( function(post) { %>
-	<div class="post">
-		<h2><%== can.route.link(post.title, {id: post.id}, {}); %></h2>
-		<hr>
-		<p class="post-meta">Updated by <%= post.user_id %> <%= relative_date(post.mtime) %> ago.</p>
-		<p><%== post.body %></p>
-	</div>
-<% }); %>
+<% if(posts.length == 0) { %>
+		<div class="post">
+			<p><i class="fa fa-large fa-exclamation-triangle"></i>Oh no. There aren't any published blog posts to display.</p>	
+		</div>
+<% } else { %>
+	<% posts.each( function(post) { %>
+		<div class="post">
+			<h2><%== can.route.link(post.title, {id: post.id}, {}); %></h2>
+			<hr>
+			<p class="post-meta">Updated by <%= post.user_id %> <%= relative_date(post.mtime) %> ago.</p>
+			<p><%== post.body %></p>
+		</div>
+	<% }); %>
 <div id="posts_pager"></div>
+<% } %>

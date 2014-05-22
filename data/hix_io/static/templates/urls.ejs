@@ -19,10 +19,12 @@
 	<% } %>
 <% } %>
 <div class="post">
-	<div class="l-box">
-		<div class="pure-form pure-g">
-			<div class="pure-u-1-2">
-				<h1>Latest</h1>
+	<div class="pure-form pure-g">
+		<div class="pure-u-1-2">
+			<h1>Latest</h1>
+			<% if( latest_urls.length == 0 ) { %>
+				<p><i class="fa fa-large fa-exclamation-triangle"></i>Nothing to see here.</p>
+			<% } else { %>
 				<ol>
 					<% latest_urls.each( function(u) { %>
 						<li>
@@ -32,9 +34,13 @@
 						</li>
 					<% }); %>
 				</ol>
-			</div>
-			<div class="pure-u-1-2">
-				<h1>Most Visited</h1>
+			<% } %>
+		</div>
+		<div class="pure-u-1-2">
+			<h1>Most Visited</h1>
+			<% if( latest_urls.length == 0 ) { %>
+				<p><i class="fa fa-large fa-exclamation-triangle"></i>Nothing to see here.</p>
+			<% } else { %>
 				<ol>
 					<% top_urls.each( function(u) { %>
 						<li>
@@ -44,7 +50,7 @@
 						</li>
 					<% }); %>
 				</ol>
-			</div>
+			<% } %>
 		</div>
 	</div>
 </div>
