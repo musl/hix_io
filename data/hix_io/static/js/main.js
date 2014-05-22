@@ -153,31 +153,39 @@ HixIO.view_helpers = {
  * Auth
  ******************************************************************************/
 
-HixIO.authorized = function() {
-	return HixIO.attr('current_user') !== null;
+HixIO.authenticated = function() {
+	return HixIO.attr('user') !== null;
 };
 
 HixIO.on_auth_change = function(callback) {
-	HixIO.bind('current_user', callback);
+	HixIO.bind('user', callback);
 };
 
-HixIO.check_auth = function(callback) {
-	if(!HixIO.attr('current_user')) {
-		HixIO.ajax('/auth', 'GET')().success(function(data) {
-			HixIO.attr('current_user', data); 
-			if(callback) { callback(); }
-		}).error(function(data) {
-			if(data.status >= 400 && data.status < 500) {
-				HixIO.attr('current_user', null);
-			}
-			if(callback) { callback(); }
-		});
+HixIO.get_auth = function() {
+	var deferral;
+
+	deferral = can.Deferred();
+
+	if(!$.cookie('hix_io_session')) {
+		HixIO.attr('user', null);
+		deferral.resolve();
+		return deferral.promise();
 	}
+
+	HixIO.ajax('/auth', 'GET')().success(function(data) {
+		HixIO.attr('user', data); 
+		deferral.resolve();
+	}).error(function(data) {
+		HixIO.attr('user', null);
+		deferral.resolve();
+	});
+
+	return deferral.promise();
 };
 
 HixIO.log_in = function(params) {
 	HixIO.ajax('/auth', 'POST')(params).success(function(data) {
-		HixIO.attr('current_user', data);
+		HixIO.attr('user', data);
 		HixIO.notify('You have signed in.', 'success-message');
 	}).error(function(data) {
 		if(data.status === 401) {
@@ -190,7 +198,7 @@ HixIO.log_in = function(params) {
 
 HixIO.log_out = function() {
 	HixIO.ajax('/auth', 'DELETE')().success(function(data) {
-		HixIO.attr('current_user', null);
+		HixIO.attr('user', null);
 		HixIO.notify('You have signed out.', 'success-message');
 	}).error(function(data) {
 		HixIO.notify('Woah. There was a problem signing out.', 'error-message');
@@ -316,7 +324,7 @@ HixIO.ProfileControl = can.Control.extend({
 
 	update: function() {
 		this.element.html(can.view(this.options.view, {
-			user: HixIO.attr('current_user')
+			user: HixIO.attr('user')
 		}));
 	},
 
@@ -730,7 +738,7 @@ HixIO.LoginForm = can.Control.extend({
 		self = this;
 		render = function() {
 			self.element.html(can.view(self.options.view, {
-				user: HixIO.attr('current_user')
+				user: HixIO.attr('user')
 			}));
 			self.element.fadeIn('fast');
 		};
@@ -781,50 +789,27 @@ HixIO.LoginForm = can.Control.extend({
  *     
  */
 HixIO.Router = can.Control.extend({},{
-
 	init: function(element, options) {
 		var self;
 
 		self = this;
+		this.controls = [];
 
-		this.count = 0;
-		this.control = null;
-		this.controls = {};
-		this.builder = function() {
-			self.build_control();
-		};
-
-		HixIO.check_auth(function() {
-			self.build_control();
-			can.route.ready();
-			can.route.bind('route', self.builder);
+		can.each(this.options.routes, function(Control,i) {
+			self.controls.push(new Control(self.element));
 		});
 	},
 
-	build_control: function() {
-		var klass, matches, route, can_route;
-		
-		console.log('build_control count: ' + ++this.count);
+	run: function() {
+		var route;
 
-		route = this.options.default_route;
-		matches = window.location.href.match(/#!(\w+)/);
-		if(can.isArray(matches)) {
-			route = matches[1];
-		} 
+		can.route.ready();
 
-		klass = this.options.routes[route];
-		this.control = new (klass)(this.element);
-		//can.route.ready();
-	
-		can_route = can.route.attr('route');
-		console.log('route: ' + route + ' can.route: ' + can_route);
-		if(!can_route || can_route.indexOf(route) != 0) {
-			can.route.unbind('route', this.builder);
-			can.route.attr('route', route);
-			can.route.bind('route', this.builder);
+		route = can.route.attr('route');
+		if(!route || route === '') {
+			can.route.attr('route', this.options.default_route);
 		}
 	}
-
 });
 
 /******************************************************************************
@@ -851,5 +836,6 @@ $(document).ready(function() {
 		default_route: 'posts'
 	});
 
+	HixIO.get_auth().done(function() { HixIO.router.run(); });
 });
 

@@ -17,7 +17,7 @@ class HixIO::Auth < Strelka::App
 		:negotiation,
 		:sessions
 
-	default_type 'application/json'
+	default_type 'text/plain'
 
 	session_namespace :hix_io
 
@@ -45,7 +45,12 @@ class HixIO::Auth < Strelka::App
 	delete '/' do |req|
 		res = req.response
 		res.destroy_session if res.session?
-		finish_with( HTTP::NO_CONTENT )
+		# Freakin' browsers. I'd like to use 204 here, but when a response with no
+		# Content-Type header and an *empty* body comes back, Firefox tries to parse
+		# the body as XML.
+		#finish_with( HTTP::NO_CONTENT )
+		res.for( :json ) { '' }
+		return res
 	end
 
 end
