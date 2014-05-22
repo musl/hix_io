@@ -77,7 +77,9 @@ describe( HixIO::Auth ) do
 			res = subject.handle( req )
 			res.body.rewind
 
-			expect( res.status ).to eq( HTTP::NO_CONTENT )
+			#expect( res.status ).to eq( HTTP::NO_CONTENT )
+			expect( res.status ).to eq( HTTP::OK )
+			expect( res.body.read ).to eq( ''.to_json )
 		end
 
 	end
