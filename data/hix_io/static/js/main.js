@@ -514,8 +514,6 @@ HixIO.Pager = can.Control.extend({
 });
 
 /*
- * An application menu.
- *
  * This control listens to route changes and updates the classes of menu items
  * to match the route.
  *
@@ -527,7 +525,7 @@ HixIO.Pager = can.Control.extend({
  *         link's path.
  *
  */
-HixIO.Menu = can.Control.extend({},
+HixIO.LinkHighlighter = can.Control.extend({},
 {
 	init: function(element, options) {
 		var self = this;
@@ -537,13 +535,15 @@ HixIO.Menu = can.Control.extend({},
 	update: function() {
 		var self = this;
 
-		$(this.element).find('a').each(function(i,e) {
+		$('.pure-menu li a').each(function(i,e) {
 			var route, regex;
 
 			if(!can.route.attr('route')) { return; }
 
 			route = can.route.attr('route').split('/')[0];
 			regex = new RegExp(route + '(\/|$)');
+
+			console.log( route, regex )
 
 			if(e.href.match(regex)){
 				$(e).parent().addClass(self.options.selected_class);
@@ -828,7 +828,7 @@ $(document).ready(function() {
 	HixIO.message_bar = new HixIO.MessageBar('#messages');
 	HixIO.delegate('notify', HixIO.message_bar);
 
-	HixIO.menu = new HixIO.Menu('#menu', {
+	HixIO.link_highlighter = new HixIO.LinkHighlighter('#menu', {
 		selected_class: 'pure-menu-selected'
 	});
 
