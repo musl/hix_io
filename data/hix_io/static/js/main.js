@@ -608,7 +608,6 @@ HixIO.MessageBar = can.Control.extend({
 		timeout: 10,
 		persist: false,
 		view: '/static/templates/message.ejs',
-		close: '.close-button',
 		default_class: 'info-message'
 	}
 },{
@@ -708,7 +707,7 @@ HixIO.MessageBar = can.Control.extend({
 	},
 
 	// Hook up the close event.
-	'{close} click': function(element, event) { this.close(); }
+	'click': function(element, event) { this.close(); }
 });
 
 /*
