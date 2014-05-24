@@ -1,0 +1,17 @@
+{{^posts}}
+	<div class="post">
+		<p><i class="fa fa-large fa-exclamation-triangle"></i>Oh no. There aren't any published blog posts to display.</p>	
+	</div>
+{{/posts}}
+
+{{#posts}}
+	<div class="post">
+		<h2><a href="#!posts/{{id}}">{{title}}</a></h2>
+		<hr>
+		<p class="post-meta">Updated by {{user_id}} {{relative_time mtime}} ago.</p>
+		<p>{{body}}</p>
+	</div>
+{{/posts}}
+
+{{#posts}}<div id="posts_pager"></div>{{/posts}}
+

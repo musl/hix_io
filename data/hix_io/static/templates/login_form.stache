@@ -1,4 +1,4 @@
-<% if(!user) { %>
+{{^user}}
 	<a class="pure-menu-heading">sign in</a>
 	<ul>
 		<li class="pure-form">
@@ -9,10 +9,11 @@
 			<button id="log-in-button" class="pure-button pure-u-1">submit</button>
 		</li>
 	</ul>
-<% } else { %>
-	<a class="pure-menu-heading"><%= user.email %></a>
+{{/user}}
+{{#user}}
+	<a class="pure-menu-heading">{{email}}</a>
 	<ul>
 		<li><a href="#!profile"><i class="fa fa-user fa-large fa-fw"></i>&nbsp; your profile</a></li>
 		<li class="pure-form"><button id="log-out-button" class="pure-button pure-u-1">sign out</button></li>
 	</ul>
-<% } %>
+{{/user}}

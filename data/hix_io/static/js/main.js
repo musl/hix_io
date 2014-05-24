@@ -263,7 +263,7 @@ HixIO.PostControl = can.Control.extend({}, {
 		params = this.pager.params();
 
 		HixIO.Post.list(params).success(function(data) {
-			self.element.html(can.view('/static/templates/posts.ejs', {
+			self.element.html(can.view('/static/templates/posts.stache', {
 				posts: HixIO.Post.models(data.posts)
 			},
 			HixIO.view_helpers));
@@ -282,7 +282,7 @@ HixIO.PostControl = can.Control.extend({}, {
 		var self = this;
 
 		HixIO.Post.findOne({ id: data.id }, function(post) {
-			self.element.html(can.view('/static/templates/post.ejs', {
+			self.element.html(can.view('/static/templates/post.stache', {
 				post: post
 			},
 			HixIO.view_helpers));
@@ -296,7 +296,7 @@ HixIO.PostControl = can.Control.extend({}, {
  */
 HixIO.PicsControl = can.Control.extend({
 	defaults: {
-		view: '/static/templates/pics.ejs'
+		view: '/static/templates/pics.stache'
 	}
 }, {
 	'pics route': function(data) {
@@ -309,7 +309,7 @@ HixIO.PicsControl = can.Control.extend({
  */
 HixIO.ProfileControl = can.Control.extend({
 	defaults: {
-		view: '/static/templates/profile.ejs'
+		view: '/static/templates/profile.stache'
 	}
 }, {
 	init: function(element, options) {
@@ -351,7 +351,8 @@ HixIO.URLControl = can.Control.extend({}, {
 		var self = this;
 		
 		HixIO.URL.list().success(function(data) {
-			self.element.html(can.view('/static/templates/urls.ejs', {
+			self.element.html(can.view('/static/templates/urls.stache', {
+				authenticated: HixIO.authenticated,
 				scheme: HixIO.meta.scheme,
 				host: HixIO.meta.host,
 				top_urls: HixIO.URL.models(data.top_urls),
@@ -543,8 +544,6 @@ HixIO.LinkHighlighter = can.Control.extend({},
 			route = can.route.attr('route').split('/')[0];
 			regex = new RegExp(route + '(\/|$)');
 
-			console.log( route, regex )
-
 			if(e.href.match(regex)){
 				$(e).parent().addClass(self.options.selected_class);
 			} else {
@@ -607,7 +606,7 @@ HixIO.MessageBar = can.Control.extend({
 	defaults: {
 		timeout: 10,
 		persist: false,
-		view: '/static/templates/message.ejs',
+		view: '/static/templates/message.stache',
 		default_class: 'info-message'
 	}
 },{
@@ -715,7 +714,7 @@ HixIO.MessageBar = can.Control.extend({
  */
 HixIO.LoginForm = can.Control.extend({
 	defaults: {
-		view: '/static/templates/login_form.ejs',
+		view: '/static/templates/login_form.stache',
 		log_in_button: '#log-in-button',
 		log_out_button: '#log-out-button',
 		log_in_email: '#log-in-email',

@@ -1,0 +1,55 @@
+<div class="post">
+	{{#if authenticated}}
+		<div class="l-box">
+			<div class="pure-form pure-g">
+				<label for="shorten" class="pure-u-1">Shorten a URL:</label>
+				<input type="text" id="shorten" name="shorten" class="pure-input pure-u-1" placeholder="http://example.com">
+			</div>
+		</div>
+	{{else}}
+		<h1>Shortened URLs</h1>
+	{{/if}}
+</div>
+
+{{#url}}
+	<div class="post">
+		<div class="l-box">
+			Short URL: <a href="{{scheme}}://{{host}}/{{short}}">{{scheme}}://{{host}}/{{short}}</a><br>
+			<small>Original URL: <a href="{{url}}">{{url}}</a></small>
+		</div>
+	</div>
+{{/url}}
+
+<div class="post">
+	<div class="pure-form pure-g">
+		<div class="pure-u-1-2">
+			<h2>Latest</h2>
+			{{^latest_urls}}
+				<p><i class="fa fa-large fa-exclamation-triangle"></i>Nothing to see here.</p>
+			{{/latest_urls}}
+			<ol>
+			{{#latest_urls}}
+				<li>
+					<a href="{{scheme}}://{{host}}/{{short}}">{{scheme}}://{{host}}/{{short}}</a>
+					<br>
+					<small>{{relative_date ctime}} ago &middot; {{url}}</small>
+				</li>
+			{{/latest_urls}}
+			</ol>
+		</div>
+		<div class="pure-u-1-2">
+			<h2>Most Visited</h2>
+			{{^top_urls}}
+				<p><i class="fa fa-large fa-exclamation-triangle"></i>Nothing to see here.</p>
+			{{/top_urls}}
+			<ol>
+			{{#top_urls}}
+				<li>
+					<a href="{{scheme}}://{{host}}/{{short}}">{{scheme}}://{{host}}/{{short}}</a>
+					<br>
+					<small>{{hits}} hits &middot; {{url}}</small>
+				</li>
+			{{/top_urls}}
+		</div>
+	</div>
+</div>
