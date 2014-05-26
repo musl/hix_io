@@ -93,6 +93,10 @@ HixIO.highlightSyntax = function() {
  */
 HixIO.view_helpers = {
 
+	authenticated: function() {
+		return HixIO.attr('user') !== null;
+	},
+
 	capitalize: function(string) {
 		if(typeof string === 'function') { string = string(); }
 		return string.charAt(0).toUpperCase() + string.slice(1);
@@ -157,13 +161,7 @@ HixIO.view_helpers = {
  * Auth
  ******************************************************************************/
 
-HixIO.authenticated = function() {
-	return HixIO.attr('user') !== null;
-};
-
-HixIO.on_auth_change = function(callback) {
-	HixIO.bind('user', callback);
-};
+HixIO.on_auth_change = function(callback) { HixIO.bind('user', callback); };
 
 HixIO.get_auth = function() {
 	var deferral;
@@ -260,7 +258,7 @@ HixIO.PostControl = can.Control.extend({}, {
 		});
 	},
 
-	update: function() {
+	'posts route': function(data) {
 		var self, params;
 	   
 		self = this;
@@ -278,18 +276,35 @@ HixIO.PostControl = can.Control.extend({}, {
 		});
 	},
 
-	'posts route': function(data) {
-		this.update();
+	'posts/create route': function(data) {
+		this.element.html(can.view(
+			'/static/templates/post_form.stache',
+			{},
+			HixIO.view_helpers
+		));
 	},
 
-	'posts/:id route': function(data) {
+	'posts/:id/edit route': function(data) {
 		var self = this;
 
 		HixIO.Post.findOne({ id: data.id }, function(post) {
-			self.element.html(can.view('/static/templates/post.stache', {
-				post: post
-			},
-			HixIO.view_helpers));
+			self.element.html(can.view(
+				'/static/templates/post_form.stache',
+				{},
+				HixIO.view_helpers
+			));
+		});
+	},
+
+	'posts/:id/detail route': function(data) {
+		var self = this;
+
+		HixIO.Post.findOne({ id: data.id }, function(post) {
+			self.element.html(can.view(
+				'/static/templates/post.stache',
+				{ post: post },
+				HixIO.view_helpers
+			));
 			HixIO.highlightSyntax();
 		});
 	}
@@ -356,7 +371,6 @@ HixIO.URLControl = can.Control.extend({}, {
 		
 		HixIO.URL.list().success(function(data) {
 			self.element.html(can.view('/static/templates/urls.stache', {
-				authenticated: HixIO.authenticated,
 				scheme: HixIO.meta.scheme,
 				host: HixIO.meta.host,
 				top_urls: HixIO.URL.models(data.top_urls),

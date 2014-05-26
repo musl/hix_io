@@ -1,0 +1,46 @@
+<div class="post">
+	{{#if authenticated}}
+		{{#post}}
+			<form id="profile-form" class="pure-form pure-form-aligned">
+				<fieldset id="profile_information" class="">
+					<legend>Edit Post #{{id}}:</legend>
+
+					<div class="pure-control-group">
+						<label for="title">title</label><input type="title" name="title" value="{{title}}" id="title">
+					</div>
+
+					<div class="pure-control-group">
+						<label for="body">body</label><textarea id="body">{{{body}}}</textarea>
+					</div>
+
+					<div class="pure-controls">
+						<input type="save" class="pure-button pure-button-primary" value="save">
+						<input type="reset" class="pure-button" value="reset">
+					</div>
+				</fieldset>
+			</form>
+		{{/post}}
+		{{^post}}
+			<form id="profile-form" class="pure-form pure-form-aligned">
+				<fieldset id="profile_information" class="">
+					<legend>Create a Post:</legend>
+
+					<div class="pure-control-group">
+						<label for="title">title</label><input type="title" name="title" value="" id="title">
+					</div>
+
+					<div class="pure-control-group">
+						<label for="body">body</label><textarea id="body"></textarea>
+					</div>
+
+					<div class="pure-controls">
+						<input type="save" class="pure-button pure-button-primary" value="save">
+						<input type="reset" class="pure-button" value="reset">
+					</div>
+				</fieldset>
+			</form>
+		{{/post}}
+	{{else}}
+		<p>You need to sign in to create or edit posts.</p>
+	{{/if}}
+</div>
