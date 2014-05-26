@@ -1,8 +1,8 @@
-{{^posts}}
+{{#unless posts}}
 	<div class="post">
 		<p><i class="fa fa-large fa-exclamation-triangle"></i>Oh no. There aren't any published blog posts to display.</p>	
 	</div>
-{{/posts}}
+{{/unless}}
 
 {{#posts}}
 	<div class="post">
@@ -13,5 +13,4 @@
 	</div>
 {{/posts}}
 
-{{#posts}}<div id="posts_pager"></div>{{/posts}}
-
+{{#if posts}}<div id="posts_pager"></div>{{/if}}
