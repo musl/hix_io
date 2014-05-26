@@ -8,7 +8,8 @@
 	<div class="post">
 		<h2><a href="#!posts/{{id}}">{{title}}</a></h2>
 		<hr>
-		<p class="post-meta">Updated by {{user_id}} {{relative_time mtime}} ago.</p>
+		{{log @this}}
+		<p class="post-meta">Updated by {{user_id}} {{relative_date mtime}} ago. ({{mtime}})</p>
 		<p>{{body}}</p>
 	</div>
 {{/posts}}

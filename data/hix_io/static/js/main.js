@@ -94,10 +94,12 @@ HixIO.highlightSyntax = function() {
 HixIO.view_helpers = {
 
 	capitalize: function(string) {
+		if(typeof string === 'function') { string = string(); }
 		return string.charAt(0).toUpperCase() + string.slice(1);
 	},
 
 	short_date: function(date_arg) {
+		if(typeof date_arg === 'function') { date_arg = date_arg(); }
 		return (new Date(date_arg)).toISOString();
 	},
 
@@ -115,6 +117,8 @@ HixIO.view_helpers = {
 		minute = 60000;
 		hour = 60 * minute;
 		day = 24 * hour;
+
+		if(typeof date_arg === 'function') { date_arg = date_arg(); }
 
 		date = new Date(date_arg).getTime();
 		if(date <= 0 || isNaN(date)) { return date_arg; }
@@ -499,8 +503,8 @@ HixIO.Pager = can.Control.extend({
 			last:  c,
 		};
 
-		for(i = ds; i < p; i++ ){ data.left.push(i); }
-		for(i = p + 1; i <= de; i++ ){ data.right.push(i); }
+		for(i = ds; i < p; i += 1 ){ data.left.push(i); }
+		for(i = p + 1; i <= de; i += 1 ){ data.right.push(i); }
 
 		$(this.options.target).html(can.view(this.options.view, data));
 
@@ -752,7 +756,7 @@ HixIO.LoginForm = can.Control.extend({
 			creds = {email: email_field.val(), password: sha.getHash(this.options.hash_algorithm, "HEX")};
 
 			HixIO.log_in(creds);
-		}
+		};
 	},
 
 	update: function() {
