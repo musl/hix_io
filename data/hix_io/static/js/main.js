@@ -443,7 +443,7 @@ HixIO.URLControl = can.Control.extend({}, {
  */
 HixIO.Pager = can.Control.extend({
 	defaults: {
-		view: '/static/templates/pager.ejs',
+		view: '/static/templates/pager.stache',
 	}
 },{
 	init: function(element, options) {
@@ -453,7 +453,7 @@ HixIO.Pager = can.Control.extend({
 			count: 0,
 			per_page: 10,
 			pages: 0, 
-			page: 0,
+			page: 1,
 			pad: 2
 		});
 
@@ -467,7 +467,7 @@ HixIO.Pager = can.Control.extend({
 	},
 
 	update: function(count) {
-		var a, c, p, ds, de;
+		var a, c, i, p, ds, de, data;
 
 		this.state.attr('count', count);
 		this.state.attr('pages',
@@ -485,22 +485,31 @@ HixIO.Pager = can.Control.extend({
 		 * collapses on the opposite side. This allows for a roughly constant-width
 		 * control.
 		 */
-		ds = Math.min(0, c - (p + a) - 1);	
-		de = Math.max(0, -1 * (p - a)) + 1;
+		ds = Math.max(1, p - a + Math.min(1, c - (p + a) - 1));
+		de = Math.min(c, p + a + Math.max(1, -1 * (p - a)) + 1);
 
-		/*
-		 * Calculate and store the indexes for the window.
-		 */
-		this.state.attr('window_start', Math.max(0, p - a + ds));
-		this.state.attr('window_end', Math.min(c, p + a + de));
+		data = {
+			first: 1,
+			prev:  p > 1 ? p - 1 : null,
+			left:  [],
+			page:  p,
+			count: c,
+			right: [],
+			next:  p < c ? p + 1 : null,
+			last:  c,
+		};
 
-		$(this.options.target).html(can.view(this.options.view, this.state));
+		for(i = ds; i < p; i++ ){ data.left.push(i); }
+		for(i = p + 1; i <= de; i++ ){ data.right.push(i); }
+
+		$(this.options.target).html(can.view(this.options.view, data));
 
 	},
 
 	params: function(params) {
 		if(!params) { params = {}; }
-		params.offset = this.state.attr('page') * this.state.attr('per_page');
+		params.page = this.state.attr('page') - 1;
+		params.offset = (this.state.attr('page') - 1) * this.state.attr('per_page');
 		params.limit = this.state.attr('per_page');
 		return params;
 	},
@@ -508,7 +517,7 @@ HixIO.Pager = can.Control.extend({
 	'{target} a click': function(element, event) {
 		var page = parseInt(element.attr('data-page'), 10);
 
-		if(page >= 0 && page < this.state.attr('pages')) {
+		if(page > 0 && page <= this.state.attr('pages')) {
 			this.state.attr('page', page);
 		}
 	}
