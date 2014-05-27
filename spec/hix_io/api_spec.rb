@@ -109,7 +109,7 @@ describe( HixIO::API ) do
 			expect( res.status ).to eq( HTTP::OK )
 			expect {
 				obj = JSON.parse( res.body.read )
-				expect( obj['short'] ).to match( /[0-9a-f]{1,7}/ )
+				expect( obj['short'] ).to match( /[0-9a-z]{7}/ )
 				expect( obj['url'] ).to eq( url )
 			}.not_to raise_error
 		end

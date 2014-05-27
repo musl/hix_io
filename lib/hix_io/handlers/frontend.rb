@@ -16,11 +16,16 @@ class HixIO::Frontend < Strelka::App
 		:parameters,
 		:templating
 
+	router :exclusive
+
 	default_type 'text/html'
 
-	templates :index => 'index.tmpl'
+	layout 'layout.tmpl'
+	templates \
+		:index => 'index.tmpl',
+		:admin => 'admin.tmpl'
 
-	param :short, /[a-z0-9]{1,7}/
+	param :short, /[0-9a-z]{7}/
 
 	########################################################################
 	### R O U T E S
@@ -28,6 +33,12 @@ class HixIO::Frontend < Strelka::App
 
 	get '/' do |req|
 		tmpl = template( :index )
+		tmpl.meta = self.meta( req )
+		return tmpl
+	end
+
+	get '/admin' do |req|
+		tmpl = template( :admin )
 		tmpl.meta = self.meta( req )
 		return tmpl
 	end

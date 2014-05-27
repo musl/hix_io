@@ -1,14 +1,13 @@
-{{#unless posts}}
+{{^posts}}
 	<div class="post">
 		<p><i class="fa fa-large fa-exclamation-triangle"></i>Oh no. There aren't any published blog posts to display.</p>	
 	</div>
-{{/unless}}
+{{/posts}}
 
 {{#posts}}
 	<div class="post">
-		<h2><a href="#!posts/{{id}}/detail">{{title}}</a></h2>
+		<h2><a href="#!posts/{{id}}">{{title}}</a></h2>
 		<hr>
-		{{log @this}}
 		<p class="post-meta">Updated by {{user_id}} {{relative_date mtime}} ago. ({{mtime}})</p>
 		<p>{{body}}</p>
 	</div>

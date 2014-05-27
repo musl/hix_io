@@ -1,4 +1,20 @@
-<div class="post"><h1>Shortened URLs</h1></div>
+<div class="post">
+	<div class="l-box">
+		<div class="pure-form pure-g">
+			<label for="shorten" class="pure-u-1">Shorten a URL:</label>
+			<input type="text" id="shorten" name="shorten" class="pure-input pure-u-1" placeholder="http://example.com">
+		</div>
+	</div>
+</div>
+
+{{#url}}
+	<div class="post">
+		<div class="l-box">
+			Short URL: <a href="{{scheme}}://{{host}}/{{short}}">{{scheme}}://{{host}}/{{short}}</a><br>
+			<small>Original URL: <a href="{{url}}">{{url}}</a></small>
+		</div>
+	</div>
+{{/url}}
 
 <div class="post">
 	<div class="pure-form pure-g">
