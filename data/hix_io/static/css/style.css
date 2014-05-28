@@ -103,7 +103,7 @@ div#main > div.loading {
 }
 
 .post-meta {
-	margin: 0;
+	margin: 0 0 1em 0;
 	font-size: 8pt;
 	text-align: right !important;
 }
@@ -210,6 +210,8 @@ div#main > div.loading {
 	background: rgb(66, 184, 221); /* this is a light blue */
 }
 
+/* Message bar styles */
+
 .error-message,
 .info-message,
 .success-message,
@@ -237,19 +239,27 @@ div#main > div.loading {
 	background-color: #fff6e6 !important;
 }
 
-.close-button {
-	position: absolute;
-	display: inline-block;
-	top: 50%;
-	right: 18px;
-	width: 18px;
-	height: 18px;
-	margin-top: -9px;
-}
+/* Font Awesome - no &nbsp; */
 
 p i.fa,
 li > a > i.fa {
 	margin: 0 0.5em;
 }
 
+/* Font Awesome - Watermarks */
+
+span.watermark {
+	display: block;
+	overflow: hidden;
+	height: 64px;
+	margin: -64px 8px 0 0 !important;
+	border: 0;
+	padding: 0;
+	text-align: right;
+}
+
+span.watermark > i.fa {
+	color: #ffe0c0 !important;
+	font-size: 96px; 
+}
 

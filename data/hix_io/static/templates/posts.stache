@@ -8,8 +8,8 @@
 	<div class="post">
 		<h2><a href="#!posts/{{id}}">{{title}}</a></h2>
 		<hr>
-		<p class="post-meta">Updated by {{user_id}} {{relative_date mtime}} ago. ({{mtime}})</p>
-		<p>{{body}}</p>
+		<p>{{{body}}}</p>
+		<p class="post-meta">Updated by {{user_id}} {{relative_date mtime}} ago.</p>
 	</div>
 {{/posts}}
 

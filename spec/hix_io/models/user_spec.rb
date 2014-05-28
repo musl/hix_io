@@ -22,7 +22,7 @@ describe( HixIO::User ) do
 		subject do
 			described_class.create({
 				:email => 'tester@example.com',
-				:password => Digest::SHA512.hexdigest( 'tester' )
+				:password => Digest::SHA512.hexdigest( 'password' )
 			})
 		end
 

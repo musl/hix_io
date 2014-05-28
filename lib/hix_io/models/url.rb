@@ -50,7 +50,7 @@ class HixIO::URL < Sequel::Model( :hix_io__urls )
 	# Sequel hook. Updates a dependent column.
 	#
 	def before_save
-		self.short = "%07s" % [Zlib::crc32( self.url.to_s ).to_s( 36 )]
+		self.short = Zlib::crc32( self.url.to_s ).to_s( 36 ).rjust( 7, '0' )
 		super
 	end
 
