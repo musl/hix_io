@@ -11,8 +11,8 @@
  */
 HixIO.PostControl = can.Control.extend({
 	defaults: {
-		list_view: HixIO.template('posts'),
-		detail_view: HixIO.template('post')
+		list_view: 'posts',
+		detail_view: 'post'
 	}
 }, {
 	init: function(element, options) {
@@ -34,10 +34,9 @@ HixIO.PostControl = can.Control.extend({
 		params = this.pager.params();
 
 		HixIO.Post.list(params).success(function(data) {
-			self.element.html(can.view(
+			self.element.html(HixIO.view(
 				self.options.list_view,
-				{ posts: HixIO.Post.models(data.posts) },
-				HixIO.view_helpers
+				{ posts: HixIO.Post.models(data.posts) }
 			));
 			self.pager.update(data.count);
 			HixIO.highlightSyntax();
@@ -54,10 +53,9 @@ HixIO.PostControl = can.Control.extend({
 		var self = this;
 
 		HixIO.Post.findOne({ id: data.id }, function(post) {
-			self.element.html(can.view(
+			self.element.html(HixIO.view(
 				self.options.detail_view,
-				{ post: post },
-				HixIO.view_helpers
+				{ post: post }
 			));
 			HixIO.highlightSyntax();
 		});
@@ -69,14 +67,13 @@ HixIO.PostControl = can.Control.extend({
  */
 HixIO.PicsControl = can.Control.extend({
 	defaults: {
-		view: HixIO.template('pics')
+		view: 'pics'
 	}
 }, {
 	'pics route': function(data) {
-		this.element.html(can.view(
+		this.element.html(HixIO.view(
 			this.options.view,
-			{},
-			HixIO.view_helpers
+			{}
 		));
 	}
 });
@@ -86,7 +83,7 @@ HixIO.PicsControl = can.Control.extend({
  */
 HixIO.URLControl = can.Control.extend({
 	defaults: {
-		view: HixIO.template('urls')
+		view: 'urls'
 	}
 }, {
 	'urls route': function() {
@@ -95,7 +92,7 @@ HixIO.URLControl = can.Control.extend({
 		self = this;
 		
 		HixIO.URL.list().success(function(data) {
-			self.element.html(can.view(
+			self.element.html(HixIO.view(
 				self.options.view,
 				{
 					scheme: HixIO.meta.scheme,
@@ -103,8 +100,7 @@ HixIO.URLControl = can.Control.extend({
 					top_urls: HixIO.URL.models(data.top_urls),
 					latest_urls: HixIO.URL.models(data.latest_urls),
 					url: self.url,
-				},
-				HixIO.view_helpers
+				}
 			));
 		}).error(function(data) {
 			HixIO.notify("Woah! Where'd my URLs go?", 'error-message');

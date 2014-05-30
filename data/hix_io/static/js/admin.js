@@ -101,16 +101,15 @@ HixIO.PicsControl = can.Control.extend({}, {
  */
 HixIO.ProfileControl = can.Control.extend({
 	defaults: {
-		view: HixIO.template('admin/profile')
+		view: 'admin/profile'
 	}
 }, {
 	'profile route': function(data) {
-		this.element.html(can.view(
+		this.element.html(HixIO.view(
 			this.options.view,
 			{
 				user: HixIO.attr('user')
-			},
-			HixIO.view_helpers
+			}
 		));
 	}
 });
@@ -120,7 +119,7 @@ HixIO.ProfileControl = can.Control.extend({
  */
 HixIO.URLControl = can.Control.extend({
 	defaults: {
-		view: HixIO.template('admin/urls')
+		view: 'admin/urls'
 	}
 }, {
 	init: function(element, options) {
@@ -133,7 +132,7 @@ HixIO.URLControl = can.Control.extend({
 		var self = this;
 		
 		HixIO.URL.list().success(function(data) {
-			self.element.html(can.view(
+			self.element.html(HixIO.view(
 				self.options.view,
 				{
 					scheme: HixIO.meta.scheme,
@@ -141,8 +140,7 @@ HixIO.URLControl = can.Control.extend({
 					top_urls: HixIO.URL.models(data.top_urls),
 					latest_urls: HixIO.URL.models(data.latest_urls),
 					url: self.url,
-				},
-				HixIO.view_helpers
+				}
 			));
 		}).error(function(data) {
 			HixIO.notify("Woah! Where'd my URLs go?", 'error-message');
@@ -178,7 +176,7 @@ HixIO.URLControl = can.Control.extend({
  */
 HixIO.LoginForm = can.Control.extend({
 	defaults: {
-		view: HixIO.template('admin/login_form'),
+		view: 'admin/login_form',
 		log_in_button: '#log-in-button',
 		log_out_button: '#log-out-button',
 		log_in_email: '#log-in-email',
@@ -215,12 +213,11 @@ HixIO.LoginForm = can.Control.extend({
 	
 		self = this;
 		render = function() {
-			self.element.html(can.view(
+			self.element.html(HixIO.view(
 				self.options.view,
 				{
 					user: HixIO.attr('user')
-				},
-				HixIO.view_helpers
+				}
 			));
 			self.element.fadeIn('fast');
 		};

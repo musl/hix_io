@@ -6,7 +6,10 @@
  * Namespace
  ******************************************************************************/
 
-var HixIO = new can.Map({});
+var HixIO = new can.Map({
+	template_path: '/static/templates/',
+	template_suffix: '.stache'
+});
 
 /******************************************************************************
  * Utility Functions
@@ -30,10 +33,13 @@ HixIO.delegate = function(name, object) {
 };
 
 /*
- *
+ * Render a view with a template's short name and the view helpers included.
  */
-HixIO.template = function(name) {
-	return '/static/templates/' + name + ".stache"
+HixIO.view = function(name, obj) {
+	var tmpl;
+
+	tmpl = HixIO.attr('template_path') + name + HixIO.attr('template_suffix');
+	return can.view(tmpl, obj, HixIO.view_helpers);
 };
 
 /*
@@ -96,7 +102,7 @@ HixIO.highlightSyntax = function() {
 };
 
 /*
- * Helpers for views. Pass this to can.view.
+ * Helpers for views.
  */
 HixIO.view_helpers = {
 
@@ -245,7 +251,7 @@ HixIO.User = can.Model.extend({}, {});
  */
 HixIO.Pager = can.Control.extend({
 	defaults: {
-		view: '/static/templates/pager.stache',
+		view: 'pager',
 	}
 },{
 	init: function(element, options) {
@@ -304,7 +310,7 @@ HixIO.Pager = can.Control.extend({
 		for(i = ds; i < p; i += 1 ){ data.left.push(i); }
 		for(i = p + 1; i <= de; i += 1 ){ data.right.push(i); }
 
-		$(this.options.target).html(can.view(this.options.view, data));
+		$(this.options.target).html(HixIO.view(this.options.view, data));
 
 	},
 
@@ -417,7 +423,7 @@ HixIO.MessageBar = can.Control.extend({
 	defaults: {
 		timeout: 10,
 		persist: false,
-		view: '/static/templates/message.stache',
+		view: 'message',
 		default_class: 'info-message'
 	}
 },{
@@ -451,11 +457,11 @@ HixIO.MessageBar = can.Control.extend({
 					clearTimeout(self.timeout);
 					self.timeout = null;
 					self.element.fadeOut('fast', function() {
-						self.element.html(can.view(self.options.view, self.data));
+						self.element.html(HixIO.view(self.options.view, self.data));
 						self.element.fadeIn('fast');
 					});
 				} else {
-					self.element.html(can.view(self.options.view, self.data));
+					self.element.html(HixIO.view(self.options.view, self.data));
 					self.element.slideDown('fast');	
 				}
 
