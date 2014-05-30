@@ -30,6 +30,13 @@ HixIO.delegate = function(name, object) {
 };
 
 /*
+ *
+ */
+HixIO.template = function(name) {
+	return '/static/templates/' + name + ".stache"
+};
+
+/*
  * Perform an asynchronous HTTP request and return the deferred result. See
  * can.ajax() and JQuery.ajax() for more information. I created this to help
  * keep the model definitions nice and clean and free of duplicated code.

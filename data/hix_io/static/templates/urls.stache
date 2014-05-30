@@ -1,9 +1,7 @@
 <div class="post">
 	<h1>URLs</h1>
 	<p>Links that we've shortened.</p>
-	<span class="watermark"><i class="fa fa-link fa-rotate-90"></i></span>
 </div>
-
 <div class="post">
 	<div class="pure-form pure-g">
 		<div class="pure-u-1-2">

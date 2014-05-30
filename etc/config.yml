@@ -20,6 +20,9 @@ dbsession:
 auth:
     provider: 'hixio'
 
+frontend:
+    template_path: '/static/templates'
+
 logging:
     __default__: 'warn (color)'
     hix_io: 'debug (color)'

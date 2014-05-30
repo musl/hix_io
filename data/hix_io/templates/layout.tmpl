@@ -15,8 +15,14 @@
 		<meta http-equiv="cache-control" content="no-cache" />
 		<meta http-equiv="pragma" content="no-cache" />
 
-		<link rel="stylesheet" href="/static/css/base-min.css" type="text/css" media="screen" charset="utf-8">
 		<link rel="stylesheet" href="/static/css/pure-min.css" type="text/css" media="screen" charset="utf-8">
+		<!--[if lte IE 8]>
+			<link rel="stylesheet" href="/static/css/grids-responsive-old-ie-min.css">
+		<![endif]-->
+		<!--[if gt IE 8]><!-->
+			<link rel="stylesheet" href="/static/css/grids-responsive-min.css">
+		<!--<![endif]-->
+
 		<link rel="stylesheet" href="/static/css/style.css" type="text/css" media="screen" charset="utf-8">
 		<link rel="stylesheet" href="/static/css/highlight/googlecode.min.css" type="text/css" media="screen" charset="utf-8">
 		<link rel="stylesheet" href="/static/css/font-awesome.min.css" type="text/css" media="screen" charset="utf-8">

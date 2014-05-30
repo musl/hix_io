@@ -11,6 +11,9 @@ class HixIO::Frontend < Strelka::App
 	extend Loggability
 	log_to :hix_io
 
+	extend Configurability
+	config_key :frontend
+
 	plugins \
 		:routing,
 		:parameters,

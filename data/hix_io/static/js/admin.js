@@ -101,20 +101,28 @@ HixIO.PicsControl = can.Control.extend({}, {
  */
 HixIO.ProfileControl = can.Control.extend({
 	defaults: {
-		view: '/static/templates/admin/profile.stache'
+		view: HixIO.template('admin/profile')
 	}
 }, {
 	'profile route': function(data) {
-		this.element.html(can.view(this.options.view, {
-			user: HixIO.attr('user')
-		}));
+		this.element.html(can.view(
+			this.options.view,
+			{
+				user: HixIO.attr('user')
+			},
+			HixIO.view_helpers
+		));
 	}
 });
 
 /*
  * A control for shortening urls.
  */
-HixIO.URLControl = can.Control.extend({}, {
+HixIO.URLControl = can.Control.extend({
+	defaults: {
+		view: HixIO.template('admin/urls')
+	}
+}, {
 	init: function(element, options) {
 		var self;
 
@@ -125,14 +133,17 @@ HixIO.URLControl = can.Control.extend({}, {
 		var self = this;
 		
 		HixIO.URL.list().success(function(data) {
-			self.element.html(can.view('/static/templates/admin/urls.stache', {
-				scheme: HixIO.meta.scheme,
-				host: HixIO.meta.host,
-				top_urls: HixIO.URL.models(data.top_urls),
-				latest_urls: HixIO.URL.models(data.latest_urls),
-				url: self.url,
-			},
-			HixIO.view_helpers));
+			self.element.html(can.view(
+				self.options.view,
+				{
+					scheme: HixIO.meta.scheme,
+					host: HixIO.meta.host,
+					top_urls: HixIO.URL.models(data.top_urls),
+					latest_urls: HixIO.URL.models(data.latest_urls),
+					url: self.url,
+				},
+				HixIO.view_helpers
+			));
 		}).error(function(data) {
 			HixIO.notify("Woah! Where'd my URLs go?", 'error-message');
 		});
@@ -167,7 +178,7 @@ HixIO.URLControl = can.Control.extend({}, {
  */
 HixIO.LoginForm = can.Control.extend({
 	defaults: {
-		view: '/static/templates/admin/login_form.stache',
+		view: HixIO.template('admin/login_form'),
 		log_in_button: '#log-in-button',
 		log_out_button: '#log-out-button',
 		log_in_email: '#log-in-email',
@@ -186,14 +197,14 @@ HixIO.LoginForm = can.Control.extend({
 		this.submit = function() {
 			var creds, email_field, password_field, sha, SHA;
 
-			email_field = $(this.options.log_in_email);
-			password_field = $(this.options.log_in_password);
+			email_field = $(self.options.log_in_email);
+			password_field = $(self.options.log_in_password);
 
 			if(email_field.val() === '' || password_field.val() === '') { return; } 
 
 			SHA = jsSHA;
 			sha = new SHA( password_field.val(), "TEXT" );
-			creds = {email: email_field.val(), password: sha.getHash(this.options.hash_algorithm, "HEX")};
+			creds = {email: email_field.val(), password: sha.getHash(self.options.hash_algorithm, "HEX")};
 
 			HixIO.log_in(creds);
 		};
@@ -204,16 +215,18 @@ HixIO.LoginForm = can.Control.extend({
 	
 		self = this;
 		render = function() {
-			self.element.html(can.view(self.options.view, {
-				user: HixIO.attr('user')
-			}));
+			self.element.html(can.view(
+				self.options.view,
+				{
+					user: HixIO.attr('user')
+				},
+				HixIO.view_helpers
+			));
 			self.element.fadeIn('fast');
 		};
 
 		if(this.element.is(':visible')) {
-			this.element.fadeOut('fast', function() {
-				render();
-			});
+			this.element.fadeOut('fast', function() { render(); });
 			return;
 		}
 
