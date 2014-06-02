@@ -1,19 +1,10 @@
-{{^user}}
-	<a class="pure-menu-heading">sign in</a>
-	<ul>
-		<li class="pure-form">
+<div class="post">
+	<h1>sign in</h1>
+		<div class="pure-form">
 			<div class="l-box">
-				<input type="email" id="log-in-email" class="menu-input-text" placeholder="you@example.com" />
-				<input type="password" id="log-in-password" class="menu-input-text" placeholder="***" />
-			</div>
-			<button id="log-in-button" class="pure-button pure-u-1">submit</button>
-		</li>
-	</ul>
-{{/user}}
-{{#user}}
-	<a class="pure-menu-heading">{{email}}</a>
-	<ul>
-		<li><a href="#!profile"><i class="fa fa-user fa-large fa-fw"></i>&nbsp; your profile</a></li>
-		<li class="pure-form"><button id="log-out-button" class="pure-button pure-u-1">sign out</button></li>
-	</ul>
-{{/user}}
+			<input type="email" id="log-in-email" class="menu-input-text" placeholder="you@example.com" />
+			<input type="password" id="log-in-password" class="menu-input-text" placeholder="***" />
+		</div>
+		<button id="log-in-button" class="pure-button pure-u-1">submit</button>
+	</div>
+</div>
