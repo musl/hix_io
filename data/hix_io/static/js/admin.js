@@ -68,27 +68,19 @@ HixIO.URLControl = can.Control.extend({
 		view: 'admin/urls'
 	}
 }, {
-	init: function(element, options) {
-		var self;
-
-		self = this;
-	},
-
 	update: function() {
-		var self = this;
-		
 		HixIO.URL.list().success(function(data) {
-			self.element.html(HixIO.view(
-				self.options.view,
+			this.element.html(HixIO.view(
+				this.options.view,
 				{
 					scheme: HixIO.meta.scheme,
 					host: HixIO.meta.host,
 					top_urls: HixIO.URL.models(data.top_urls),
 					latest_urls: HixIO.URL.models(data.latest_urls),
-					url: self.url,
+					url: this.url,
 				}
 			));
-		}).error(function(data) {
+		}.bind( this )).error(function(data) {
 			HixIO.notify("Woah! Where'd my URLs go?", 'error-message');
 		});
 	},
@@ -98,13 +90,11 @@ HixIO.URLControl = can.Control.extend({
 	},
 
 	'#shorten keyup': function(element, event) {
-		var self = this;
-
 		if(event.keyCode === 13 && event.target.value !== '') {
 			HixIO.URL.shorten({url: event.target.value}).success(function(data) {
-				self.url = data;
-				self.update();
-			}).error(function(data) {
+				this.url = data;
+				this.update();
+			}.bind( this )).error(function(data) {
 				if(data.status === 403) {
 					HixIO.notify('You aren\'t allowed to shorten urls.', 'error-message');
 				} else if(data.status === 401) {
@@ -131,24 +121,20 @@ HixIO.AuthControl = can.Control.extend({
 	}
 },{
 	init: function(element, options) {
-		var self;
-
-		self = this;
-
 		this.submit = function() {
 			var creds, email_field, password_field, sha, SHA;
 
-			email_field = $(self.options.log_in_email);
-			password_field = $(self.options.log_in_password);
+			email_field = $(this.options.log_in_email);
+			password_field = $(this.options.log_in_password);
 
 			if(email_field.val() === '' || password_field.val() === '') { return; } 
 
 			SHA = jsSHA;
 			sha = new SHA( password_field.val(), "TEXT" );
-			creds = {email: email_field.val(), password: sha.getHash(self.options.hash_algorithm, "HEX")};
+			creds = {email: email_field.val(), password: sha.getHash(this.options.hash_algorithm, "HEX")};
 
-			self.log_in(creds);
-		};
+			this.log_in(creds);
+		}.bind( this );
 	},
 
 	log_in: function(params) {

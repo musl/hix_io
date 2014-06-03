@@ -139,6 +139,7 @@ begin
 				--predef can
 				--predef hljs
 				--predef jsSHA
+				--predef HixIO
 				--unparam
 				--white
 			],
