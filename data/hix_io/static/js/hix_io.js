@@ -371,7 +371,7 @@ HixIO.LinkHighlighter = can.Control.extend({},
  */
 HixIO.MessageBar = can.Control.extend({
 	defaults: {
-		timeout: 10,
+		timeout: 6,
 		persist: false,
 		view: 'message',
 		default_class: 'info-message'
@@ -412,7 +412,7 @@ HixIO.MessageBar = can.Control.extend({
 					});
 				} else {
 					self.element.html(HixIO.view(self.options.view, self.data));
-					self.element.slideDown('fast');	
+					self.element.fadeIn('slow');
 				}
 
 				/*
@@ -462,7 +462,7 @@ HixIO.MessageBar = can.Control.extend({
 		clearTimeout(this.timeout);
 		this.timeout = null;
 
-		this.element.slideUp('slow', function() {
+		this.element.fadeOut('slow', function() {
 			self.element.empty();
 			self.data.attr({
 				message: null,

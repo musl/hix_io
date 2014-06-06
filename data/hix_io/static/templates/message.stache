@@ -1,5 +1,5 @@
 {{#message}}
-	<div class="overlay {{message_class}}">
+	<div class="message_bar {{message_class}}">
 		<p>
 			<i class="fa fa-asterisk fa-large fa-spin"></i>
 			{{{message}}}

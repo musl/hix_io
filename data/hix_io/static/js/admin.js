@@ -121,26 +121,55 @@ HixIO.AuthControl = can.Control.extend({
 	}
 },{
 	init: function(element, options) {
+		var self;
+
+		self = this;
+
+		this.require_auth = function() {
+			if(!$.cookie('hix_io_session')) {
+				HixIO.attr('user', null);
+				can.route.attr('route', 'sign-in');
+				return;
+			}
+
+			if(HixIO.attr('user') !== null) { return; }
+
+			HixIO.ajax('/auth', 'GET')().success(function(data) {
+				HixIO.attr('user', data); 
+			}).error(function(data) {
+				HixIO.attr('user', null);
+				can.route.attr('route', 'sign-in');
+			});
+		};
+
+		can.route.bind('route', function(event, new_value, old_value) {
+			if(new_value === 'sign-in') { return; }
+			self.require_auth();
+		});
+
 		this.submit = function() {
 			var creds, email_field, password_field, sha, SHA;
 
-			email_field = $(this.options.log_in_email);
-			password_field = $(this.options.log_in_password);
+			email_field = $(self.options.log_in_email);
+			password_field = $(self.options.log_in_password);
 
 			if(email_field.val() === '' || password_field.val() === '') { return; } 
 
 			SHA = jsSHA;
 			sha = new SHA( password_field.val(), "TEXT" );
-			creds = {email: email_field.val(), password: sha.getHash(this.options.hash_algorithm, "HEX")};
+			creds = {email: email_field.val(), password: sha.getHash(self.options.hash_algorithm, "HEX")};
 
-			this.log_in(creds);
-		}.bind( this );
+			self.log_in(creds);
+		};
 	},
 
 	log_in: function(params) {
+		var self;
+
+		self = this;
+
 		HixIO.ajax('/auth', 'POST')(params).success(function(data) {
 			HixIO.attr('user', data);
-			HixIO.notify('You have signed in.', 'success-message');
 		}).error(function(data) {
 			if(data.status === 401) {
 				HixIO.notify('Invalid email or password.', 'warning-message');
@@ -151,9 +180,13 @@ HixIO.AuthControl = can.Control.extend({
 	},
 
 	log_out: function() {
+		var self;
+
+		self = this;
+
 		HixIO.ajax('/auth', 'DELETE')().success(function(data) {
 			HixIO.attr('user', null);
-			HixIO.notify('You have signed out.', 'success-message');
+			self.require_auth();
 		}).error(function(data) {
 			HixIO.notify('Woah. There was a problem signing out.', 'error-message');
 		});
@@ -209,19 +242,6 @@ $(document).ready(function() {
 		default_route: 'dash'
 	});
 
-	if(!$.cookie('hix_io_session')) {
-		HixIO.attr('user', null);
-		can.route.attr('route', 'sign-in');
-		HixIO.router.run();
-	} else {
-		HixIO.ajax('/auth', 'GET')().success(function(data) {
-			HixIO.attr('user', data); 
-			HixIO.router.run();
-		}).error(function(data) {
-			HixIO.attr('user', null);
-			can.route.attr('route', 'sign-in');
-			HixIO.router.run();
-		});
-	}
+	HixIO.router.run();
 });
 

@@ -217,10 +217,9 @@ div#main > div.loading {
 
 /* Message bar styles */
 
-
-.overlay{
+.message_bar{
   position: fixed;
-  z-index: 10;
+  z-index: 100;
   top: 0;
   left: 0;
   width: 100%;
@@ -231,8 +230,9 @@ div#main > div.loading {
 .info-message,
 .success-message,
 .warning-message {
-	font-size: 14pt;
-	padding: 0 1em;
+	padding: 0 0.5em;
+	font-size: 16pt;
+	font-weight: 400;
 }
 
 .error-message {
@@ -260,22 +260,5 @@ div#main > div.loading {
 p i.fa,
 li > a > i.fa {
 	margin: 0 0.5em;
-}
-
-/* Font Awesome - Watermarks */
-
-span.watermark {
-	display: block;
-	overflow: hidden;
-	height: 64px;
-	margin: -64px 8px 0 0 !important;
-	border: 0;
-	padding: 0;
-	text-align: right;
-}
-
-span.watermark > i.fa {
-	color: #ffe0c0 !important;
-	font-size: 96px; 
 }
 

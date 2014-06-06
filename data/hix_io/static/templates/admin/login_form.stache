@@ -1,10 +1,12 @@
 <div class="post">
-	<h1>sign in</h1>
-		<div class="pure-form">
-			<div class="l-box">
+	<div class="pure-form">
+		<legend><h2>Sign In</h2></legend>
+		<fieldset>
 			<input type="email" id="log-in-email" class="menu-input-text" placeholder="you@example.com" />
 			<input type="password" id="log-in-password" class="menu-input-text" placeholder="***" />
-		</div>
-		<button id="log-in-button" class="pure-button pure-u-1">submit</button>
+		</fieldset>
+		<fieldset>
+			<button id="log-in-button" class="pure-button">submit</button>
+		</fieldset>
 	</div>
 </div>
