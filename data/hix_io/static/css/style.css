@@ -14,7 +14,12 @@ html, button, input, select, textarea,
 	color: #565d64;
 }
 
+html, body {
+	min-height: 100%;
+}
+
 body {
+	position: relative;
 	background: #e0e0e0;
 }
 
@@ -212,31 +217,42 @@ div#main > div.loading {
 
 /* Message bar styles */
 
+
+.overlay{
+  position: fixed;
+  z-index: 10;
+  top: 0;
+  left: 0;
+  width: 100%;
+  box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.25);
+}
+
 .error-message,
 .info-message,
 .success-message,
 .warning-message {
-	padding-left: 18px;
+	font-size: 14pt;
+	padding: 0 1em;
 }
 
 .error-message {
 	color: #a00000;
-	background-color: #f0e0e0 !important;
+	background: repeating-linear-gradient(45deg, #f0e0e0, #f0e0e0 10px, #f0d7d7 10px, #f0d7d7 20px);
 }
 
 .info-message {
 	color: #00a0ff;
-	background-color: #e6f6ff !important;
+	background: repeating-linear-gradient(45deg, #e7f7ff, #e7f7ff 10px, #e0f0ff 10px, #e0f0ff 20px);
 }
 
 .success-message {
 	color: #00a000;
-	background-color: #e0f0e0 !important;
+	background: repeating-linear-gradient(45deg, #e0f0e0, #e0f0e0 10px, #d7f0d7 10px, #d7f0d7 20px);
 }
 
 .warning-message {
 	color: #e08000;
-	background-color: #fff6e6 !important;
+	background: repeating-linear-gradient(45deg, #fff7e7, #fff7e7 10px, #fff0e0 10px, #fff0e0 20px);
 }
 
 /* Font Awesome - no &nbsp; */
