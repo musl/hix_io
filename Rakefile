@@ -201,6 +201,7 @@ data/hix_io/static/css/style.css
 data/hix_io/static/js/lib/can.js
 data/hix_io/static/js/lib/highlight.min.js
 data/hix_io/static/js/lib/jquery.min.js
+data/hix_io/static/js/lib/moment.min.js
 data/hix_io/static/js/lib/sha512.js
 data/hix_io/static/js/main.js
 data/hix_io/static/templates/code.ejs

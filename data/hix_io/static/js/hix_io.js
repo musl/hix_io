@@ -105,7 +105,6 @@ HixIO.highlightSyntax = function() {
  * Helpers for views.
  */
 HixIO.view_helpers = {
-
 	capitalize: function(string) {
 		if(typeof string === 'function') { string = string(); }
 		return string.charAt(0).toUpperCase() + string.slice(1);
@@ -117,52 +116,8 @@ HixIO.view_helpers = {
 	},
 
 	relative_date: function(date_arg) {
-		var minute,
-			hour,
-			day,
-			now,
-			date,
-			delta,
-			last_night,
-			the_other_night,
-			ago;
-
-		minute = 60000;
-		hour = 60 * minute;
-		day = 24 * hour;
-
 		if(typeof date_arg === 'function') { date_arg = date_arg(); }
-
-		date = new Date(date_arg).getTime();
-		if(date <= 0 || isNaN(date)) { return date_arg; }
-
-		now = new Date().getTime();
-		delta = now - date;
-
-		if(delta < 0) { return date_arg; }
-
-		if(delta === 0) { return 'now'; }
-
-		if(delta < 2 * minute) { return 'seconds'; }
-
-		if(delta < 2 * hour) {
-			ago = Math.ceil(delta / minute);
-			return ago + ' minutes';
-		}
-
-		if(delta < 2 * day) {
-			ago = Math.ceil(delta / hour);
-			return ago + ' hours';
-		}
-
-		last_night = new Date(now - now % day).getTime();
-		if(date > last_night) { return 'today'; }
-
-		the_other_night = last_night - day;
-		if(date > the_other_night) { return 'yesterday'; }
-
-		ago = Math.ceil(delta / day);
-		return ago + ' days';
+		return moment(new Date(date_arg)).fromNow();
 	}
 };
 
@@ -191,11 +146,6 @@ HixIO.URL = can.Model.extend({
 	list: HixIO.ajax('/api/v1/urls'),
 	shorten: HixIO.ajax('/api/v1/urls', 'POST')
 }, {});
-
-/*
- * User accounts.
- */
-HixIO.User = can.Model.extend({}, {});
 
 /******************************************************************************
  * Re-usable Controls
