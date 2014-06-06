@@ -28,7 +28,7 @@ describe( HixIO::Auth ) do
 		described_class.new( *TEST_APP_PARAMS )
 	end
 
-	it 'allows a user to log in' do
+	it 'allows a user to sign in' do
 		req = factory.post( '/' )
 
 		req.content_type = 'application/x-www-form-encoded'
@@ -68,7 +68,7 @@ describe( HixIO::Auth ) do
 			expect( returned_user['email'] ).to eq( user.email )
 		end
 
-		it 'allows a user to log out' do
+		it 'allows a user to sign out' do
 			req = factory.delete( '/' )
 			req.content_type = 'text/html'
 

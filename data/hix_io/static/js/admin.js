@@ -80,8 +80,6 @@ HixIO.URLControl = can.Control.extend({
 					url: this.url,
 				}
 			));
-		}.bind( this )).error(function(data) {
-			HixIO.notify("Woah! Where'd my URLs go?", 'error-message');
 		});
 	},
 
@@ -98,7 +96,7 @@ HixIO.URLControl = can.Control.extend({
 				if(data.status === 403) {
 					HixIO.notify('You aren\'t allowed to shorten urls.', 'error-message');
 				} else if(data.status === 401) {
-					HixIO.notify('You need to log in to shorten URLs.', 'info-message');
+					HixIO.notify('You need to sign in to shorten URLs.', 'info-message');
 				} else {
 					HixIO.notify('I wasn\'t able to shorten that.', 'warning-message');
 				}
@@ -109,14 +107,26 @@ HixIO.URLControl = can.Control.extend({
 
 /*
  * An auth control.
+ *
+ * Options:
+ *
+ *     session_key (required):
+ *         The name of the cookie to check for that represents the presence of
+ *         a session.
+ *
+ *     view (optional):
+ *         The name of the template to use.
+ *
+ *     TODO: Document options.
+ *
  */
 HixIO.AuthControl = can.Control.extend({
 	defaults: {
-		view: 'admin/login_form',
-		log_in_button: '#log-in-button',
-		log_out_button: '#log-out-button',
-		log_in_email: '#log-in-email',
-		log_in_password: '#log-in-password',
+		view: 'admin/sign_in',
+		sign_in_button: '#sign-in-button',
+		sign_out_button: '#sign-out-button',
+		sign_in_email: '#sign-in-email',
+		sign_in_password: '#sign-in-password',
 		hash_algorithm: 'SHA-512'
 	}
 },{
@@ -124,99 +134,100 @@ HixIO.AuthControl = can.Control.extend({
 		var self;
 
 		self = this;
+		this.redirect = null;
 
-		this.require_auth = function() {
-			if(!$.cookie('hix_io_session')) {
-				HixIO.attr('user', null);
-				can.route.attr('route', 'sign-in');
-				return;
-			}
-
-			if(HixIO.attr('user') !== null) { return; }
-
-			HixIO.ajax('/auth', 'GET')().success(function(data) {
-				HixIO.attr('user', data); 
-			}).error(function(data) {
-				HixIO.attr('user', null);
-				can.route.attr('route', 'sign-in');
+		/*
+		 * Don't bother fetching the user if a session doesn't exist.
+		 */
+		if($.cookie(this.options.session_key)) {
+			can.ajax({
+				url: '/auth',
+				type: 'GET',
+				async: false,
+				data: 'json'
+			}).done(function(data) {
+				HixIO.attr('user', data);	
 			});
-		};
-
-		can.route.bind('route', function(event, new_value, old_value) {
-			if(new_value === 'sign-in') { return; }
-			self.require_auth();
-		});
-
-		this.submit = function() {
-			var creds, email_field, password_field, sha, SHA;
-
-			email_field = $(self.options.log_in_email);
-			password_field = $(self.options.log_in_password);
-
-			if(email_field.val() === '' || password_field.val() === '') { return; } 
-
-			SHA = jsSHA;
-			sha = new SHA( password_field.val(), "TEXT" );
-			creds = {email: email_field.val(), password: sha.getHash(self.options.hash_algorithm, "HEX")};
-
-			self.log_in(creds);
-		};
+		}
 	},
 
-	log_in: function(params) {
-		var self;
+	check: function(route) {
+		if(route === 'sign-in' || route === 'sign-out' ) { return route; }
+		if(!HixIO.attr('user')) {
+			this.redirect = route;
+			return 'sign-in';
+		}
+		return route;
+	},
+
+	sign_in: function() {
+		var creds, email_field, params, password_field, self, sha, SHA;
 
 		self = this;
+		email_field = $(this.options.sign_in_email);
+		password_field = $(this.options.sign_in_password);
 
-		HixIO.ajax('/auth', 'POST')(params).success(function(data) {
-			HixIO.attr('user', data);
-		}).error(function(data) {
-			if(data.status === 401) {
-				HixIO.notify('Invalid email or password.', 'warning-message');
+		if(email_field.val() === '' || password_field.val() === '') { return; } 
+
+		SHA = jsSHA;
+		sha = new SHA( password_field.val(), "TEXT" );
+		creds = {
+			email: email_field.val(),
+			password: sha.getHash(this.options.hash_algorithm, "HEX")
+		};
+
+		HixIO.ajax('/auth', 'POST')(creds).success(function(data) {
+			HixIO.attr('user', data);	
+			if(self.redirect) {
+				can.route.attr('route', self.redirect);
+				self.redirect = null;
 			} else {
-				HixIO.notify('Woah, there was a problem signing you in.', 'error-message');
+				can.route.attr('route', '');
+			}
+			HixIO.notify('You have signed in.', 'success-message');
+		}).error(function(data) {
+			if(data.status >= 400 && data.status < 500) {
+				HixIO.notify('Invalid email or password.', 'warning-message');
+			}
+			if(data.status >= 500 && data.status < 600) {
+				HixIO.notify('', 'error-message');
 			}
 		});
 	},
 
-	log_out: function() {
+	sign_out: function() {
 		var self;
 
 		self = this;
 
 		HixIO.ajax('/auth', 'DELETE')().success(function(data) {
 			HixIO.attr('user', null);
-			self.require_auth();
+			HixIO.router.redirect();
+			HixIO.notify('You have signed out.', 'success-message');
 		}).error(function(data) {
 			HixIO.notify('Woah. There was a problem signing out.', 'error-message');
 		});
 	},
 
-	update: function(data) {
-		this.element.html(HixIO.view(
-			this.options.view,
-			{ user: HixIO.attr('user') }
-		));
-	},
-
 	'sign-in route': function(data) {
-		this.update();
+		this.element.html(HixIO.view(this.options.view, {
+			redirect: this.redirect
+		}));
 	},
 
-	'{log_in_button} click': function(element, event) {
-		this.submit();
+	'sign-out route': function(data) {
+		this.sign_out();
 	},
 
-	'{log_in_password} keyup': function(element, event) {
-		if(event.keyCode === 13) { this.submit(); }
+	'{sign_in_button} click': function(element, event) {
+		this.sign_in();
 	},
 
-	'{log_out_button} click': function(element, event) {
-		this.log_out();	
-	}
+	'{sign_in_password} keyup': function(element, event) {
+		if(event.keyCode === 13) { this.sign_in(); }
+	},
 
 });
-
 
 /******************************************************************************
  * Application entry point.
@@ -226,20 +237,23 @@ $(document).ready(function() {
 	HixIO.message_bar = new HixIO.MessageBar('#messages');
 	HixIO.delegate('notify', HixIO.message_bar);
 
-	HixIO.link_highlighter = new HixIO.LinkHighlighter('#menu', {
+	HixIO.menu = new HixIO.Menu('#menu', {
+		view: 'admin/menu',
 		selected_class: 'pure-menu-selected'
 	});
 
 	HixIO.router = new HixIO.Router('#main', {
 		routes: {
-			auth: HixIO.AuthControl,
 			dash: HixIO.DashControl,
 			pics: HixIO.PicsControl,
 			posts: HixIO.PostControl,
 			profile: HixIO.ProfileControl,
 			urls: HixIO.URLControl
 		},
-		default_route: 'dash'
+		default_route: 'dash',
+		auth_control: new HixIO.AuthControl('#main', {
+			session_key: 'hix_io_session'
+		})
 	});
 
 	HixIO.router.run();

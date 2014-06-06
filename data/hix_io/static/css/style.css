@@ -71,6 +71,10 @@ div#main > div.loading {
 	background: transparent url('/images/loading.gif') no-repeat center top;
 }
 
+.small {
+	font-size: 80%;
+}
+
 .l-box {
 	padding: 1em 0.5em;
 }
@@ -218,21 +222,24 @@ div#main > div.loading {
 /* Message bar styles */
 
 .message_bar{
-  position: fixed;
-  z-index: 100;
-  top: 0;
-  left: 0;
-  width: 100%;
-  box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.25);
+	position: fixed;
+	z-index: 100;
+	top: 100%;
+	left: 0;
+	width: 100%;
+	height: 38pt;
+	margin: -38pt 0 0 0;
+	border: 0;
+	padding: 10pt !important;
+	box-shadow: 0 0 5px 2px rgba(0, 0, 0, 0.25);
+	font-size: 14pt;
+	font-weight: 400;
 }
 
-.error-message,
-.info-message,
-.success-message,
-.warning-message {
-	padding: 0 0.5em;
-	font-size: 16pt;
-	font-weight: 400;
+.message_bar p {
+	margin: 0;
+	border: 0;
+	padding: 0;
 }
 
 .error-message {

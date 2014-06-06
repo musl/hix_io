@@ -105,6 +105,11 @@ HixIO.highlightSyntax = function() {
  * Helpers for views.
  */
 HixIO.view_helpers = {
+	current_user: function(block, options) {
+		if(HixIO.attr('user')) { return block.fn(HixIO.attr('user')); }
+		return false;
+	},
+
 	capitalize: function(string) {
 		if(typeof string === 'function') { string = string(); }
 		return string.charAt(0).toUpperCase() + string.slice(1);
@@ -282,6 +287,8 @@ HixIO.Pager = can.Control.extend({
 });
 
 /*
+ * An application menu.
+ *
  * This control listens to route changes and updates the classes of menu items
  * to match the route.
  *
@@ -293,14 +300,26 @@ HixIO.Pager = can.Control.extend({
  *         link's path.
  *
  */
-HixIO.LinkHighlighter = can.Control.extend({},
-{
+HixIO.Menu = can.Control.extend({
+	defaults: {
+		view: 'menu',
+		selected_class: 'selected'
+	}
+},{
 	init: function(element, options) {
 		var self = this;
-		can.route.bind('route', function() { self.update(); });
+
+		this.update();
+
+		HixIO.bind('user', function() { self.update(); });
+		can.route.bind('route', function() { self.highlight(); });
 	},
 
 	update: function() {
+		this.element.html(HixIO.view(this.options.view, {}));
+	},
+
+	highlight: function() {
 		var self = this;
 
 		$('.pure-menu li a').each(function(i,e) {
@@ -372,7 +391,7 @@ HixIO.LinkHighlighter = can.Control.extend({},
 HixIO.MessageBar = can.Control.extend({
 	defaults: {
 		timeout: 6,
-		persist: false,
+		persist: true,
 		view: 'message',
 		default_class: 'info-message'
 	}
@@ -494,22 +513,36 @@ HixIO.Router = can.Control.extend({},{
 		var self;
 
 		self = this;
-		this.controls = [];
+		this.controls = {};
 
-		can.each(this.options.routes, function(Control,i) {
-			self.controls.push(new Control(self.element));
+		can.each(this.options.routes, function(Control,name) {
+			self.controls[name] = new Control(self.element);
 		});
 	},
 
 	run: function() {
-		var route;
+		var route, self;
 
+		self = this;
 		can.route.ready();
 
-		route = can.route.attr('route');
+		this.redirect(can.route.attr('route'));
+
+		can.route.bind('route', function(event, new_value, old_value) {
+			self.redirect(new_value);
+		});
+	},
+
+	redirect: function(route) {
 		if(!route || route === '') {
-			can.route.attr('route', this.options.default_route);
+			route = this.options.default_route;
 		}
+
+		if(this.options.auth_control) {
+			route = this.options.auth_control.check(route);
+		}
+
+		can.route.attr('route', route);
 	}
 });
 
