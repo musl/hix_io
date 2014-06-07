@@ -1,0 +1,15 @@
+<div class="post">
+	<h2>Content Summary</h2>
+	<ul class="fa-ul">
+		<li><i class="fa fa-li fa-large fa-pencil"></i>Posts: {{posts}}</li>
+		<li><i class="fa fa-li fa-large fa-link"></i>URLs: {{urls}}</li>
+		<li><i class="fa fa-li fa-large fa-photo"></i>Photo Sets: {{photo_sets}}</li>
+		<li><i class="fa fa-li fa-large fa-photo"></i>Photos: {{photos}}</li>
+	</ul>
+	<h2>Admin Summary</h2>
+	<ul class="fa-ul">
+		<li><i class="fa fa-li fa-large fa-user"></i>Users: {{users}}</li>
+		<li><i class="fa fa-li fa-large fa-sign-in"></i>Sessions: {{sessions}}</li>
+		<li><i class="fa fa-li fa-large fa-database"></i>Schema Version: {{schema}}</li>
+	</ul>
+</div>

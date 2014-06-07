@@ -28,7 +28,7 @@
 				<li>
 					<a href="{{scheme}}://{{host}}/{{short}}">{{scheme}}://{{host}}/{{short}}</a>
 					<br>
-					<small>{{relative_date ctime}} ago &middot; {{url}}</small>
+					<small>{{relative_date ctime}} &middot; {{url}}</small>
 				</li>
 			{{/latest_urls}}
 			</ol>

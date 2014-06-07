@@ -77,5 +77,19 @@ class HixIO::API < Strelka::App
 		return res
 	end
 
+	get '/dash' do |req|
+		res = req.response
+		res.for( :json ) {{
+			:posts => HixIO::Post.count,
+			:urls => HixIO::URL.count,
+			:photo_sets => HixIO::PhotoSet.count,
+			:photos => HixIO::Photo.count,
+			:users => HixIO::User.count,
+			:sessions => HixIO.db[:sessions].count,
+			:schema => HixIO.db[:schema_info].first[:version]
+		}}
+		return res
+	end
+
 end
 

@@ -16,26 +16,31 @@ HixIO.PostControl = can.Control.extend({
 	}
 }, {
 	init: function(element, options) {
+		var self;
+
+		self = this;
+
 		this.pager = new HixIO.Pager(this.element, {
 			per_page: 5,
-			on_change: function() { this.update(); }.bind( this ),
+			on_change: function() { self.update(); },
 			target: '#posts_pager'
 		});
 	},
 
 	update: function() {
-		var params;
+		var params, self;
 	   
+		self = this;
 		params = this.pager.params();
 
 		HixIO.Post.list(params).success(function(data) {
-			this.element.html(HixIO.view(
-				this.options.list_view,
+			self.element.html(HixIO.view(
+				self.options.list_view,
 				{ posts: HixIO.Post.models(data.posts) }
 			));
-			this.pager.update(data.count);
+			self.pager.update(data.count);
 			HixIO.highlightSyntax();
-		}.bind( this )).error(function(data) {
+		}).error(function(data) {
 			HixIO.notify('Unable to load posts.', 'error-message');
 		});
 	},
@@ -45,13 +50,17 @@ HixIO.PostControl = can.Control.extend({
 	},
 
 	'posts/:id route': function(data) {
+		var self;
+
+		self = this;
+
 		HixIO.Post.findOne({ id: data.id }, function(post) {
-			this.element.html(HixIO.view(
-				this.options.detail_view,
+			self.element.html(HixIO.view(
+				self.options.detail_view,
 				{ post: post }
 			));
 			HixIO.highlightSyntax();
-		}.bind( this ));
+		});
 	}
 });
 
@@ -80,18 +89,22 @@ HixIO.URLControl = can.Control.extend({
 	}
 }, {
 	'urls route': function() {
+		var self;
+
+		self = this;
+
 		HixIO.URL.list().success(function(data) {
-			this.element.html(HixIO.view(
-				this.options.view,
+			self.element.html(HixIO.view(
+				self.options.view,
 				{
 					scheme: HixIO.meta.scheme,
 					host: HixIO.meta.host,
 					top_urls: HixIO.URL.models(data.top_urls),
 					latest_urls: HixIO.URL.models(data.latest_urls),
-					url: this.url,
+					url: self.url,
 				}
 			));
-		}.bind( this )).error(function(data) {
+		}).error(function(data) {
 			HixIO.notify("Woah! Where'd my URLs go?", 'error-message');
 		});
 	}

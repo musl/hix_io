@@ -152,6 +152,13 @@ HixIO.URL = can.Model.extend({
 	shorten: HixIO.ajax('/api/v1/urls', 'POST')
 }, {});
 
+/*
+ * Metadata View
+ */
+HixIO.Meta = can.Model.extend({
+	dash: HixIO.ajax('/api/v1/dash')
+}, {});
+
 /******************************************************************************
  * Re-usable Controls
  ******************************************************************************/

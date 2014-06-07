@@ -265,7 +265,7 @@ div#main > div.loading {
 /* Font Awesome - no &nbsp; */
 
 p i.fa,
-li > a > i.fa {
-	margin: 0 0.5em;
+li i.fa {
+	margin: 0 0.25em 0 0 !important;
 }
 

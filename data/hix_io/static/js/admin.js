@@ -6,14 +6,20 @@
  * Provide a list of quick links to add content and provide a summary of what's
  * already there.
  */
-HixIO.DashControl = can.Control.extend({}, {
-	'dash route': function(data) {
-		this.element.html(can.route.attr('route'));
-	},
-
-	'dash/:id route': function(data) {
-		this.element.html(can.route.attr('route'));
+HixIO.DashControl = can.Control.extend({
+	defaults: {
+		view: 'admin/dash'
 	}
+}, {
+	'dash route': function(data) {
+		var self;
+
+		self = this;
+
+		HixIO.Meta.dash().success(function(data){
+			self.element.html(HixIO.view(self.options.view, data));
+		});
+	},
 });
 
 /*
@@ -53,9 +59,7 @@ HixIO.ProfileControl = can.Control.extend({
 	'profile route': function(data) {
 		this.element.html(HixIO.view(
 			this.options.view,
-			{
-				user: HixIO.attr('user')
-			}
+			{ user: HixIO.attr('user') }
 		));
 	}
 });
@@ -69,15 +73,18 @@ HixIO.URLControl = can.Control.extend({
 	}
 }, {
 	update: function() {
+		var self;
+
+		self = this;
 		HixIO.URL.list().success(function(data) {
-			this.element.html(HixIO.view(
-				this.options.view,
+			self.element.html(HixIO.view(
+				self.options.view,
 				{
 					scheme: HixIO.meta.scheme,
 					host: HixIO.meta.host,
 					top_urls: HixIO.URL.models(data.top_urls),
 					latest_urls: HixIO.URL.models(data.latest_urls),
-					url: this.url,
+					url: self.url,
 				}
 			));
 		});
@@ -88,11 +95,15 @@ HixIO.URLControl = can.Control.extend({
 	},
 
 	'#shorten keyup': function(element, event) {
+		var self;
+	   
+		self = this;
+
 		if(event.keyCode === 13 && event.target.value !== '') {
 			HixIO.URL.shorten({url: event.target.value}).success(function(data) {
-				this.url = data;
-				this.update();
-			}.bind( this )).error(function(data) {
+				self.url = data;
+				self.update();
+			}).error(function(data) {
 				if(data.status === 403) {
 					HixIO.notify('You aren\'t allowed to shorten urls.', 'error-message');
 				} else if(data.status === 401) {
