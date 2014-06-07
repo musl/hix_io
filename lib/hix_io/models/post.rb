@@ -7,7 +7,7 @@ class HixIO::Post < Sequel::Model( :hix_io__posts )
 	plugin :validation_helpers
 	plugin :json_serializer
 
-	many_to_one :user, :eager => [:user]
+	many_to_one :user
 
 	########################################################################
 	### D A T A S E T S
@@ -77,16 +77,6 @@ class HixIO::Post < Sequel::Model( :hix_io__posts )
 	def validate
 		validates_presence( :title )
 		validates_presence( :body )
-	end
-
-	########################################################################
-	### I N S T A N C E   M E T H O D S
-	########################################################################
-
-	# Override & cripple to_json. There can only be one!
-	#
-	def to_json( *a ) #:nodoc:
-		return super( :include => :user )
 	end
 
 end

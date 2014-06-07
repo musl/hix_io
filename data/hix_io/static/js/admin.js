@@ -57,10 +57,7 @@ HixIO.ProfileControl = can.Control.extend({
 	}
 }, {
 	'profile route': function(data) {
-		this.element.html(HixIO.view(
-			this.options.view,
-			{ user: HixIO.attr('user') }
-		));
+		this.element.html(HixIO.view(this.options.view, HixIO.attr('user')));
 	}
 });
 

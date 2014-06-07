@@ -5,7 +5,9 @@ Sequel.migration do
 
 	up do
 		create_table( :users ) do
-			String      :email, :primary_key => true, :size => 255
+			primary_key	:id
+
+			String      :email, :size => 255
 
 			# Form Auth, SHA512 hashed user supplied string
 			String      :password, :null => false, :size => 128
@@ -21,8 +23,8 @@ Sequel.migration do
 			timestamptz :ctime, :null => false, :default => 'now()'.lit
 			timestamptz :mtime, :null => false, :default => 'now()'.lit
 
+			index :email, :unique => true
 			index :ctime
-			index :email
 			index :mtime
 		end
 

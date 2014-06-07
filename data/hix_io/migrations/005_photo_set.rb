@@ -7,7 +7,7 @@ Sequel.migration do
 		create_table( :photo_sets ) do
 			primary_key :id
 
-			foreign_key :user_id, :users, :type => :text, :null => false, :on_delete => :cascade
+			foreign_key :user_id, :users, :null => false, :on_delete => :cascade
 
 			text :title, :null => false
 			timestamptz :ctime, :null => false, :default => 'now()'.lit

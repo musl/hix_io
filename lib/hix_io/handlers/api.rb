@@ -68,7 +68,7 @@ class HixIO::API < Strelka::App
 			begin
 				HixIO::URL.find_or_create( :url => req.params[:url] ) do |url|
 					url.source_ip = [req.headers.x_forwarded_for].flatten.first
-					url.user_id = req.authenticated_user.email
+					url.user_id = req.authenticated_user.id
 				end
 			rescue Sequel::ValidationFailed => e
 				finish_with( HTTP::UNPROCESSABLE_ENTITY, e )
@@ -89,6 +89,11 @@ class HixIO::API < Strelka::App
 			:schema => HixIO.db[:schema_info].first[:version]
 		}}
 		return res
+	end
+
+	post '/users/:id' do |req|
+		req.params.add :email
+		req.params.add :password, :string
 	end
 
 end

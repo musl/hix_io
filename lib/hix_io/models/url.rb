@@ -12,7 +12,7 @@ class HixIO::URL < Sequel::Model( :hix_io__urls )
 
 	unrestrict_primary_key
 
-	many_to_one :user, :eager => [:user]
+	many_to_one :user
 
 	########################################################################
 	### D A T A S E T S
@@ -68,12 +68,6 @@ class HixIO::URL < Sequel::Model( :hix_io__urls )
 		return true
 	rescue URI::InvalidURIError
 		return false
-	end
-
-	# Override & cripple to_json. There can only be one!
-	#
-	def to_json( *a ) #:nodoc:
-		return super( :include => :user )
 	end
 
 end

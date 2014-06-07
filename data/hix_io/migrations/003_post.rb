@@ -7,7 +7,7 @@ Sequel.migration do
 		create_table( :posts ) do
 			primary_key :id
 
-			foreign_key :user_id, :users, :type => :text, :null => false, :on_delete => :cascade
+			foreign_key :user_id, :users, :null => false, :on_delete => :cascade
 			String      :title, :null => false
 
 			String      :body, :null => false

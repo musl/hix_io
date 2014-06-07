@@ -59,7 +59,7 @@ class Strelka::AuthProvider::HixIO < Strelka::AuthProvider
 
 		req_ip = request.headers[:x_forwarded_for]
 		session_ip = request.session[:src_ip]
-		user = ::HixIO::User[request.session[:email]]
+		user = ::HixIO::User[request.session[:id]]
 
 		return user if user and req_ip == session_ip
 	end
@@ -71,7 +71,7 @@ class Strelka::AuthProvider::HixIO < Strelka::AuthProvider
 		request.body.rewind
 
 		form = Hash[URI.decode_www_form( request.body.read )]
-		user = ::HixIO::User[form['email']]
+		user = ::HixIO::User.where( :email => form['email'] ).first
 
 		if user and form['password'] == user.password
 			make_session( user, request )
@@ -84,7 +84,7 @@ class Strelka::AuthProvider::HixIO < Strelka::AuthProvider
 	# Create a session for the given +user+ and +request+.
 	#
 	def make_session( user, request )
-		request.session[:email] = user.email
+		request.session[:id] = user.id
 		request.session[:src_ip] = request.headers[:x_forwarded_for]
 	end
 
