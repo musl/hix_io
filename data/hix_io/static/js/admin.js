@@ -56,8 +56,27 @@ HixIO.ProfileControl = can.Control.extend({
 		view: 'admin/profile'
 	}
 }, {
+	init: function(element, options) {
+		// TODO: Clone a user object?
+	},
+
+	update: function() {
+		this.element.html(HixIO.view(this.options.view, {
+			user: HixIO.attr('user')
+		}));
+	},
+
 	'profile route': function(data) {
-		this.element.html(HixIO.view(this.options.view, HixIO.attr('user')));
+		this.update();
+	},
+
+	'form submit': function(element, event) {
+		event.preventDefault();
+		// TODO: Send the data if there are no validation errors.
+	},
+
+	'input change': function(element, event) {
+		// TODO: Re-run validaitons.
 	}
 });
 
@@ -128,11 +147,10 @@ HixIO.URLControl = can.Control.extend({
  *     TODO: Document options.
  *
  */
-HixIO.AuthControl = can.Control.extend({
+HixIO .AuthControl = can.Control.extend({
 	defaults: {
 		view: 'admin/sign_in',
 		sign_in_button: '#sign-in-button',
-		sign_out_button: '#sign-out-button',
 		sign_in_email: '#sign-in-email',
 		sign_in_password: '#sign-in-password',
 		hash_algorithm: 'SHA-512'
@@ -154,7 +172,7 @@ HixIO.AuthControl = can.Control.extend({
 				async: false,
 				data: 'json'
 			}).done(function(data) {
-				HixIO.attr('user', data);	
+				HixIO.attr('user', HixIO.User.model(data));	
 			});
 		}
 	},
@@ -185,7 +203,7 @@ HixIO.AuthControl = can.Control.extend({
 		};
 
 		HixIO.ajax('/auth', 'POST')(creds).success(function(data) {
-			HixIO.attr('user', data);	
+			HixIO.attr('user', HixIO.User.model(data));	
 			if(self.redirect) {
 				can.route.attr('route', self.redirect);
 				self.redirect = null;

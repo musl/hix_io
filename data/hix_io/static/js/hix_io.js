@@ -43,6 +43,21 @@ HixIO.view = function(name, obj) {
 };
 
 /*
+ * Retrieve form values as an object.
+ */
+HixIO.read_form = function(element) {
+	var obj;
+
+	obj = {};
+	$(element).find('input').each(function(i, input) {
+		if(input.name && input.name !== '') {
+			obj[input.name] = input.value;
+		}
+	}); 
+	return obj;
+};
+
+/*
  * Perform an asynchronous HTTP request and return the deferred result. See
  * can.ajax() and JQuery.ajax() for more information. I created this to help
  * keep the model definitions nice and clean and free of duplicated code.
@@ -105,7 +120,7 @@ HixIO.highlightSyntax = function() {
  * Helpers for views.
  */
 HixIO.view_helpers = {
-	current_user: function(block, options) {
+	current_user: function(block) {
 		if(HixIO.attr('user')) { return block.fn(HixIO.attr('user')); }
 		return false;
 	},
@@ -123,7 +138,12 @@ HixIO.view_helpers = {
 	relative_date: function(date_arg) {
 		if(typeof date_arg === 'function') { date_arg = date_arg(); }
 		return moment(new Date(date_arg)).fromNow();
-	}
+	},
+
+	validation_error: function(block) {
+		// TODO: extract a specific validaiton error for display in a template.
+		return false;
+	},
 };
 
 /******************************************************************************
@@ -153,7 +173,30 @@ HixIO.URL = can.Model.extend({
 }, {});
 
 /*
- * Metadata View
+ * User Accounts.
+ */
+HixIO.User = can.Model.extend({
+	init: function() {
+		var self;
+
+		self = this;
+
+		this.validate('email', function(value) {
+			if(!value || value.length < 3) { return 'Invalid email.'; }
+		});
+
+		this.validate('password', function(value) {
+			if(!value || value.length < 1) { return 'Invalid password.'; }
+		});
+
+		this.validate('verify_password', function(value) {
+			if(!value || value.length < 1) { return 'Invalid password.'; }
+		});
+	},
+}, {});
+
+/*
+ * Metadata Catch-all.
  */
 HixIO.Meta = can.Model.extend({
 	dash: HixIO.ajax('/api/v1/dash')

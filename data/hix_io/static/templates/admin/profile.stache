@@ -1,4 +1,5 @@
 <div class="post">
+	{{#user}}
 	<h2>{{email}}</h2>
 	<form id="profile-form" class="pure-form pure-form-aligned">
 		<fieldset id="profile_information" class="">
@@ -21,4 +22,5 @@
 			</div>
 		</fieldset>
 	</form>
+	{{/user}}
 </div>
