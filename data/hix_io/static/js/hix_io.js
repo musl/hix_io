@@ -140,10 +140,15 @@ HixIO.view_helpers = {
 		return moment(new Date(date_arg)).fromNow();
 	},
 
-	validation_error: function(block) {
-		// TODO: extract a specific validaiton error for display in a template.
-		return false;
-	},
+	validation_error: function(property) {
+		var errors;
+
+		errors = this.errors.attr(property);
+		if(errors) {
+			return '<span class="validation-error">' + errors.join(' ') + '</span>';
+		}
+		return false;	
+	}
 };
 
 /******************************************************************************
@@ -177,10 +182,6 @@ HixIO.URL = can.Model.extend({
  */
 HixIO.User = can.Model.extend({
 	init: function() {
-		var self;
-
-		self = this;
-
 		this.validate('email', function(value) {
 			if(!value || value.length < 3) { return 'Invalid email.'; }
 		});
@@ -190,7 +191,9 @@ HixIO.User = can.Model.extend({
 		});
 
 		this.validate('verify_password', function(value) {
-			if(!value || value.length < 1) { return 'Invalid password.'; }
+			if(!value || value !== this.attr('password')) {
+				return 'Those passwords do not match.';
+			}
 		});
 	},
 }, {});
@@ -584,6 +587,10 @@ HixIO.Router = can.Control.extend({},{
 	},
 
 	redirect: function(route) {
+		var self;
+
+		self = this;
+
 		if(!route || route === '') {
 			route = this.options.default_route;
 		}

@@ -49,7 +49,7 @@ HixIO.PicsControl = can.Control.extend({}, {
 });
 
 /*
- * A control for a shared photo timeline.
+ * A control for modifying your profile data.
  */
 HixIO.ProfileControl = can.Control.extend({
 	defaults: {
@@ -57,27 +57,38 @@ HixIO.ProfileControl = can.Control.extend({
 	}
 }, {
 	init: function(element, options) {
-		// TODO: Clone a user object?
+		this.user = new HixIO.User();
+		this.errors = new can.Map({});
 	},
 
-	update: function() {
-		this.element.html(HixIO.view(this.options.view, {
-			user: HixIO.attr('user')
-		}));
+	validate: function() {
+		this.errors.attr(this.user.errors(), true);
+		if(!this.user.errors()) {
+			this.element.find(':submit').removeAttr('disabled');
+		} else {
+			this.element.find(':submit').attr('disabled', 'disabled');
+		}
 	},
 
 	'profile route': function(data) {
-		this.update();
+		this.user.attr(HixIO.attr('user').attr());
+		this.element.html(HixIO.view(this.options.view, {
+			user: this.user,
+			errors: this.errors
+		}));
+		this.element.find(':submit').attr('disabled', 'disabled');
 	},
 
-	'form submit': function(element, event) {
+	submit: function(element, event) {
 		event.preventDefault();
-		// TODO: Send the data if there are no validation errors.
+		this.validate();
+		if(!this.user.errors()) {
+			HixIO.attr('user', this.user.attr());
+			// TODO: Save the accepted changes.
+		}
 	},
 
-	'input change': function(element, event) {
-		// TODO: Re-run validaitons.
-	}
+	change: function(element, event) { this.validate(); }
 });
 
 /*
@@ -85,7 +96,8 @@ HixIO.ProfileControl = can.Control.extend({
  */
 HixIO.URLControl = can.Control.extend({
 	defaults: {
-		view: 'admin/urls'
+		view: 'admin/urls',
+		field: '#shorten'
 	}
 }, {
 	update: function() {
@@ -110,7 +122,7 @@ HixIO.URLControl = can.Control.extend({
 		this.update();
 	},
 
-	'#shorten keyup': function(element, event) {
+	'{field} keyup': function(element, event) {
 		var self;
 	   
 		self = this;
