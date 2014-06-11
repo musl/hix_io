@@ -68,6 +68,11 @@ class Strelka::AuthProvider::HixIO < Strelka::AuthProvider
 	# valid, nil otherwise.
 	#
 	def check_login( request )
+
+		# TODO: find a better way to control which routes can create sessions.
+		HixIO.log.warn( "%p: %p" % [request.path, request.verb] )
+		return unless request.path =~ /\/(auth)?/ and request.verb == :POST
+
 		request.body.rewind
 
 		form = Hash[URI.decode_www_form( request.body.read )]
