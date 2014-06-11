@@ -116,7 +116,6 @@ HixIO.URLControl = can.Control.extend({
 
 $(document).ready(function() {
 	HixIO.message_bar = new HixIO.MessageBar('#messages');
-	HixIO.delegate('notify', HixIO.message_bar);
 
 	HixIO.menu = new HixIO.Menu('#menu', {
 		selected_class: 'pure-menu-selected'

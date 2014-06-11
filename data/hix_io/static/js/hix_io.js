@@ -43,21 +43,6 @@ HixIO.view = function(name, obj) {
 };
 
 /*
- * Retrieve form values as an object.
- */
-HixIO.read_form = function(element) {
-	var obj;
-
-	obj = {};
-	$(element).find('input').each(function(i, input) {
-		if(input.name && input.name !== '') {
-			obj[input.name] = input.value;
-		}
-	}); 
-	return obj;
-};
-
-/*
  * Perform an asynchronous HTTP request and return the deferred result. See
  * can.ajax() and JQuery.ajax() for more information. I created this to help
  * keep the model definitions nice and clean and free of duplicated code.
@@ -145,7 +130,8 @@ HixIO.view_helpers = {
 
 		errors = this.errors.attr(property);
 		if(errors) {
-			return '<span class="validation-error">' + errors.join(' ') + '</span>';
+			// TODO: Turn this into a partial.
+			return '<span class="validation-error arrow_box">' + errors.join(' ') + '</span>';
 		}
 		return false;	
 	}
@@ -191,7 +177,7 @@ HixIO.User = can.Model.extend({
 		});
 
 		this.validate('verify_password', function(value) {
-			if(!value || value !== this.attr('password')) {
+			if(value !== this.attr('password')) {
 				return 'Those passwords do not match.';
 			}
 		});
@@ -502,6 +488,8 @@ HixIO.MessageBar = can.Control.extend({
 		can.route.bind('route', function() {
 			if(!self.options.persist) { self.close(); }
 		});
+
+		HixIO.delegate('notify', this);
 	},
 
 	/*
@@ -571,6 +559,8 @@ HixIO.Router = can.Control.extend({},{
 		can.each(this.options.routes, function(Control,name) {
 			self.controls[name] = new Control(self.element);
 		});
+
+		HixIO.delegate('redirect', this);
 	},
 
 	run: function() {

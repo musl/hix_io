@@ -53,7 +53,8 @@ HixIO.PicsControl = can.Control.extend({}, {
  */
 HixIO.ProfileControl = can.Control.extend({
 	defaults: {
-		view: 'admin/profile'
+		view: 'admin/profile',
+		form: '#profile-form'
 	}
 }, {
 	init: function(element, options) {
@@ -63,6 +64,7 @@ HixIO.ProfileControl = can.Control.extend({
 
 	validate: function() {
 		this.errors.attr(this.user.errors(), true);
+
 		if(!this.user.errors()) {
 			this.element.find(':submit').removeAttr('disabled');
 		} else {
@@ -71,24 +73,31 @@ HixIO.ProfileControl = can.Control.extend({
 	},
 
 	'profile route': function(data) {
+		var self;
+		self = this;
+
 		this.user.attr(HixIO.attr('user').attr());
+		this.user.bind('change', function(event, attr, how, new_value, old_value) {
+			self.validate();
+		});
+
 		this.element.html(HixIO.view(this.options.view, {
 			user: this.user,
 			errors: this.errors
 		}));
+
 		this.element.find(':submit').attr('disabled', 'disabled');
 	},
 
-	submit: function(element, event) {
+	'{form} submit': function(element, event) {
 		event.preventDefault();
-		this.validate();
+
 		if(!this.user.errors()) {
 			HixIO.attr('user', this.user.attr());
+			this.element.find(':submit').attr('disabled', 'disabled');
 			// TODO: Save the accepted changes.
 		}
-	},
-
-	change: function(element, event) { this.validate(); }
+	}
 });
 
 /*
@@ -159,12 +168,10 @@ HixIO.URLControl = can.Control.extend({
  *     TODO: Document options.
  *
  */
-HixIO .AuthControl = can.Control.extend({
+HixIO.AuthControl = can.Control.extend({
 	defaults: {
 		view: 'admin/sign_in',
-		sign_in_button: '#sign-in-button',
-		sign_in_email: '#sign-in-email',
-		sign_in_password: '#sign-in-password',
+		form: '#sign-in-form',
 		hash_algorithm: 'SHA-512'
 	}
 },{
@@ -173,6 +180,7 @@ HixIO .AuthControl = can.Control.extend({
 
 		self = this;
 		this.redirect = null;
+		this.credentials = new can.Map({});
 
 		/*
 		 * Don't bother fetching the user if a session doesn't exist.
@@ -199,30 +207,26 @@ HixIO .AuthControl = can.Control.extend({
 	},
 
 	sign_in: function() {
-		var creds, email_field, params, password_field, self, sha, SHA;
+		var creds, params, self, sha, SHA;
 
 		self = this;
-		email_field = $(this.options.sign_in_email);
-		password_field = $(this.options.sign_in_password);
-
-		if(email_field.val() === '' || password_field.val() === '') { return; } 
-
 		SHA = jsSHA;
-		sha = new SHA( password_field.val(), "TEXT" );
+		sha = new SHA(this.credentials.password, "TEXT");
 		creds = {
-			email: email_field.val(),
+			email: this.credentials.email,
 			password: sha.getHash(this.options.hash_algorithm, "HEX")
 		};
 
 		HixIO.ajax('/auth', 'POST')(creds).success(function(data) {
 			HixIO.attr('user', HixIO.User.model(data));	
 			if(self.redirect) {
-				can.route.attr('route', self.redirect);
+				HixIO.redirect(self.redirect);
 				self.redirect = null;
 			} else {
 				can.route.attr('route', '');
 			}
 			HixIO.notify('You have signed in.', 'success-message');
+			self.credentials.attr({}, true);
 		}).error(function(data) {
 			if(data.status >= 400 && data.status < 500) {
 				HixIO.notify('Invalid email or password.', 'warning-message');
@@ -234,13 +238,9 @@ HixIO .AuthControl = can.Control.extend({
 	},
 
 	sign_out: function() {
-		var self;
-
-		self = this;
-
 		HixIO.ajax('/auth', 'DELETE')().success(function(data) {
 			HixIO.attr('user', null);
-			HixIO.router.redirect();
+			HixIO.redirect();
 			HixIO.notify('You have signed out.', 'success-message');
 		}).error(function(data) {
 			HixIO.notify('Woah. There was a problem signing out.', 'error-message');
@@ -249,6 +249,7 @@ HixIO .AuthControl = can.Control.extend({
 
 	'sign-in route': function(data) {
 		this.element.html(HixIO.view(this.options.view, {
+			credentials: this.credentials,
 			redirect: this.redirect
 		}));
 	},
@@ -257,13 +258,10 @@ HixIO .AuthControl = can.Control.extend({
 		this.sign_out();
 	},
 
-	'{sign_in_button} click': function(element, event) {
+	'{form} submit': function(element, event) {
+		event.preventDefault();
 		this.sign_in();
-	},
-
-	'{sign_in_password} keyup': function(element, event) {
-		if(event.keyCode === 13) { this.sign_in(); }
-	},
+	}
 
 });
 
@@ -273,7 +271,6 @@ HixIO .AuthControl = can.Control.extend({
 
 $(document).ready(function() {
 	HixIO.message_bar = new HixIO.MessageBar('#messages');
-	HixIO.delegate('notify', HixIO.message_bar);
 
 	HixIO.menu = new HixIO.Menu('#menu', {
 		view: 'admin/menu',
