@@ -91,9 +91,24 @@ class HixIO::API < Strelka::App
 		return res
 	end
 
-	post '/users/:id' do |req|
+	put '/users/:id' do |req|
 		req.params.add :email
-		req.params.add :password, :string
+		req.params.add :password, :sha512sum
+
+		user = HixIO::User[req.params[:id]]
+		finish_with( HTTP::NOT_FOUND, '' ) if user.nil?
+
+		begin
+			user.email = req.params[:email]
+			user.password = req.params[:password]
+			user.save
+		rescue Sequel::ValidationFailed
+			finish_with( HTTP::CONFLICT, user.errors.to_json )
+		end
+
+		res = req.response
+		res.for( :json ) { 'User updated.' }
+		return res
 	end
 
 end

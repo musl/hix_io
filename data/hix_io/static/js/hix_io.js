@@ -137,6 +137,18 @@ HixIO.view_helpers = {
 	}
 };
 
+/*
+ * Generate a SHA512 hex digest.
+ */
+HixIO.sha512 = function(message) {
+	var SHA, sha;
+
+	SHA = jsSHA;
+	sha = new SHA(message, "TEXT");
+
+	return sha.getHash('SHA-512', 'HEX');
+};
+
 /******************************************************************************
  * Models
  ******************************************************************************/
@@ -169,11 +181,15 @@ HixIO.URL = can.Model.extend({
 HixIO.User = can.Model.extend({
 	init: function() {
 		this.validate('email', function(value) {
-			if(!value || value.length < 3) { return 'Invalid email.'; }
+			if(!value || value.length < 3) {
+				return 'Please enter your email address.';
+			}
 		});
 
 		this.validate('password', function(value) {
-			if(!value || value.length < 1) { return 'Invalid password.'; }
+			if(!value || value.length < 1) {
+				return 'Please enter a password.';
+			}
 		});
 
 		this.validate('verify_password', function(value) {
@@ -182,6 +198,9 @@ HixIO.User = can.Model.extend({
 			}
 		});
 	},
+
+	update: 'PUT /api/v1/users/{id}'
+
 }, {});
 
 /*

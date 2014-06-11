@@ -49,7 +49,7 @@ class HixIO::User < Sequel::Model( :hix_io__users )
 	def valid_user?
 	end
 
-	# Override & cripple to_json. There can only be one!
+	# Prevent secrets from being sent with user data.
 	#
 	def to_json( *a ) #:nodoc:
 		return super( :except => [:password, :api_secret] )

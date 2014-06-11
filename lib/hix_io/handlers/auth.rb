@@ -21,7 +21,7 @@ class HixIO::Auth < Strelka::App
 
 	session_namespace :hix_io
 
-	require_auth_for { |r| %i[GET DELETE].include?( r.verb ) }
+	no_auth_for { |req| req.verb == :POST }
 	no_perms_for //
 
 	########################################################################

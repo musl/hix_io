@@ -90,12 +90,24 @@ HixIO.ProfileControl = can.Control.extend({
 	},
 
 	'{form} submit': function(element, event) {
+		var user;
 		event.preventDefault();
 
 		if(!this.user.errors()) {
-			HixIO.attr('user', this.user.attr());
 			this.element.find(':submit').attr('disabled', 'disabled');
-			// TODO: Save the accepted changes.
+			user = HixIO.attr('user');
+
+			user.attr(this.user.attr());
+			user.attr('password', HixIO.sha512(user.attr('password')));
+			user.removeAttr('verify_password');
+
+			user.save(function(data) {
+				HixIO.notify('Your profile has been updated.', 'success-message');
+				user.removeAttr('password');
+			},function(data) {
+				HixIO.notify('There was a problem updating your profile.', 'error-message');
+				user.removeAttr('password');
+			});
 		}
 	}
 });
@@ -172,7 +184,6 @@ HixIO.AuthControl = can.Control.extend({
 	defaults: {
 		view: 'admin/sign_in',
 		form: '#sign-in-form',
-		hash_algorithm: 'SHA-512'
 	}
 },{
 	init: function(element, options) {
@@ -207,14 +218,12 @@ HixIO.AuthControl = can.Control.extend({
 	},
 
 	sign_in: function() {
-		var creds, params, self, sha, SHA;
+		var creds, params, self;
 
 		self = this;
-		SHA = jsSHA;
-		sha = new SHA(this.credentials.password, "TEXT");
 		creds = {
 			email: this.credentials.email,
-			password: sha.getHash(this.options.hash_algorithm, "HEX")
+			password: HixIO.sha512(this.credentials.password),
 		};
 
 		HixIO.ajax('/auth', 'POST')(creds).success(function(data) {
