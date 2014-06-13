@@ -30,17 +30,41 @@ HixIO.PostControl = can.Control.extend({
 		view: 'admin/posts',
 	}
 }, {
+	init: function() {
+		can.route('posts/:id');
+	},
+
 	'posts route': function(data) {
 		var self;
 		
 		self = this;
 
 		HixIO.Post.list().success(function(data) {
-			self.element.html(HixIO.view(self.options.view, {posts: data.posts}));
+			can.each(data.posts, function(post,i) {
+				post.title = can.route.link(post.title, {id: post.id}, {}, false);
+			});
+			self.element.html(HixIO.view(
+				self.options.view,
+				{ posts: data.posts }
+			));
 		}).error(function(data) {
 			HixIO.notify('There was a problem fetching the posts.', 'error-message');
 		});
+	},
+
+	'posts/:id route': function(data) {
+		var self;
+
+		self = this;
+
+		HixIO.Post.findOne({ id: data.id }, function(post) {
+			self.element.html(HixIO.view(
+				self.options.detail_view,
+				{ post: post }
+			));
+		});
 	}
+
 });
 
 /*

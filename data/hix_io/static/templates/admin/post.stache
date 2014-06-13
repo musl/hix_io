@@ -1,0 +1,10 @@
+<div class="post">
+	<form class="pure-form">
+		<legend>Edit Post #{{id}}</legend>
+		<fieldset>
+			<div class="pure-control-group">
+		<label for="title"></label>
+		<input id="title" name="title" can-value="title">
+		<label for="body"></label>
+	</form>
+</div>
