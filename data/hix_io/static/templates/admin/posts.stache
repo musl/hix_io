@@ -1,6 +1,6 @@
 <div class="post">
 	<h2>Posts</h2>
 	<p>
-	{{datatable data 'id title mtime'}}
+	{{datatable posts 'id title mtime'}}
 	</p>
 </div>

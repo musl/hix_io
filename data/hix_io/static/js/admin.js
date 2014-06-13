@@ -36,7 +36,7 @@ HixIO.PostControl = can.Control.extend({
 		self = this;
 
 		HixIO.Post.list().success(function(data) {
-			self.element.html(HixIO.view(self.options.view, {data: data}));
+			self.element.html(HixIO.view(self.options.view, {posts: data.posts}));
 		}).error(function(data) {
 			HixIO.notify('There was a problem fetching the posts.', 'error-message');
 		});
@@ -133,15 +133,13 @@ HixIO.URLControl = can.Control.extend({
 		var self;
 
 		self = this;
-		HixIO.URL.list().success(function(data) {
+
+		HixIO.ajax('/api/v1/urls')().success(function(urls) {
 			self.element.html(HixIO.view(
 				self.options.view,
 				{
-					scheme: HixIO.meta.scheme,
-					host: HixIO.meta.host,
-					top_urls: HixIO.URL.models(data.top_urls),
-					latest_urls: HixIO.URL.models(data.latest_urls),
 					url: self.url,
+					urls: urls
 				}
 			));
 		});

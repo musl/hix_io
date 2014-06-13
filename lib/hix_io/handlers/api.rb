@@ -25,6 +25,8 @@ class HixIO::API < Strelka::App
 
 	default_type 'application/json'
 
+	router :exclusive
+
 	no_auth_for { |req| req.verb == :GET }
 	no_perms_for { |req| req.verb == :GET }
 
@@ -51,6 +53,12 @@ class HixIO::API < Strelka::App
 	end
 
 	get '/urls' do |req|
+		res = req.response
+		res.for( :json ) { HixIO::URL.all }
+		return res
+	end
+
+	get '/urls/summary' do |req|
 		res = req.response
 		res.for( :json ) {{
 			:host => HixIO.host,

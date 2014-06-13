@@ -93,7 +93,7 @@ HixIO.URLControl = can.Control.extend({
 
 		self = this;
 
-		HixIO.URL.list().success(function(data) {
+		HixIO.URL.summary().success(function(data) {
 			self.element.html(HixIO.view(
 				self.options.view,
 				{

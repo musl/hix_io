@@ -115,6 +115,17 @@ HixIO.view_helpers = {
 		return string.charAt(0).toUpperCase() + string.slice(1);
 	},
 
+	expand_link: function(path, html) {
+		var url;
+
+		console.log('expand_link(' + path + ', ' + html + ');');
+
+		url = HixIO.meta.scheme + '://' + HixIO.meta.host + '/' + path;
+		if(typeof html !== 'string' ) { html = url; }
+
+		return $('<a></a>').attr('href', url).html(html);
+	},
+
 	short_date: function(date_arg) {
 		if(typeof date_arg === 'function') { date_arg = date_arg(); }
 		return (new Date(date_arg)).toISOString();
@@ -131,17 +142,18 @@ HixIO.view_helpers = {
 		errors = this.errors.attr(property);
 		if(errors) {
 			// TODO: Turn this into a partial or a block helper.
-			return '<span class="validation-error arrow_box">' + errors.join(' ') + '</span>';
+			return $('<span></span>').addClass("validation-error arrow_box").html(errors.join(' '));
 		}
 		return false;	
 	},
 
-	// TODO: I CAN HAS search & paginations?
 	datatable: function(data, columns) {
-		var cols, self, table;
+		var cols, self, table, wrapper;
 		
 		self = this;	
 		table = $('<table></table>');
+		table.wrap('<div></div>');
+		wrapper = table.parent();
 
 		cols = $.map(columns.split(/\s+/), function(col) {
 			return {
@@ -150,12 +162,16 @@ HixIO.view_helpers = {
 			};
 		});
 
+		// TODO: Use the hash form for columns, and accept options.
+		wrapper.addClass('pure-form');
+		table.addClass('stripe');
+
 		table.dataTable({
-			data: data.posts,
+			data: data,
 			columns: cols
 		});
 
-		return table;
+		return wrapper;
 	}
 };
 
@@ -193,7 +209,7 @@ HixIO.Post = can.Model.extend({
  * URLs for a URL-shortener.
  */
 HixIO.URL = can.Model.extend({
-	list: HixIO.ajax('/api/v1/urls'),
+	summary: HixIO.ajax('/api/v1/urls/summary'),
 	shorten: HixIO.ajax('/api/v1/urls', 'POST')
 }, {});
 

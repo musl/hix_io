@@ -107,7 +107,7 @@ div#main > div.loading {
 	-webkit-border-radius: 2px;
 	-moz-border-radius:    2px;
 	border-radius:         2px;
-	padding: 1px 1em; /* the vertical padding needs to be set to avoid a bug */
+	padding: 1px 1em 1em 1em;
 	background: #ffffff;
 }
 

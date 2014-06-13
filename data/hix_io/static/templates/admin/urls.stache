@@ -1,51 +1,18 @@
 <div class="post">
-	<div class="l-box">
-		<div class="pure-form pure-g">
-			<label for="shorten" class="pure-u-1">Shorten a URL:</label>
-			<input type="text" id="shorten" name="shorten" class="pure-input pure-u-1" placeholder="http://example.com">
-		</div>
+	<h2>Shorten a URL:</h2>
+	<div class="pure-form pure-g l-box">
+		<input type="text" id="shorten" name="shorten" class="pure-input pure-u-1" placeholder="http://example.com">
 	</div>
 </div>
 
 {{#url}}
-	<div class="post">
-		<div class="l-box">
-			Short URL: <a href="{{scheme}}://{{host}}/{{short}}">{{scheme}}://{{host}}/{{short}}</a><br>
-			<small>Original URL: <a href="{{url}}">{{url}}</a></small>
-		</div>
-	</div>
+<div class="post">
+	<h2>Short URL:</h2>
+	{{expand_link short}}
+</div>
 {{/url}}
 
 <div class="post">
-	<div class="pure-form pure-g">
-		<div class="pure-u-1-2">
-			<h2>Latest</h2>
-			{{^latest_urls}}
-				<p><i class="fa fa-large fa-exclamation-triangle"></i>Nothing to see here.</p>
-			{{/latest_urls}}
-			<ol>
-			{{#latest_urls}}
-				<li>
-					<a href="{{scheme}}://{{host}}/{{short}}">{{scheme}}://{{host}}/{{short}}</a>
-					<br>
-					<small>{{relative_date ctime}} &middot; {{url}}</small>
-				</li>
-			{{/latest_urls}}
-			</ol>
-		</div>
-		<div class="pure-u-1-2">
-			<h2>Most Visited</h2>
-			{{^top_urls}}
-				<p><i class="fa fa-large fa-exclamation-triangle"></i>Nothing to see here.</p>
-			{{/top_urls}}
-			<ol>
-			{{#top_urls}}
-				<li>
-					<a href="{{scheme}}://{{host}}/{{short}}">{{scheme}}://{{host}}/{{short}}</a>
-					<br>
-					<small>{{hits}} hits &middot; {{url}}</small>
-				</li>
-			{{/top_urls}}
-		</div>
-	</div>
+	<h2>URLs</h2>
+	{{datatable urls "hits short url source_ip ctime"}}
 </div>
