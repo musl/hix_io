@@ -130,10 +130,32 @@ HixIO.view_helpers = {
 
 		errors = this.errors.attr(property);
 		if(errors) {
-			// TODO: Turn this into a partial.
+			// TODO: Turn this into a partial or a block helper.
 			return '<span class="validation-error arrow_box">' + errors.join(' ') + '</span>';
 		}
 		return false;	
+	},
+
+	// TODO: I CAN HAS search & paginations?
+	datatable: function(data, columns) {
+		var cols, self, table;
+		
+		self = this;	
+		table = $('<table></table>');
+
+		cols = $.map(columns.split(/\s+/), function(col) {
+			return {
+				data: col,
+				title: col
+			};
+		});
+
+		table.dataTable({
+			data: data.posts,
+			columns: cols
+		});
+
+		return table;
 	}
 };
 

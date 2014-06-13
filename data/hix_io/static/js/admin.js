@@ -25,13 +25,21 @@ HixIO.DashControl = can.Control.extend({
 /*
  * Provide a list of posts or details on a single post.
  */
-HixIO.PostControl = can.Control.extend({}, {
+HixIO.PostControl = can.Control.extend({
+	defaults: {
+		view: 'admin/posts',
+	}
+}, {
 	'posts route': function(data) {
-		this.element.html(can.route.attr('route'));
-	},
+		var self;
+		
+		self = this;
 
-	'posts/:id route': function(data) {
-		this.element.html(can.route.attr('route'));
+		HixIO.Post.list().success(function(data) {
+			self.element.html(HixIO.view(self.options.view, {data: data}));
+		}).error(function(data) {
+			HixIO.notify('There was a problem fetching the posts.', 'error-message');
+		});
 	}
 });
 
@@ -194,7 +202,7 @@ HixIO.AuthControl = can.Control.extend({
 		this.credentials = new can.Map({});
 
 		/*
-		 * Don't bother fetching the user if a session doesn't exist.
+		 * Don't bother trying to fetch the user if a session doesn't exist.
 		 */
 		if($.cookie(this.options.session_key)) {
 			can.ajax({
