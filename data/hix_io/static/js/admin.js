@@ -28,6 +28,7 @@ HixIO.DashControl = can.Control.extend({
 HixIO.PostControl = can.Control.extend({
 	defaults: {
 		view: 'admin/posts',
+		detail: 'admin/post'
 	}
 }, {
 	init: function() {
@@ -39,9 +40,11 @@ HixIO.PostControl = can.Control.extend({
 		
 		self = this;
 
+		console.log(can.route, can.route.url({id: 3}));
+
 		HixIO.Post.list().success(function(data) {
 			can.each(data.posts, function(post,i) {
-				post.title = can.route.link(post.title, {id: post.id}, {}, false);
+				post.title = $('<a></a>').attr('href', '#!posts/' + post.id).html(post.title).prop('outerHTML');
 			});
 			self.element.html(HixIO.view(
 				self.options.view,
@@ -59,7 +62,7 @@ HixIO.PostControl = can.Control.extend({
 
 		HixIO.Post.findOne({ id: data.id }, function(post) {
 			self.element.html(HixIO.view(
-				self.options.detail_view,
+				self.options.detail,
 				{ post: post }
 			));
 		});
@@ -71,6 +74,10 @@ HixIO.PostControl = can.Control.extend({
  * A control for a shared photo timeline.
  */
 HixIO.PicsControl = can.Control.extend({}, {
+	init: function() {
+		can.route('pics/:id');
+	},
+
 	'pics route': function(data) {
 		this.element.html(can.route.attr('route'));
 	},

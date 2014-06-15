@@ -312,3 +312,7 @@ li i.fa {
 	margin: 0 0.25em 0 0 !important;
 }
 
+textarea {
+	height: 40em;
+}
+

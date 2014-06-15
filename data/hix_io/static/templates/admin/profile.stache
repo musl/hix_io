@@ -6,19 +6,19 @@
 			<div class="pure-control-group">
 				<label for="email">email</label>
 				<input type="email" id="email" can-value="user.email">
-				{{{validation_error 'email'}}}
+				{{validation_error 'email'}}
 			</div>
 		</fieldset>
 		<fieldset>
 			<div class="pure-control-group">
 				<label for="password">password</label>
 				<input type="password" id="password" can-value="user.password">
-				{{{validation_error 'password'}}}
+				{{validation_error 'password'}}
 			</div>
 			<div class="pure-control-group">
 				<label for="verify_password">verify password</label>
 				<input type="password" id="verify_password" can-value="user.verify_password">
-				{{{validation_error 'verify_password'}}}
+				{{validation_error 'verify_password'}}
 			</div>
 		</fieldset>
 		<fieldset>

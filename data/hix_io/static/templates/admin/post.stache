@@ -1,10 +1,22 @@
 <div class="post">
-	<form class="pure-form">
-		<legend>Edit Post #{{id}}</legend>
+	<form class="pure-form pure-form-aligned">
+		<legend><h2>Edit Post #{{post.id}}</h2></legend>
 		<fieldset>
 			<div class="pure-control-group">
-		<label for="title"></label>
-		<input id="title" name="title" can-value="title">
-		<label for="body"></label>
+				<label for="title">title</label>
+				<input id="title" name="title" can-value="post.title" class="pure-input-2-3">
+			</div>
+			<div class="pure-control-group">
+				<label for="body">body</label>
+				<textarea id="body" name="body" can-value="post.body" class="pure-input-2-3"></textarea>
+			</div>
+		</fieldset>
+		<fieldset>
+			<div class="pure-control-group">
+				<label></label>
+				<input type="submit" value="save" class="pure-button pure-button-primary">
+				&#124; <a href="admin#!posts">cancel</a>
+			</div>
+		</fieldset>
 	</form>
 </div>
