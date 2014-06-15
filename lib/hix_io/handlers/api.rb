@@ -52,6 +52,25 @@ class HixIO::API < Strelka::App
 		return res
 	end
 
+	put '/posts/:id' do |req|
+		req.params.add :title, :string
+		req.params.add :body, :string
+
+		post = HixIO::Post[req.params[:id]] || finish_with( HTTP::NOT_FOUND, '' )
+
+		res = req.response
+		res.for( :json ) { post.update( req.params ) }
+		return res
+	end
+
+	delete '/posts/:id' do |req|
+		post = HixIO::Post[req.params[:id]] || finish_with( HTTP::NOT_FOUND, '' )
+
+		res = req.response
+		res.for( :json ) { post.delete }
+		return res
+	end
+
 	get '/urls' do |req|
 		res = req.response
 		res.for( :json ) { HixIO::URL.all }

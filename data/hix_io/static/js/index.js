@@ -25,6 +25,9 @@ HixIO.PostControl = can.Control.extend({
 			on_change: function() { self.update(); },
 			target: '#posts_pager'
 		});
+
+		can.route('posts');
+		can.route('posts/:id');
 	},
 
 	update: function() {
@@ -72,6 +75,10 @@ HixIO.PicsControl = can.Control.extend({
 		view: 'pics'
 	}
 }, {
+	init: function() {
+		can.route('pics');
+	},
+
 	'pics route': function(data) {
 		this.element.html(HixIO.view(
 			this.options.view,
@@ -88,6 +95,10 @@ HixIO.URLControl = can.Control.extend({
 		view: 'urls'
 	}
 }, {
+	init: function() {
+		can.route('urls');
+	},
+
 	'urls route': function() {
 		var self;
 
@@ -97,8 +108,8 @@ HixIO.URLControl = can.Control.extend({
 			self.element.html(HixIO.view(
 				self.options.view,
 				{
-					scheme: HixIO.meta.scheme,
-					host: HixIO.meta.host,
+					scheme: HixIO.attr('meta').scheme,
+					host: HixIO.attr('meta').host,
 					top_urls: HixIO.URL.models(data.top_urls),
 					latest_urls: HixIO.URL.models(data.latest_urls),
 					url: self.url,
@@ -129,7 +140,5 @@ $(document).ready(function() {
 		},
 		default_route: 'posts'
 	});
-
-	HixIO.router.run();
 });
 

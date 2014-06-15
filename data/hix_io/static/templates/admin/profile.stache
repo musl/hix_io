@@ -1,31 +1,31 @@
 <div class="post">
 	<h2>Your Profile</h2>
-	<form id="profile-form" class="pure-form pure-form-aligned">
+	<div class="pure-form pure-form-aligned">
 		<legend>Change your details:</legend>
 		<fieldset>
 			<div class="pure-control-group">
 				<label for="email">email</label>
 				<input type="email" id="email" can-value="user.email">
-				{{validation_error 'email'}}
+				{{{validation_error 'email'}}}
 			</div>
 		</fieldset>
 		<fieldset>
 			<div class="pure-control-group">
 				<label for="password">password</label>
 				<input type="password" id="password" can-value="user.password">
-				{{validation_error 'password'}}
+				{{{validation_error 'password'}}}
 			</div>
 			<div class="pure-control-group">
 				<label for="verify_password">verify password</label>
 				<input type="password" id="verify_password" can-value="user.verify_password">
-				{{validation_error 'verify_password'}}
+				{{{validation_error 'verify_password'}}}
 			</div>
 		</fieldset>
 		<fieldset>
 			<div class="pure-control-group">
 				<label></label>
-				<input type="submit" class="pure-button pure-button-primary" value="save">
+				<input type="button" class="pure-button pure-button-primary" value="save" can-click="update_profile">
 			</div>
 		</fieldset>
-	</form>
+	</div>
 </div>

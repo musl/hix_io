@@ -7,8 +7,10 @@
  ******************************************************************************/
 
 var HixIO = new can.Map({
+	meta: {},
 	template_path: '/static/templates/',
-	template_suffix: '.stache'
+	template_suffix: '.stache',
+	user: null
 });
 
 /******************************************************************************
@@ -120,7 +122,7 @@ HixIO.view_helpers = {
 
 		console.log('expand_link(' + path + ', ' + html + ');');
 
-		url = HixIO.meta.scheme + '://' + HixIO.meta.host + '/' + path;
+		url = HixIO.attr('meta').scheme + '://' + HixIO.attr('meta').host + '/' + path;
 		if(typeof html !== 'string' ) { html = url; }
 
 		return $('<a></a>').attr('href', url).html(html);
@@ -202,7 +204,9 @@ HixIO.sha512 = function(message) {
  */
 HixIO.Post = can.Model.extend({
 	list: HixIO.ajax('/api/v1/posts'),
-	findOne: 'GET /api/v1/posts/{id}'
+	findOne: 'GET /api/v1/posts/{id}',
+	update: 'PUT /api/v1/posts/{id}',
+	destroy: 'DELETE /api/v1/posts/{id}'
 }, {});
 
 /*
@@ -606,6 +610,8 @@ HixIO.MessageBar = can.Control.extend({
  *         The route to use if no hash is present in the current location.
  *     
  */
+
+// FIXME: This router breaks can.route.link and friends. Figure out why.
 HixIO.Router = can.Control.extend({},{
 	init: function(element, options) {
 		var self;
@@ -613,24 +619,21 @@ HixIO.Router = can.Control.extend({},{
 		self = this;
 		this.controls = {};
 
+
 		can.each(this.options.routes, function(Control,name) {
 			self.controls[name] = new Control(self.element);
 		});
 
-		HixIO.delegate('redirect', this);
-	},
-
-	run: function() {
-		var route, self;
-
-		self = this;
 		can.route.ready();
 
 		this.redirect(can.route.attr('route'));
 
 		can.route.bind('route', function(event, new_value, old_value) {
+			console.log('route changed!');
 			self.redirect(new_value);
 		});
+
+		HixIO.delegate('redirect', this);
 	},
 
 	redirect: function(route) {
@@ -638,15 +641,24 @@ HixIO.Router = can.Control.extend({},{
 
 		self = this;
 
+		console.log('redirect called with: ' + route);
+
 		if(!route || route === '') {
+			console.log('Null or empty route!');
 			route = this.options.default_route;
 		}
 
 		if(this.options.auth_control) {
+			console.log('Auth redirect!');
 			route = this.options.auth_control.check(route);
 		}
 
+		if(route === can.route.attr('route')) { return; }
+
+		console.log(can.route.attr('route') + ' -> ' + route);
+
 		can.route.attr('route', route);
+		console.log(can.route.attr());
 	}
 });
 

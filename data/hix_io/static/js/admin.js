@@ -11,6 +11,10 @@ HixIO.DashControl = can.Control.extend({
 		view: 'admin/dash'
 	}
 }, {
+	init: function() {
+		can.route('dash');
+	},
+
 	'dash route': function(data) {
 		var self;
 
@@ -28,10 +32,11 @@ HixIO.DashControl = can.Control.extend({
 HixIO.PostControl = can.Control.extend({
 	defaults: {
 		view: 'admin/posts',
-		detail: 'admin/post'
+		detail: 'admin/post',
 	}
 }, {
 	init: function() {
+		can.route('posts');
 		can.route('posts/:id');
 	},
 
@@ -39,8 +44,6 @@ HixIO.PostControl = can.Control.extend({
 		var self;
 		
 		self = this;
-
-		console.log(can.route, can.route.url({id: 3}));
 
 		HixIO.Post.list().success(function(data) {
 			can.each(data.posts, function(post,i) {
@@ -63,8 +66,36 @@ HixIO.PostControl = can.Control.extend({
 		HixIO.Post.findOne({ id: data.id }, function(post) {
 			self.element.html(HixIO.view(
 				self.options.detail,
-				{ post: post }
+				{
+					post: post,
+					update_post: self.update_post,
+					destroy_post: self.destroy_post
+				}
 			));
+		});
+	},
+
+	update_post: function(context, event, element) {
+		var post;
+
+		post = context.post;
+		post.save(function(data) {		
+			HixIO.redirect('posts');
+			HixIO.notify('Post #' + post.id + ' saved.', 'success-message');
+		}, function(data) {
+			HixIO.notify("Woops. I couldn\'t save post id #" + post.id + ".", 'error-message');
+		});
+	},
+
+	destroy_post: function(context, event, element) {
+		var post;
+
+		post = context.post;
+		post.destroy(function(data) {
+			HixIO.redirect('posts');
+			HixIO.notify('Post #' + post.id + ' destroyed.', 'success-message');
+		}, function(data) {
+			HixIO.notify("Woops. I couldn\'t destroy post id #" + post.id + ".", 'error-message');
 		});
 	}
 
@@ -75,6 +106,7 @@ HixIO.PostControl = can.Control.extend({
  */
 HixIO.PicsControl = can.Control.extend({}, {
 	init: function() {
+		can.route('pics');
 		can.route('pics/:id');
 	},
 
@@ -93,23 +125,16 @@ HixIO.PicsControl = can.Control.extend({}, {
 HixIO.ProfileControl = can.Control.extend({
 	defaults: {
 		view: 'admin/profile',
-		form: '#profile-form'
 	}
 }, {
 	init: function(element, options) {
 		this.user = new HixIO.User();
 		this.errors = new can.Map({});
+
+		can.route('profile');
 	},
 
-	validate: function() {
-		this.errors.attr(this.user.errors(), true);
-
-		if(!this.user.errors()) {
-			this.element.find(':submit').removeAttr('disabled');
-		} else {
-			this.element.find(':submit').attr('disabled', 'disabled');
-		}
-	},
+	validate: function() { this.errors.attr(this.user.errors(), true); },
 
 	'profile route': function(data) {
 		var self;
@@ -122,18 +147,17 @@ HixIO.ProfileControl = can.Control.extend({
 
 		this.element.html(HixIO.view(this.options.view, {
 			user: this.user,
-			errors: this.errors
+			errors: this.errors,
+			update_profile: self.update_profile
 		}));
 
 		this.element.find(':submit').attr('disabled', 'disabled');
 	},
 
-	'{form} submit': function(element, event) {
+	update_profile: function(context, element, event) {
 		var user;
-		event.preventDefault();
 
 		if(!this.user.errors()) {
-			this.element.find(':submit').attr('disabled', 'disabled');
 			user = HixIO.attr('user');
 
 			user.attr(this.user.attr());
@@ -160,6 +184,10 @@ HixIO.URLControl = can.Control.extend({
 		field: '#shorten'
 	}
 }, {
+	init: function() {
+		can.route('urls');
+	},
+
 	update: function() {
 		var self;
 
@@ -180,6 +208,7 @@ HixIO.URLControl = can.Control.extend({
 		this.update();
 	},
 
+	//TODO: convert this to a can-event attribute.
 	'{field} keyup': function(element, event) {
 		var self;
 	   
@@ -220,7 +249,6 @@ HixIO.URLControl = can.Control.extend({
 HixIO.AuthControl = can.Control.extend({
 	defaults: {
 		view: 'admin/sign_in',
-		form: '#sign-in-form',
 	}
 },{
 	init: function(element, options) {
@@ -243,6 +271,9 @@ HixIO.AuthControl = can.Control.extend({
 				HixIO.attr('user', HixIO.User.model(data));	
 			});
 		}
+
+		can.route('sign-in');
+		can.route('sign-out');
 	},
 
 	check: function(route) {
@@ -296,18 +327,14 @@ HixIO.AuthControl = can.Control.extend({
 	'sign-in route': function(data) {
 		this.element.html(HixIO.view(this.options.view, {
 			credentials: this.credentials,
-			redirect: this.redirect
+			redirect: this.redirect,
+			sign_in: this.sign_in
 		}));
 	},
 
 	'sign-out route': function(data) {
 		this.sign_out();
 	},
-
-	'{form} submit': function(element, event) {
-		event.preventDefault();
-		this.sign_in();
-	}
 
 });
 
@@ -336,7 +363,5 @@ $(document).ready(function() {
 			session_key: 'hix_io_session'
 		})
 	});
-
-	HixIO.router.run();
 });
 

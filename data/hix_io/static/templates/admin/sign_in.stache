@@ -1,6 +1,6 @@
 <div class="post">
 	<h2>Sign In</h2>
-	<form id="sign-in-form" class="pure-form pure-form-aligned">
+	<div class="pure-form pure-form-aligned">
 		<fieldset>
 			<div class="pure-control-group">
 				<label for="email">email:</label>
@@ -8,18 +8,18 @@
 			</div>
 			<div class="pure-control-group">
 				<label for="password">password:</label>
-				<input type="password" id="password" placeholder="***" can-value="credentials.password">
+				<input type="password" id="password" placeholder="***" can-value="credentials.password" can-enter="sign_in">
 			</div>
 		</fieldset>
 		<fieldset>
 			<div class="pure-control-group">
 				<label></label>
 				{{#if redirect}}
-				<input type="submit" class="pure-button pure-button-primary" value="take me to my {{redirect}}">
+				<input type="button" class="pure-button pure-button-primary" value="take me to my {{redirect}}" can-click="sign_in">
 				{{else}}
-				<input type="submit" class="pure-button pure-button-primary" value="sign in">
+				<input type="button" class="pure-button pure-button-primary" value="sign in" can-click="sign_in">
 				{{/if}}
 			</div>
 		</fieldset>
-	</form>
+	</div>
 </div>

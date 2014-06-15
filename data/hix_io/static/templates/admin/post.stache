@@ -1,5 +1,5 @@
 <div class="post">
-	<form class="pure-form pure-form-aligned">
+	<div class="pure-form pure-form-aligned">
 		<legend><h2>Edit Post #{{post.id}}</h2></legend>
 		<fieldset>
 			<div class="pure-control-group">
@@ -13,10 +13,11 @@
 		</fieldset>
 		<fieldset>
 			<div class="pure-control-group">
-				<label></label>
-				<input type="submit" value="save" class="pure-button pure-button-primary">
-				&#124; <a href="admin#!posts">cancel</a>
+				<label></label>		
+				<input type="button" value="save" class="pure-button pure-button-primary" can-click="update_post">
+				&nbsp;&#124;&nbsp;
+				<input type="button" value="delete" class="pure-button button-error" can-click="destroy_post">
 			</div>
 		</fieldset>
-	</form>
+	</div>
 </div>
