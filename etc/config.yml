@@ -6,7 +6,7 @@ hix_io:
     log_sql: false
 
 mongrel2:
-    configdb: 'etc/hixio.sqlite'
+    configdb: 'etc/hix_io.sqlite'
 
 sessions:
     session_class: 'db'
