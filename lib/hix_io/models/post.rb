@@ -25,7 +25,7 @@ class HixIO::Post < Sequel::Model( :hix_io__posts )
 		#   Passed to the limit SQL clause.
 		#
 		def published( params = {} )
-			set = self.where( :published => true ).order( :mtime )
+			set = self.where( :published => true ).order( :mtime ).reverse
 			set = set.offset( params[:offset] ) unless params[:offset].nil?
 			set = set.limit( params[:limit] ) unless params[:limit].nil?
 

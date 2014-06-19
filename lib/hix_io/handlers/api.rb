@@ -57,9 +57,11 @@ class HixIO::API < Strelka::App
 		req.params.add :body, :string
 
 		post = HixIO::Post[req.params[:id]] || finish_with( HTTP::NOT_FOUND, '' )
-
 		res = req.response
-		res.for( :json ) { post.update( req.params ) }
+		res.for( :json ) { post.update(
+			:title => req.params[:title],
+			:body => req.params[:body]
+		) }
 		return res
 	end
 
