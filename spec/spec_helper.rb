@@ -41,6 +41,6 @@ end
 
 RSpec.configure do |config|
   config.formatter = :documentation # :progress, :html, :textmate
-  config.color_enabled = true
+  config.color = true
 end
 

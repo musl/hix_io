@@ -52,18 +52,18 @@ begin
 		s.required_ruby_version = '>= 2.0.0'
 		s.executables           = %w[hix_io_configure hix_io_migrate hix_io_run]
 
-		s.add_dependency 'strelka', '~> 0.8'
+		s.add_dependency 'strelka', '~> 0.9'
 		s.add_dependency 'inversion', '~> 0.12'
-		s.add_dependency 'sequel', '~> 4.7'
+		s.add_dependency 'sequel', '~> 4.11'
 		s.add_dependency 'pg', '~> 1.17'
-		s.add_dependency 'loggability', '~> 0.10'
+		s.add_dependency 'loggability', '~> 0.11'
 		s.add_dependency 'trollop', '~> 2.0'
 
-		s.add_development_dependency 'pry', '~> 0.9'
+		s.add_development_dependency 'pry', '~> 0.10'
 		s.add_development_dependency 'rdoc', '>= 4.1'
 		s.add_development_dependency 'rdoc-generator-fivefish', '>= 0.1'
-		s.add_development_dependency 'rspec', '~> 2.14'
-		s.add_development_dependency 'ruby-prof', '~> 0.14'
+		s.add_development_dependency 'rspec', '~> 3.0'
+		s.add_development_dependency 'ruby-prof', '~> 0.15'
 		s.add_development_dependency 'simplecov', '~> 0.8'
 	end
 

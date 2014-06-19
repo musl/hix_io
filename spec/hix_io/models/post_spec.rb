@@ -42,7 +42,7 @@ describe( HixIO::Post ) do
 		end
 
 		it 'quickly find a published post' do
-			expect( subject.detail( published.id ).first.published ).to be_true
+			expect( subject.detail( published.id ).first.published ).to eq( true )
 		end
 
 		it 'quickly find all published posts' do

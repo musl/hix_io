@@ -25,4 +25,4 @@ logging:
     hix_io: 'debug (color)'
     loggability: 'warn (color)'
     configurability: 'warn (color)'
-    strelka: 'fatal (color)'
+    strelka: 'debug (color)'

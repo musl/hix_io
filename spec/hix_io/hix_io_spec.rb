@@ -15,7 +15,7 @@ describe( HixIO ) do
 	end
 
 	it 'loads at least one model' do
-		expect( subject.models.values ).to have_at_least( 1 ).things
+		expect( subject.models.values.length ).to be > 1
 	end
 
 	it 'propigates the database handle to all loaded models' do

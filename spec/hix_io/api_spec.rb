@@ -74,7 +74,7 @@ describe( HixIO::API ) do
 		end
 
 		it 'provides lists of top and latest shortened URLs' do
-			req = factory.get( '/urls' )
+			req = factory.get( '/urls/summary' )
 
 			res = subject.handle( req )
 			res.body.rewind
