@@ -60,7 +60,7 @@ describe( Strelka::AuthProvider::HixIO ) do
 	end
 
 	it 'should authorize all requests' do
-		expect( subject.authorize( nil, req, nil ) ).to be_true
+		expect( subject.authorize( nil, req, nil ) ).to be( true )
 	end
 
 end

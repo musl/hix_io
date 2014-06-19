@@ -25,6 +25,7 @@ describe( HixIO::Photo ) do
 
 		it 'must be well tested' do
 			pending 'tests'
+			fail
 		end
 
 	end
@@ -36,6 +37,7 @@ describe( HixIO::Photo ) do
 
 		it 'must be well tested' do
 			pending 'tests'
+			fail
 		end
 
 	end

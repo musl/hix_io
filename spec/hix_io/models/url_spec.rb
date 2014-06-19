@@ -35,11 +35,11 @@ describe( HixIO::URL ) do
 		end
 
 		it 'quickly find the top URLs' do
-			expect( urls.top.all ).to have( 10 ).things
+			expect( urls.top.all.length ).to eq( 10 )
 		end
 
 		it 'quickly find the latest URLs' do
-			expect( urls.latest.all ).to have( 10 ).things
+			expect( urls.latest.all.length ).to eq( 10 )
 		end
 
 	end

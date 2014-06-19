@@ -47,12 +47,12 @@ describe( HixIO::Post ) do
 
 		it 'quickly find all published posts' do
 			subject.published.each do |p|
-				expect( p.published ).to be_true
+				expect( p.published ).to eq( true )
 			end
 		end
 
 		it 'provide a functioning full-text search' do
-			expect( subject.search( :q => 'rspec' ).first.published ).to be_true
+			expect( subject.search( :q => 'rspec' ).first.published ).to eq( true )
 		end
 
 	end
