@@ -264,7 +264,9 @@ HixIO.AuthControl = can.Control.extend({
 				HixIO.attr('user', HixIO.User.model(data));	
 			});
 		}
-
+		
+		can.route('sign-in');
+		can.route('sign-out');
 	},
 
 	check: function(route) {

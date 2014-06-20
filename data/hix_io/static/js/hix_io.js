@@ -603,7 +603,11 @@ HixIO.MessageBar = can.Control.extend({
  */
 
 // FIXME: This router breaks can.route.link and friends. Figure out why.
-HixIO.Router = can.Control.extend({}, {
+HixIO.Router = can.Control.extend({
+	defaults: {
+		
+	}
+}, {
 
 	init: function(element, options) {
 		can.route(':control');
@@ -621,18 +625,24 @@ HixIO.Router = can.Control.extend({}, {
 
 		if(this.options.auth_control) {
 			route = this.options.auth_control.check(route);
+			can.route.attr('route', route);
+			return;
 		}
 
-		if(this.control) { this.control.destroy(); }
+		if(this.control) {
+			this.control.destroy();
+			this.element.empty();
+		}
 
 		if(this.options.routes[route]) {
+			console.log('building control');
 			Control = this.options.routes[route];
 			this.control = new Control(this.element); 
-		} else {
-			// FIXME: This gives some wierd behavior.
-			console.log('unknown route');
 		}
 
+		// FIXME: How do we redirect if the route isn't defined?
+
+		console.log('routing: ' + route );
 		this.route = route;
 		can.route.attr('route', this.route);
 	},
