@@ -9,14 +9,13 @@ Sequel.migration do
 
 			String      :email, :size => 255
 
+			String      :name, :size => 255
+
 			# Form Auth, SHA512 hashed user supplied string
 			String      :password, :null => false, :size => 128
 
 			# API Auth, SHA512 hashed random bytes
 			String      :api_secret, :null => false, :size => 128
-
-			json        :perms, :null => false, :default => "'{}'::json".lit
-			json        :attributes, :null => false, :default => "'{}'::json".lit
 
 			timestamptz :disable_on, :default => nil
 

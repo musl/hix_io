@@ -44,11 +44,6 @@ class HixIO::User < Sequel::Model( :hix_io__users )
 	### I N S T A N C E   M E T H O D S
 	########################################################################
 
-	# Validate the given URL.
-	#
-	def valid_user?
-	end
-
 	# Prevent secrets from being sent with user data.
 	#
 	def to_json( *a ) #:nodoc:

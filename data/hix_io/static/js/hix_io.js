@@ -228,6 +228,13 @@ HixIO.User = can.Model.extend({
 			}
 		});
 
+		this.validate('name', function(value) {
+			// TODO: name availability checking.
+			if(!value || value.length < 3) {
+				return 'Please enter a name.';
+			}
+		});
+
 		this.validate('password', function(value) {
 			if(!value || value.length < 1) {
 				return 'Please enter a password.';

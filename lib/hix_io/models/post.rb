@@ -28,6 +28,7 @@ class HixIO::Post < Sequel::Model( :hix_io__posts )
 			set = self.where( :published => true ).order( :mtime ).reverse
 			set = set.offset( params[:offset] ) unless params[:offset].nil?
 			set = set.limit( params[:limit] ) unless params[:limit].nil?
+			set = set.eager( :user )
 
 			return set
 		end
@@ -35,7 +36,7 @@ class HixIO::Post < Sequel::Model( :hix_io__posts )
 		# Fetch a published post with the given +id+.
 		#
 		def detail( id )
-			return self.where( :id => id, :published => true )
+			return self.where( :id => id, :published => true ).eager( :user )
 		end
 
 		# Perform a full-text search with a limited number of terms.

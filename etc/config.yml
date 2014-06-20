@@ -3,7 +3,6 @@ hix_io:
     host: 'localhost'
     db_uri: 'postgres://hix_io@localhost/hix_io_dev'
     dev: true
-    log_sql: false
 
 mongrel2:
     configdb: 'etc/hix_io.sqlite'

@@ -7,7 +7,7 @@ class HixIO::PhotoSet < Sequel::Model( :hix_io__photo_sets )
 	plugin :validation_helpers
 	plugin :json_serializer
 
-	many_to_one :user, :eager => [:user]
+	many_to_one :user
 	one_to_many :photos
 
 	########################################################################

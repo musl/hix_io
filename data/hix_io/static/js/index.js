@@ -37,6 +37,7 @@ HixIO.PostControl = can.Control.extend({
 		params = this.pager.params();
 
 		HixIO.Post.list(params).success(function(data) {
+			window.post_data = data;
 			self.element.html(HixIO.view(
 				self.options.list_view,
 				{ posts: HixIO.Post.models(data.posts) }

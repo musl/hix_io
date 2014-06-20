@@ -11,6 +11,13 @@
 		</fieldset>
 		<fieldset>
 			<div class="pure-control-group">
+				<label for="email">name</label>
+				<input type="email" id="email" can-value="user.name">
+				{{{validation_error 'email'}}}
+			</div>
+		</fieldset>
+		<fieldset>
+			<div class="pure-control-group">
 				<label for="password">password</label>
 				<input type="password" id="password" can-value="user.password">
 				{{{validation_error 'password'}}}
