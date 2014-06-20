@@ -12,7 +12,6 @@ HixIO.DashControl = can.Control.extend({
 	}
 }, {
 	init: function() {
-		can.route('dash');
 	},
 
 	'dash route': function(data) {
@@ -36,8 +35,6 @@ HixIO.PostControl = can.Control.extend({
 	}
 }, {
 	init: function() {
-		can.route('posts');
-		can.route('posts/:id');
 	},
 
 	'posts route': function(data) {
@@ -106,8 +103,6 @@ HixIO.PostControl = can.Control.extend({
  */
 HixIO.PicsControl = can.Control.extend({}, {
 	init: function() {
-		can.route('pics');
-		can.route('pics/:id');
 	},
 
 	'pics route': function(data) {
@@ -131,7 +126,6 @@ HixIO.ProfileControl = can.Control.extend({
 		this.user = new HixIO.User();
 		this.errors = new can.Map({});
 
-		can.route('profile');
 	},
 
 	validate: function() { this.errors.attr(this.user.errors(), true); },
@@ -185,7 +179,6 @@ HixIO.URLControl = can.Control.extend({
 	}
 }, {
 	init: function() {
-		can.route('urls');
 	},
 
 	update: function() {
@@ -272,8 +265,6 @@ HixIO.AuthControl = can.Control.extend({
 			});
 		}
 
-		can.route('sign-in');
-		can.route('sign-out');
 	},
 
 	check: function(route) {
@@ -356,7 +347,7 @@ $(document).ready(function() {
 			pics: HixIO.PicsControl,
 			posts: HixIO.PostControl,
 			profile: HixIO.ProfileControl,
-			urls: HixIO.URLControl
+			urls: HixIO.URLControl,
 		},
 		default_route: 'dash',
 		auth_control: new HixIO.AuthControl('#main', {

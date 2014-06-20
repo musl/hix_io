@@ -1,4 +1,4 @@
-/* vim: set nosta noet ts=4 sw=4 ft=javascript: */
+ /* vim: set nosta noet ts=4 sw=4 ft=javascript: */
 
 'use strict';
 
@@ -26,8 +26,6 @@ HixIO.PostControl = can.Control.extend({
 			target: '#posts_pager'
 		});
 
-		can.route('posts');
-		can.route('posts/:id');
 	},
 
 	update: function() {
@@ -77,7 +75,6 @@ HixIO.PicsControl = can.Control.extend({
 	}
 }, {
 	init: function() {
-		can.route('pics');
 	},
 
 	'pics route': function(data) {
@@ -97,7 +94,6 @@ HixIO.URLControl = can.Control.extend({
 	}
 }, {
 	init: function() {
-		can.route('urls');
 	},
 
 	'urls route': function() {

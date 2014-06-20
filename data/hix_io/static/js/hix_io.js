@@ -143,7 +143,7 @@ HixIO.view_helpers = {
 
 		errors = this.errors.attr(property);
 		if(errors) {
-			// TODO: Turn this into a partial or a block helper.
+			// TODO: Turn this into a block helper.
 			return $('<span></span>').addClass("validation-error arrow_box").html(errors.join(' '));
 		}
 		return false;	
@@ -603,53 +603,46 @@ HixIO.MessageBar = can.Control.extend({
  */
 
 // FIXME: This router breaks can.route.link and friends. Figure out why.
-HixIO.Router = can.Control.extend({},{
+HixIO.Router = can.Control.extend({}, {
+
 	init: function(element, options) {
-		var self;
-
-		self = this;
-		this.controls = {};
-
-
-		can.each(this.options.routes, function(Control,name) {
-			self.controls[name] = new Control(self.element);
-		});
-
+		can.route(':control');
 		can.route.ready();
-
-		this.redirect(can.route.attr('route'));
-
-		can.route.bind('route', function(event, new_value, old_value) {
-			console.log('route changed!');
-			self.redirect(new_value);
-		});
 
 		HixIO.delegate('redirect', this);
 	},
 
 	redirect: function(route) {
-		var self;
+		var Control;
 
-		self = this;
+		if(this.route === route) { return; }
 
-		console.log('redirect called with: ' + route);
-
-		if(!route || route === '') {
-			console.log('Null or empty route!');
-			route = this.options.default_route;
-		}
+		if(!route || route === '') { route = this.options.default_route; }
 
 		if(this.options.auth_control) {
-			console.log('Auth redirect!');
 			route = this.options.auth_control.check(route);
 		}
 
-		if(route === can.route.attr('route')) { return; }
+		if(this.control) { this.control.destroy(); }
 
-		console.log(can.route.attr('route') + ' -> ' + route);
+		if(this.options.routes[route]) {
+			Control = this.options.routes[route];
+			this.control = new Control(this.element); 
+		} else {
+			// FIXME: This gives some wierd behavior.
+			console.log('unknown route');
+		}
 
-		can.route.attr('route', route);
-		console.log(can.route.attr());
+		this.route = route;
+		can.route.attr('route', this.route);
+	},
+
+	route: function() {
+		if(!can.route.attr('route')) { this.redirect(); }
+	},
+
+	':control route': function(route) {
+		this.redirect(route.control);
 	}
 });
 
