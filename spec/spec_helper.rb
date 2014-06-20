@@ -39,6 +39,14 @@ def prep_db!
 	return nil
 end
 
+def find_a_user
+	HixIO::User.find_or_create( :email => 'a@b.c' ) do |user|
+		user.name = "Penelope Pentalobe"
+		user.password = Digest::SHA512.hexdigest( 'test' )
+		user.disable_on = Time.now() + 86400
+	end
+end
+
 RSpec.configure do |config|
   config.formatter = :documentation # :progress, :html, :textmate
   config.color = true

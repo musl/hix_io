@@ -13,16 +13,13 @@ describe( HixIO::Auth ) do
 		Strelka::App::Auth.configure( HixIO.global_config.auth )
 	end
 
+	after( :all ) { prep_db! }
+
 	let( :factory ) do
 		Mongrel2::RequestFactory.new( :route => '/' )
 	end
 
-	let( :user ) do
-		HixIO::User.find_or_create( :email => 'test@example.com' ) do |user|
-			user.password = Digest::SHA512.hexdigest( 'test' )
-			user.disable_on = Time.now() + 86400
-		end
-	end
+	let( :user ) { find_a_user }
 
 	subject do
 		described_class.new( *TEST_APP_PARAMS )

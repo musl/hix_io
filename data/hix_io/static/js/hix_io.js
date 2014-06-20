@@ -222,25 +222,9 @@ HixIO.URL = can.Model.extend({
  */
 HixIO.User = can.Model.extend({
 	init: function() {
-		this.validate('email', function(value) {
-			if(!value || value.length < 3) {
-				return 'Please enter your email address.';
-			}
-		});
-
-		this.validate('name', function(value) {
-			// TODO: name availability checking.
-			if(!value || value.length < 3) {
-				return 'Please enter a name.';
-			}
-		});
-
-		this.validate('password', function(value) {
-			if(!value || value.length < 1) {
-				return 'Please enter a password.';
-			}
-		});
-
+		this.validateLengthOf('email', 3, 255, {message: 'Please enter your address.'});
+		this.validatePresenceOf('name', {message: 'Please enter your name.'});
+		this.validatePresenceOf('password', {message: 'Please enter a password.'});
 		this.validate('verify_password', function(value) {
 			if(value !== this.attr('password')) {
 				return 'Those passwords do not match.';

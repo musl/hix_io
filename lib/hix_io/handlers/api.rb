@@ -38,17 +38,26 @@ class HixIO::API < Strelka::App
 		req.params.add :offset, :integer
 		req.params.add :limit, :integer
 
+		count = HixIO::Post.published.count
+		posts = HixIO::Post.published( req.params ).all.map do |post|
+			hash = post.to_hash
+			hash[:user] = post.user
+			hash
+		end
+
 		res = req.response
-		res.for( :json ) {{
-			:count => HixIO::Post.published.count,
-			:posts => HixIO::Post.published( req.params ).all,
-		}}
+		res.for( :json ) {{ :count => count, :posts => posts }}
 		return res
 	end
 
 	get '/posts/:id' do |req|
+		post =  HixIO::Post.detail( req.params[:id] ).first
+		user = post.user
+	    post = post.to_hash
+		post[:user] = user
+
 		res = req.response
-		res.for( :json ) { HixIO::Post.detail( req.params[:id] ).first }
+		res.for( :json ) { post }
 		return res
 	end
 
@@ -57,11 +66,18 @@ class HixIO::API < Strelka::App
 		req.params.add :body, :string
 
 		post = HixIO::Post[req.params[:id]] || finish_with( HTTP::NOT_FOUND, '' )
+
 		res = req.response
-		res.for( :json ) { post.update(
-			:title => req.params[:title],
-			:body => req.params[:body]
-		) }
+		res.for( :json ) do
+			begin
+				post.update(
+					:title => req.params[:title],
+					:body => req.params[:body]
+				)
+			rescue Sequel::ValidationFailed => e
+				finish_with( HTTP::UNPROCESSABLE_ENTITY, e )
+			end
+		end
 		return res
 	end
 
@@ -122,21 +138,23 @@ class HixIO::API < Strelka::App
 
 	put '/users/:id' do |req|
 		req.params.add :email
+		req.params.add :name, :string
 		req.params.add :password, :sha512sum
 
-		user = HixIO::User[req.params[:id]]
-		finish_with( HTTP::NOT_FOUND, '' ) if user.nil?
-
-		begin
-			user.email = req.params[:email]
-			user.password = req.params[:password]
-			user.save
-		rescue Sequel::ValidationFailed
-			finish_with( HTTP::CONFLICT, user.errors.to_json )
-		end
+		user = HixIO::User[req.params[:id]] || finish_with( HTTP::NOT_FOUND, '' )
 
 		res = req.response
-		res.for( :json ) { 'User updated.' }
+		res.for( :json ) do
+			begin
+				user.update({
+					:email => req.params[:email],
+					:name => req.params[:name],
+					:password => req.params[:password],
+				})
+			rescue Sequel::ValidationFailed => e
+				finish_with( HTTP::UNPROCESSABLE_ENTITY, e )
+			end
+		end
 		return res
 	end
 

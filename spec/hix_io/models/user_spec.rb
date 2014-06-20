@@ -10,6 +10,7 @@ describe( HixIO::User ) do
 
 	before( :all ) { prep_db! }
 	after( :each ) { described_class.dataset.delete }
+	after( :all ) { prep_db! }
 
 	context 'dataset methods' do
 

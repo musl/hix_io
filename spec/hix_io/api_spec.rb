@@ -8,6 +8,7 @@ require 'hix_io/handlers/api'
 describe( HixIO::API ) do
 
 	before( :all ) { prep_db! }
+	after( :all ) { prep_db! }
 
 	subject do
 		described_class.new( *TEST_APP_PARAMS )
@@ -17,12 +18,7 @@ describe( HixIO::API ) do
 		Mongrel2::RequestFactory.new( :route => '/' )
 	end
 
-	let( :user ) do
-		HixIO::User.find_or_create( :email => 'test@example.com' ) do |user|
-			user.password = Digest::SHA512.hexdigest( 'test' )
-			user.disable_on = Time.now() + 86400
-		end
-	end
+	let( :user ) { find_a_user }
 
 	let( :post ) do
 		user.add_post({

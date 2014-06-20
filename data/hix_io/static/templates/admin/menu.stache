@@ -10,7 +10,7 @@
 			<li><a href="#!urls"><i class="fa fa-link fa-large fa-fw"></i>urls</a></li>
 		</ul>
 		{{#current_user}}
-		<a class="pure-menu-heading">{{email}}</a>
+		<a class="pure-menu-heading">{{name}}</a>
 		<ul>
 			<li><a href="#!sign-out"><i class="fa fa-sign-out fa-large fa-fw"></i>sign out</a></li>
 		</ul>

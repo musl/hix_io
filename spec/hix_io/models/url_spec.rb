@@ -10,13 +10,9 @@ describe( HixIO::URL ) do
 
 	before( :all ) { prep_db! }
 	after( :each ) { described_class.dataset.delete }
+	after( :all ) { prep_db! }
 
-	let( :user ) do
-		HixIO::User.find_or_create( :email => 'test@example.com' ) do |user|
-			user.password = Digest::SHA512.hexdigest( 'test' )
-			user.disable_on = Time.now() + 86400
-		end
-	end
+	let( :user ) { find_a_user }
 
 	context 'dataset methods' do
 

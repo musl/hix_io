@@ -246,6 +246,7 @@ HixIO.load_config( config )
 HixIO.log.level = :fatal
 
 user = HixIO::User.find_or_create( :email => 'a@b.c' ) do |user|
+			user.name = 'Penelope Pentalobe'
 			user.password = Digest::SHA512.hexdigest( 'a' )
 			user.disable_on = Time.now() + 86400
 		end
