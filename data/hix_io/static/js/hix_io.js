@@ -603,56 +603,68 @@ HixIO.MessageBar = can.Control.extend({
  */
 
 // FIXME: This router breaks can.route.link and friends. Figure out why.
-HixIO.Router = can.Control.extend({
-	defaults: {
-		
-	}
-}, {
+HixIO.Router = can.Control.extend({}, {
 
 	init: function(element, options) {
-		can.route(':control');
-		can.route.ready();
+		var self;
+
+		self = this;
 
 		HixIO.delegate('redirect', this);
+
+		can.route(':control');
+
+		if(self.options.auth_control) {
+			can.route.bind('route', function(event, new_value, old_value) {
+				var route;
+
+				route = self.options.auth_control.check(new_value);
+				if(route !== new_value) {
+					console.log('auth required, redirect');
+					can.route.attr('route', route);
+				}
+			});
+		}
+
+		can.route.bind('control', function(event, new_value, old_value) {
+			var Control;
+
+			console.log(new_value, old_value);
+
+			// FIXME We don't need to tear down the control if it really hasn't changed. Where does the control get set to undefined?
+			if(!new_value) { return; }
+
+			Control = self.options.routes[new_value];
+
+			if(!Control) {
+				console.log('control not found');
+				can.route.attr('control', self.options.default_route);
+				return;
+			}
+
+			if(Control) {
+				if(self.control) {
+					console.log('destroying control');
+					self.control.destroy();
+					self.element.empty();
+				}
+				console.log('creating control');
+				self.control = new Control(self.element);
+				can.route.attr('route', new_value);
+			}
+
+		});
+
+		can.route.ready();
 	},
 
 	redirect: function(route) {
-		var Control;
-
-		if(this.route === route) { return; }
-
-		if(!route || route === '') { route = this.options.default_route; }
-
-		if(this.options.auth_control) {
-			route = this.options.auth_control.check(route);
-			can.route.attr('route', route);
-			return;
-		}
-
-		if(this.control) {
-			this.control.destroy();
-			this.element.empty();
-		}
-
-		if(this.options.routes[route]) {
-			console.log('building control');
-			Control = this.options.routes[route];
-			this.control = new Control(this.element); 
-		}
-
-		// FIXME: How do we redirect if the route isn't defined?
-
-		console.log('routing: ' + route );
-		this.route = route;
-		can.route.attr('route', this.route);
+		can.route.attr('control', route);
 	},
 
 	route: function() {
-		if(!can.route.attr('route')) { this.redirect(); }
-	},
-
-	':control route': function(route) {
-		this.redirect(route.control);
+		can.route.attr('control', this.options.default_route);
 	}
+
 });
 
