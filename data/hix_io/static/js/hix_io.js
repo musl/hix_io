@@ -606,65 +606,31 @@ HixIO.MessageBar = can.Control.extend({
 HixIO.Router = can.Control.extend({}, {
 
 	init: function(element, options) {
-		var self;
-
-		self = this;
-
-		HixIO.delegate('redirect', this);
-
-		can.route(':control');
-
-		if(self.options.auth_control) {
+		if(options.auth_control) {
 			can.route.bind('route', function(event, new_value, old_value) {
-				var route;
-
-				route = self.options.auth_control.check(new_value);
-				if(route !== new_value) {
-					console.log('auth required, redirect');
-					can.route.attr('route', route);
-				}
+				route = options.auth_control.check(new_value);
+				can.route.attr('route', route);
 			});
 		}
 
-		can.route.bind('control', function(event, new_value, old_value) {
-			var Control;
-
-			console.log(new_value, old_value);
-
-			// FIXME We don't need to tear down the control if it really hasn't changed. Where does the control get set to undefined?
-			if(!new_value) { return; }
-
-			Control = self.options.routes[new_value];
-
-			if(!Control) {
-				console.log('control not found');
-				can.route.attr('control', self.options.default_route);
-				return;
-			}
-
-			if(Control) {
-				if(self.control) {
-					console.log('destroying control');
-					self.control.destroy();
-					self.element.empty();
-				}
-				console.log('creating control');
-				self.control = new Control(self.element);
-				can.route.attr('route', new_value);
-			}
-
-		});
-
+		can.route(':control', {control: options.default_route});
 		can.route.ready();
+
+		route = can.route.attr('route');
+		if(!route || route === '') {
+			can.route.attr('route', options.default_route);
+		}
 	},
 
-	redirect: function(route) {
-		can.route.attr('control', route);
-	},
+	':control route': function(data) {
+		var sandbox;
 
-	route: function() {
-		can.route.attr('control', this.options.default_route);
-	}
+		this.element.empty();
+		sandbox = $('<div></div>');
+		this.element.append(sandbox);
+
+		this.control = new (this.options.routes[data.control])(sandbox);
+	},
 
 });
 

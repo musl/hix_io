@@ -12,9 +12,6 @@ HixIO.DashControl = can.Control.extend({
 	}
 }, {
 	init: function() {
-	},
-
-	'dash route': function(data) {
 		var self;
 
 		self = this;
@@ -35,9 +32,6 @@ HixIO.PostControl = can.Control.extend({
 	}
 }, {
 	init: function() {
-	},
-
-	'posts route': function(data) {
 		var self;
 		
 		self = this;
@@ -103,9 +97,6 @@ HixIO.PostControl = can.Control.extend({
  */
 HixIO.PicsControl = can.Control.extend({}, {
 	init: function() {
-	},
-
-	'pics route': function(data) {
 		this.element.html(can.route.attr('route'));
 	},
 
@@ -123,16 +114,11 @@ HixIO.ProfileControl = can.Control.extend({
 	}
 }, {
 	init: function(element, options) {
-		this.user = new HixIO.User();
-		this.errors = new can.Map({});
-
-	},
-
-	validate: function() { this.errors.attr(this.user.errors(), true); },
-
-	'profile route': function(data) {
 		var self;
 		self = this;
+
+		this.user = new HixIO.User();
+		this.errors = new can.Map({});
 
 		this.user.attr(HixIO.attr('user').attr());
 		this.user.bind('change', function(event, attr, how, new_value, old_value) {
@@ -147,6 +133,8 @@ HixIO.ProfileControl = can.Control.extend({
 
 		this.element.find(':submit').attr('disabled', 'disabled');
 	},
+
+	validate: function() { this.errors.attr(this.user.errors(), true); },
 
 	update_profile: function(context, element, event) {
 		var user;
@@ -179,9 +167,6 @@ HixIO.URLControl = can.Control.extend({
 	}
 }, {
 	init: function() {
-	},
-
-	update: function() {
 		var self;
 
 		self = this;
@@ -264,9 +249,6 @@ HixIO.AuthControl = can.Control.extend({
 				HixIO.attr('user', HixIO.User.model(data));	
 			});
 		}
-		
-		can.route('sign-in');
-		can.route('sign-out');
 	},
 
 	check: function(route) {

@@ -26,6 +26,7 @@ HixIO.PostControl = can.Control.extend({
 			target: '#posts_pager'
 		});
 
+		this.update();
 	},
 
 	update: function() {
@@ -45,10 +46,6 @@ HixIO.PostControl = can.Control.extend({
 		}).error(function(data) {
 			HixIO.notify('Unable to load posts.', 'error-message');
 		});
-	},
-
-	'posts route': function(data) {
-		this.update();
 	},
 
 	'posts/:id route': function(data) {
@@ -75,9 +72,6 @@ HixIO.PicsControl = can.Control.extend({
 	}
 }, {
 	init: function() {
-	},
-
-	'pics route': function(data) {
 		this.element.html(HixIO.view(
 			this.options.view,
 			{}
@@ -94,9 +88,6 @@ HixIO.URLControl = can.Control.extend({
 	}
 }, {
 	init: function() {
-	},
-
-	'urls route': function() {
 		var self;
 
 		self = this;
