@@ -47,8 +47,8 @@ describe( HixIO::Auth ) do
 	context 'authenticated requests'do
 
 		before( :each ) do
-			subject.auth_provider.stub( :authenticate ).and_return( user )
-			subject.auth_provider.stub( :authenticated_user ).and_return( user )
+			allow(subject.auth_provider).to receive( :authenticate ).and_return( user )
+			allow(subject.auth_provider).to receive( :authenticated_user ).and_return( user )
 		end
 
 		it 'provides the authenticated user' do

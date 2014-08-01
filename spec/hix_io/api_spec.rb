@@ -38,8 +38,8 @@ describe( HixIO::API ) do
 	context 'unauthenticated requests' do
 
 		before( :each ) do
-			subject.auth_provider.stub( :authenticate ).and_return( nil )
-			subject.auth_provider.stub( :authenticated_user ).and_return( nil )
+			allow(subject.auth_provider).to receive( :authenticate ).and_return( nil )
+			allow(subject.auth_provider).to receive( :authenticated_user ).and_return( nil )
 		end
 
 		it 'provides a list of posts' do
@@ -88,8 +88,8 @@ describe( HixIO::API ) do
 	context 'authenticated requests' do
 
 		before( :each ) do
-			subject.auth_provider.stub( :authenticate ).and_return( user )
-			subject.auth_provider.stub( :authenticated_user ).and_return( user )
+			allow(subject.auth_provider).to receive( :authenticate ).and_return( user )
+			allow(subject.auth_provider).to receive( :authenticated_user ).and_return( user )
 		end
 
 		it 'allows one to shorten a URL' do

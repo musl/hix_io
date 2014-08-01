@@ -38,7 +38,7 @@ describe( Strelka::AuthProvider::HixIO ) do
 			:password => 'evil goatee'
 		} )
 
-		subject.should_receive( :require_authentication )
+		expect( subject ).to receive( :require_authentication )
 		expect( subject.authenticate( req ) ).to be_nil
 	end
 
@@ -49,7 +49,7 @@ describe( Strelka::AuthProvider::HixIO ) do
 			:password => 'flerp? blfoop!'
 		} )
 
-		subject.should_receive( :require_authentication )
+		expect( subject ).to receive( :require_authentication )
 		expect( subject.authenticate( req ) ).to be_nil
 	end
 
