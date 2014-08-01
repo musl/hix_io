@@ -2,6 +2,8 @@
 
 'use strict';
 
+HixIO.attr('user', new can.Map({}));
+
 /*
  * Provide a list of quick links to add content and provide a summary of what's
  * already there.
@@ -11,7 +13,7 @@ HixIO.DashControl = can.Control.extend({
 		view: 'admin/dash'
 	}
 }, {
-	init: function() {
+	'dash route': function() {
 		var self;
 
 		self = this;
@@ -31,9 +33,9 @@ HixIO.PostControl = can.Control.extend({
 		detail: 'admin/post',
 	}
 }, {
-	init: function() {
+	'posts route': function() {
 		var self;
-		
+
 		self = this;
 
 		HixIO.Post.list().success(function(data) {
@@ -96,7 +98,7 @@ HixIO.PostControl = can.Control.extend({
  * A control for a shared photo timeline.
  */
 HixIO.PicsControl = can.Control.extend({}, {
-	init: function() {
+	'pics route': function() {
 		this.element.html(can.route.attr('route'));
 	},
 
@@ -124,7 +126,8 @@ HixIO.ProfileControl = can.Control.extend({
 		this.user.bind('change', function(event, attr, how, new_value, old_value) {
 			self.validate();
 		});
-
+	},
+	'profile route': function () {
 		this.element.html(HixIO.view(this.options.view, {
 			user: this.user,
 			errors: this.errors,
@@ -166,7 +169,7 @@ HixIO.URLControl = can.Control.extend({
 		field: '#shorten'
 	}
 }, {
-	init: function() {
+	update: function() {
 		var self;
 
 		self = this;
@@ -189,7 +192,7 @@ HixIO.URLControl = can.Control.extend({
 	//TODO: convert this to a can-event attribute.
 	'{field} keyup': function(element, event) {
 		var self;
-	   
+
 		self = this;
 
 		if(event.keyCode === 13 && event.target.value !== '') {
@@ -209,115 +212,12 @@ HixIO.URLControl = can.Control.extend({
 	}
 });
 
-/*
- * An auth control.
- *
- * Options:
- *
- *     session_key (required):
- *         The name of the cookie to check for that represents the presence of
- *         a session.
- *
- *     view (optional):
- *         The name of the template to use.
- *
- *     TODO: Document options.
- *
- */
-HixIO.AuthControl = can.Control.extend({
-	defaults: {
-		view: 'admin/sign_in',
-	}
-},{
-	init: function(element, options) {
-		var self;
-
-		self = this;
-		this.redirect = null;
-		this.credentials = new can.Map({});
-
-		/*
-		 * Don't bother trying to fetch the user if a session doesn't exist.
-		 */
-		if($.cookie(this.options.session_key)) {
-			can.ajax({
-				url: '/auth',
-				type: 'GET',
-				async: false,
-				data: 'json'
-			}).done(function(data) {
-				HixIO.attr('user', HixIO.User.model(data));	
-			});
-		}
-	},
-
-	check: function(route) {
-		if(route === 'sign-in' || route === 'sign-out' ) { return route; }
-		if(!HixIO.attr('user')) {
-			this.redirect = route;
-			return 'sign-in';
-		}
-		return route;
-	},
-
-	sign_in: function() {
-		var creds, params, self;
-
-		self = this;
-		creds = {
-			email: this.credentials.email,
-			password: HixIO.sha512(this.credentials.password),
-		};
-
-		HixIO.ajax('/auth', 'POST')(creds).success(function(data) {
-			HixIO.attr('user', HixIO.User.model(data));	
-			if(self.redirect) {
-				HixIO.redirect(self.redirect);
-				self.redirect = null;
-			} else {
-				can.route.attr('route', '');
-			}
-			HixIO.notify('You have signed in.', 'success-message');
-			self.credentials.attr({}, true);
-		}).error(function(data) {
-			if(data.status >= 400 && data.status < 500) {
-				HixIO.notify('Invalid email or password.', 'warning-message');
-			}
-			if(data.status >= 500 && data.status < 600) {
-				HixIO.notify('', 'error-message');
-			}
-		});
-	},
-
-	sign_out: function() {
-		HixIO.ajax('/auth', 'DELETE')().success(function(data) {
-			HixIO.attr('user', null);
-			HixIO.redirect();
-			HixIO.notify('You have signed out.', 'success-message');
-		}).error(function(data) {
-			HixIO.notify('Woah. There was a problem signing out.', 'error-message');
-		});
-	},
-
-	'sign-in route': function(data) {
-		this.element.html(HixIO.view(this.options.view, {
-			credentials: this.credentials,
-			redirect: this.redirect,
-			sign_in: this.sign_in
-		}));
-	},
-
-	'sign-out route': function(data) {
-		this.sign_out();
-	},
-
-});
-
 /******************************************************************************
  * Application entry point.
  ******************************************************************************/
 
 $(document).ready(function() {
+
 	HixIO.message_bar = new HixIO.MessageBar('#messages');
 
 	HixIO.menu = new HixIO.Menu('#menu', {
@@ -325,18 +225,25 @@ $(document).ready(function() {
 		selected_class: 'pure-menu-selected'
 	});
 
-	HixIO.router = new HixIO.Router('#main', {
-		routes: {
-			dash: HixIO.DashControl,
-			pics: HixIO.PicsControl,
-			posts: HixIO.PostControl,
-			profile: HixIO.ProfileControl,
-			urls: HixIO.URLControl,
-		},
-		default_route: 'dash',
-		auth_control: new HixIO.AuthControl('#main', {
-			session_key: 'hix_io_session'
-		})
+	/*
+	 * FIXME: Re-do auth. It should be a simple modal dialog or redirect on page
+	 * load, before building controls and before can.route.ready().
+	 */
+
+	can.each([
+		HixIO.DashControl,
+		HixIO.PicsControl,
+		HixIO.PostControl,
+		HixIO.ProfileControl,
+		HixIO.URLControl
+	], function(Control) {
+		return new Control('#main');
 	});
+
+	can.route.ready();
+
+	if(!can.route.attr('route')) {
+		can.route.attr({route: 'dash'}, true);
+	}
 });
 

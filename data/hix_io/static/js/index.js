@@ -1,4 +1,4 @@
- /* vim: set nosta noet ts=4 sw=4 ft=javascript: */
+/* vim: set nosta noet ts=4 sw=4 ft=javascript: */
 
 'use strict';
 
@@ -25,13 +25,11 @@ HixIO.PostControl = can.Control.extend({
 			on_change: function() { self.update(); },
 			target: '#posts_pager'
 		});
-
-		this.update();
 	},
 
 	update: function() {
 		var params, self;
-	   
+
 		self = this;
 		params = this.pager.params();
 
@@ -46,6 +44,10 @@ HixIO.PostControl = can.Control.extend({
 		}).error(function(data) {
 			HixIO.notify('Unable to load posts.', 'error-message');
 		});
+	},
+
+	'posts route': function(data) {
+		this.update();
 	},
 
 	'posts/:id route': function(data) {
@@ -71,7 +73,7 @@ HixIO.PicsControl = can.Control.extend({
 		view: 'pics'
 	}
 }, {
-	init: function() {
+	'pics route': function() {
 		this.element.html(HixIO.view(
 			this.options.view,
 			{}
@@ -87,7 +89,7 @@ HixIO.URLControl = can.Control.extend({
 		view: 'urls'
 	}
 }, {
-	init: function() {
+	'urls route': function() {
 		var self;
 
 		self = this;
@@ -120,13 +122,18 @@ $(document).ready(function() {
 		selected_class: 'pure-menu-selected'
 	});
 
-	HixIO.router = new HixIO.Router('#main', {
-		routes: {
-			pics: HixIO.PicsControl,
-			posts: HixIO.PostControl,
-			urls: HixIO.URLControl
-		},
-		default_route: 'posts'
+	can.each([
+		HixIO.PicsControl,
+		HixIO.PostControl,
+		HixIO.URLControl
+	], function(Control, i) {
+		return new Control('#main');
 	});
+
+	can.route.ready();
+
+	if(!can.route.attr('route')) {
+		can.route.attr({route: 'dash'}, true);
+	}
 });
 
