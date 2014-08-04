@@ -133,7 +133,7 @@ $(document).ready(function() {
 	can.route.ready();
 
 	if(!can.route.attr('route')) {
-		can.route.attr({route: 'dash'}, true);
+		can.route.attr({route: 'posts'}, true);
 	}
 });
 
