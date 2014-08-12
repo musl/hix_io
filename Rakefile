@@ -20,8 +20,8 @@ Encoding.default_external = 'utf-8'
 
 Rake.verbose( false )
 if Rake.application.options.trace
-    $trace = true
-    $stderr.puts '$trace is enabled'
+	$trace = true
+	$stderr.puts '$trace is enabled'
 end
 
 MANIFEST = File.read( __FILE__ ).split( /^__END__/, 2 ).last.split
@@ -54,7 +54,7 @@ begin
 
 		s.add_dependency 'strelka', '~> 0.9'
 		s.add_dependency 'inversion', '~> 0.12'
-		s.add_dependency 'sequel', '~> 4.11'
+		s.add_dependency 'sequel', '~> 4.13'
 		s.add_dependency 'pg', '~> 1.17'
 		s.add_dependency 'loggability', '~> 0.11'
 		s.add_dependency 'trollop', '~> 2.0'
@@ -65,6 +65,7 @@ begin
 		s.add_development_dependency 'rspec', '~> 3.0'
 		s.add_development_dependency 'ruby-prof', '~> 0.15'
 		s.add_development_dependency 'simplecov', '~> 0.8'
+		s.add_development_dependency 'htty', '~> 1.5'
 	end
 
 	Gem::PackageTask.new( spec ).define
@@ -88,6 +89,24 @@ begin
 
 	desc "Rebuild and reinstall the gem."
 	task :reinstall => [:repackage, :uninstall, :install]
+
+	desc "Create a source-able environment file for development"
+	task :devenv do
+		newlibpath = LIBDIR.realpath
+		newlibpath += ':' + ENV['RUBYLIB'] if ENV['RUBYLIB']
+
+		env = BASEDIR + '.env'
+		env.open( 'w' ) do |f|
+			case ENV['SHELL']
+			when /csh$/
+				f.puts "setenv RUBYLIB %s" % [ newlibpath ]
+			else
+				f.puts "export RUBYLIB=%s" % [ newlibpath ]
+			end
+		end
+
+		$stderr.puts "Source #{env.realpath} from your shell."
+	end
 
 rescue LoadError
 	$stderr.puts "Omitting packaging tasks, rubygems doesn't seem to be installed?"
@@ -143,7 +162,7 @@ begin
 				--unparam
 				--white
 			],
-			Pathname.glob( DATADIR + 'static/js/*.js' )
+				Pathname.glob( DATADIR + 'static/js/*.js' )
 		]
 
 		system cmd.flatten.join( ' ' )
