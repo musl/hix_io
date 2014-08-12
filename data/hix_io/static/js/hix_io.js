@@ -205,7 +205,8 @@ HixIO.Post = can.Model.extend({
 	findAll: 'GET /api/v1/posts',
 	findOne: 'GET /api/v1/posts/{id}',
 	update:  'PUT /api/v1/posts/{id}',
-	destroy: 'DELETE /api/v1/posts/{id}'
+	destroy: 'DELETE /api/v1/posts/{id}',
+	search:  HixIO.ajax('/api/v1/posts/search')
 }, {});
 
 /*

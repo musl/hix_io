@@ -49,6 +49,20 @@ class HixIO::API < Strelka::App
 		return res
 	end
 
+	get '/posts/search' do |req|
+		req.params.add :q, :string
+
+		posts = HixIO::Post.published( req.params ).all.map do |post|
+			hash = post.to_hash
+			hash[:user] = post.user
+			hash
+		end
+
+		res = req.response
+		res.for( :json ) { posts }
+		return res
+	end
+
 	get '/posts/:id' do |req|
 		post =  HixIO::Post.detail( req.params[:id] ).first
 		user = post.user

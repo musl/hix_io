@@ -12,7 +12,8 @@
 HixIO.PostControl = can.Control.extend({
 	defaults: {
 		list_view: 'posts',
-		detail_view: 'post'
+		detail_view: 'post',
+		search_view: 'post_search'
 	}
 }, {
 	'posts route': function(data) {
@@ -20,8 +21,11 @@ HixIO.PostControl = can.Control.extend({
 
 		self = this;
 
-		HixIO.Post.findAll({}, function(posts) {
-			self.element.html(HixIO.view(self.options.list_view, { posts: posts }));
+		HixIO.Post.findAll({limit: 1}, function(posts) {
+			self.element.html(HixIO.view(
+				self.options.list_view,
+				{ posts: posts, search: self.search }
+			));
 			HixIO.highlightSyntax();
 		}, function(data) {
 			HixIO.notify('Unable to load the list of posts.', 'error-message');
@@ -40,6 +44,28 @@ HixIO.PostControl = can.Control.extend({
 			));
 			HixIO.highlightSyntax();
 		});
+	},
+
+	'posts/search/ route': function(data) {
+		var self;
+
+		self = this;
+
+		HixIO.Post.search({
+			q: data.q
+		}).success(function(posts) {
+			self.element.html(HixIO.view(
+				self.options.search_view,
+			   	{ posts: posts, q: data.q, search: self.search }
+			));
+			HixIO.highlightSyntax();
+		}).error(function(data) {
+			HixIO.notify('Unable to search posts.', 'error-message');
+		});
+	},
+
+	search: function(event, element) {
+		can.route.attr({route: 'posts/search/', q: element.val()});
 	}
 });
 

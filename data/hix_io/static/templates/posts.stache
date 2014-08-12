@@ -10,4 +10,10 @@
 		<li><a href="#!posts/{{id}}">{{title}}</a></li>
 		</ul>
 	</div>
+	<div class="post">
+		<p>
+		<label for="post-search">Search:</label>
+		<input type="text" id="post-search" can-enter="search">
+		</p>
+	</div>
 {{/posts}}
