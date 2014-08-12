@@ -6,11 +6,8 @@
 
 {{#posts}}
 	<div class="post">
-		<h2><a href="#!posts/{{id}}">{{title}}</a></h2>
-		<hr>
-		<p>{{{body}}}</p>
-		<p class="post-meta">Updated by {{user.name}} {{relative_date mtime}} ago.</p>
+		<ul>
+		<li><a href="#!posts/{{id}}">{{title}}</a></li>
+		</ul>
 	</div>
 {{/posts}}
-
-{{#if posts}}<div id="posts_pager"></div>{{/if}}

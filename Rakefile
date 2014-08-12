@@ -159,6 +159,7 @@ begin
 				--predef hljs
 				--predef jsSHA
 				--predef HixIO
+				--predef moment
 				--unparam
 				--white
 			],

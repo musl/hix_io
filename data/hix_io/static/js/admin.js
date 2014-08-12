@@ -131,7 +131,7 @@ HixIO.ProfileControl = can.Control.extend({
 		this.element.html(HixIO.view(this.options.view, {
 			user: this.user,
 			errors: this.errors,
-			update_profile: self.update_profile
+			update_profile: this.update_profile
 		}));
 
 		this.element.find(':submit').attr('disabled', 'disabled');

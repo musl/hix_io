@@ -38,7 +38,6 @@ class HixIO::API < Strelka::App
 		req.params.add :offset, :integer
 		req.params.add :limit, :integer
 
-		count = HixIO::Post.published.count
 		posts = HixIO::Post.published( req.params ).all.map do |post|
 			hash = post.to_hash
 			hash[:user] = post.user
@@ -46,7 +45,7 @@ class HixIO::API < Strelka::App
 		end
 
 		res = req.response
-		res.for( :json ) {{ :count => count, :posts => posts }}
+		res.for( :json ) { posts }
 		return res
 	end
 

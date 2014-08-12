@@ -150,9 +150,8 @@ HixIO.view_helpers = {
 	},
 
 	datatable: function(data, columns) {
-		var cols, self, table, wrapper;
+		var cols, table, wrapper;
 		
-		self = this;	
 		table = $('<table></table>');
 		table.wrap('<div></div>');
 		wrapper = table.parent();
@@ -203,9 +202,9 @@ HixIO.sha512 = function(message) {
  * Posts for a blog.
  */
 HixIO.Post = can.Model.extend({
-	list: HixIO.ajax('/api/v1/posts'),
+	findAll: 'GET /api/v1/posts',
 	findOne: 'GET /api/v1/posts/{id}',
-	update: 'PUT /api/v1/posts/{id}',
+	update:  'PUT /api/v1/posts/{id}',
 	destroy: 'DELETE /api/v1/posts/{id}'
 }, {});
 

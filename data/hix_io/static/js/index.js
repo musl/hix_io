@@ -15,39 +15,17 @@ HixIO.PostControl = can.Control.extend({
 		detail_view: 'post'
 	}
 }, {
-	init: function(element, options) {
+	'posts route': function(data) {
 		var self;
 
 		self = this;
 
-		this.pager = new HixIO.Pager(this.element, {
-			per_page: 5,
-			on_change: function() { self.update(); },
-			target: '#posts_pager'
-		});
-	},
-
-	update: function() {
-		var params, self;
-
-		self = this;
-		params = this.pager.params();
-
-		HixIO.Post.list(params).success(function(data) {
-			window.post_data = data;
-			self.element.html(HixIO.view(
-				self.options.list_view,
-				{ posts: HixIO.Post.models(data.posts) }
-			));
-			self.pager.update(data.count);
+		HixIO.Post.findAll({}, function(posts) {
+			self.element.html(HixIO.view(self.options.list_view, { posts: posts }));
 			HixIO.highlightSyntax();
-		}).error(function(data) {
-			HixIO.notify('Unable to load posts.', 'error-message');
+		}, function(data) {
+			HixIO.notify('Unable to load the list of posts.', 'error-message');
 		});
-	},
-
-	'posts route': function(data) {
-		this.update();
 	},
 
 	'posts/:id route': function(data) {
@@ -126,7 +104,7 @@ $(document).ready(function() {
 		HixIO.PicsControl,
 		HixIO.PostControl,
 		HixIO.URLControl
-	], function(Control, i) {
+	], function(Control) {
 		return new Control('#main');
 	});
 
@@ -135,5 +113,6 @@ $(document).ready(function() {
 	if(!can.route.attr('route')) {
 		can.route.attr({route: 'posts'}, true);
 	}
+
 });
 
