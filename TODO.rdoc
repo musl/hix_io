@@ -1,0 +1,10 @@
+
+= TODO
+
+== Major Features
+* Simple Blog
+* URL Shortener w/API
+* Photo Sharing App
+* Docs Wiki
+* Kick-ass visual style
+
