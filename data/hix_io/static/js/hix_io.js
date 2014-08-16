@@ -112,6 +112,10 @@ HixIO.view_helpers = {
 		return false;
 	},
 
+	json: function(obj) {
+		return JSON.stringify(obj, null, "  ");
+	},
+
 	capitalize: function(string) {
 		if(typeof string === 'function') { string = string(); }
 		return string.charAt(0).toUpperCase() + string.slice(1);

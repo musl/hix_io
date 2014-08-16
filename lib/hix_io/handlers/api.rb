@@ -52,7 +52,7 @@ class HixIO::API < Strelka::App
 	get '/posts/search' do |req|
 		req.params.add :q, :string
 
-		posts = HixIO::Post.published( req.params ).all.map do |post|
+		posts = HixIO::Post.search( req.params ).all.map do |post|
 			hash = post.to_hash
 			hash[:user] = post.user
 			hash

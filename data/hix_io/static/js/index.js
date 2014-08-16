@@ -21,7 +21,7 @@ HixIO.PostControl = can.Control.extend({
 
 		self = this;
 
-		HixIO.Post.findAll({limit: 1}, function(posts) {
+		HixIO.Post.findAll({}, function(posts) {
 			self.element.html(HixIO.view(
 				self.options.list_view,
 				{ posts: posts, search: self.search }
@@ -56,7 +56,8 @@ HixIO.PostControl = can.Control.extend({
 		}).success(function(posts) {
 			self.element.html(HixIO.view(
 				self.options.search_view,
-			   	{ posts: posts, q: data.q, search: self.search }
+				/* WTF. I thought that {{#if <key>}} would evaluate to false if the key was falsy. */
+			   	{ posts: posts.length > 0 ? posts : false, q: data.q, search: self.search }
 			));
 			HixIO.highlightSyntax();
 		}).error(function(data) {
