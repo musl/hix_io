@@ -16,5 +16,29 @@ HixIO.load_config( opts[:config], :skip_models => true )
 Loggability.level = opts[:debug] ? :debug : :fatal
 
 Sequel.extension :migration
-Sequel::Migrator.apply( HixIO.db, HixIO::MIGRATION_DIR, opts[:target] )
+
+#Sequel::Migrator.apply( HixIO.db, HixIO::MIGRATION_DIR, opts[:target] )
+
+migrator_class = Sequel::Migrator.migrator_class( HixIO::MIGRATION_DIR )
+migrator = migrator_class.new( HixIO.db, HixIO::MIGRATION_DIR, :target => opts[:target] )
+
+HixIO.log.debug "Current Schema Version: %d" % [migrator.current]
+
+if migrator.is_current?
+    "The schema is current."
+    exit
+end
+
+HixIO.log.debug "Target: %d" % [migrator.target]
+
+HixIO.log.debug "Applying migrations:"
+migrator.migrations.each do |m|
+    location = m.send( migrator.direction ).source_location
+    HixIO.log.debug "\t%s (%s, line %d)" % [File.basename( location.first ), migrator.direction, location.last]
+end
+
+migrator.run
+
+migrator = migrator_class.new( HixIO.db, HixIO::MIGRATION_DIR, :target => opts[:target] )
+HixIO.log.debug "After migration: %d" % [migrator.current]
 
