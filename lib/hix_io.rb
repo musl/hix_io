@@ -53,9 +53,17 @@ module HixIO
 	# any of the defaults for the namespace at runtime by passing in +opts+, a
 	# hash that will be merged against the namespace's section of config.
 	#
-	def self::load_config( path, opts = {} )
+	def self::load_config( path = nil, opts = {} )
 		defaults = DEFAULT_CONFIG
 		defaults[self.config_key].merge!( opts )
+
+		path ||= HixIO::CONFIG_PATHS.find( &:readable? )
+		self.log.debug "Reading config from: %p" % [path]
+
+		if path.nil?
+			raise "No path to a config file given, and none found elsewhere."
+		end
+
 		@global_config = Configurability::Config.load( path, defaults )
 		self.global_config.install
 

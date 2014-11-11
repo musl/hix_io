@@ -20,5 +20,11 @@ module HixIO::Constants
 	# The location for models.
 	MODEL_DIR = Pathname( __FILE__ ).parent + 'models'
 
+	# Defaults for config file locations to ease development and deployment.
+	CONFIG_PATHS = [
+		Pathname( ENV['HOME'] ) + '.hix_io.yml', # a file in a service account's homedir
+		Pathname( __FILE__ ).parent.parent.parent + 'etc/config.yml', # development. works anywhere in the source tree
+	].freeze
+
 end
 
