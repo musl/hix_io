@@ -100,25 +100,26 @@ module HixIO
 		self.load_models
 	end
 
-	# Require all of the models present in this gem and keep track of the classes
-	# that were added to the namespace.
+	# Manually require all of our models when we're ready. Doing this
+	# automatically didn't allow for dependencies and consequently associations.
 	#
 	def self::load_models
 		@models ||= {}
-		new_models = {}
 
-		Dir[MODEL_DIR + '*.rb'].each do |f|
-			snap = constants
-			next unless require f
-			begin
-				(constants - snap).each do|sym|
-					new_models[sym] = const_get( sym )
-				end
-			rescue NameError, TypeError
-			end
-		end
+		require 'hix_io/models/photo'
+		@models[:Photo] = HixIO::Photo
 
-		@models.merge!( new_models )
+		require 'hix_io/models/photo_set'
+		@models[:PhotoSet] = HixIO::PhotoSet
+
+		require 'hix_io/models/url'
+		@models[:URL] = HixIO::URL
+
+		require 'hix_io/models/post'
+		@models[:Post] = HixIO::Post
+
+		require 'hix_io/models/user'
+		@models[:User] = HixIO::User
 	end
 
 	# Are we in development mode?
