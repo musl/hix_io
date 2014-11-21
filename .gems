@@ -7,7 +7,7 @@ diff-lcs -v1.2.5
 docile -v1.1.5
 dotenv -v0.11.1
 dotenv-deployment -v0.0.2
-foreman -v0.74.0
+foreman -v0.75.0
 highline -v1.6.21
 htty -v1.5.0
 inversion -v0.12.3
