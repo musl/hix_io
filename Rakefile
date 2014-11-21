@@ -66,6 +66,7 @@ begin
 		s.add_development_dependency 'ruby-prof', '~> 0.15'
 		s.add_development_dependency 'simplecov', '~> 0.8'
 		s.add_development_dependency 'htty', '~> 1.5'
+		s.add_development_dependency 'foreman', '~> 0.75'
 	end
 
 	Gem::PackageTask.new( spec ).define
