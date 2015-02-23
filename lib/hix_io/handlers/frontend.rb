@@ -24,9 +24,7 @@ class HixIO::Frontend < Strelka::App
 	default_type 'text/html'
 
 	layout 'layout.tmpl'
-	templates \
-		:index => 'index.tmpl',
-		:admin => 'admin.tmpl'
+	templates :index => 'index.tmpl'
 
 	param :short, /[0-9a-z]{7}/
 
@@ -36,12 +34,6 @@ class HixIO::Frontend < Strelka::App
 
 	get '/' do |req|
 		tmpl = template( :index )
-		tmpl.meta = self.meta( req )
-		return tmpl
-	end
-
-	get '/admin' do |req|
-		tmpl = template( :admin )
 		tmpl.meta = self.meta( req )
 		return tmpl
 	end
@@ -67,7 +59,6 @@ class HixIO::Frontend < Strelka::App
 			:stamp => Time.now,
 			:dev => HixIO.dev?,
 			:ssl => req.ssl?,
-			:scheme => req.scheme,
 		}
 
 		if HixIO.dev?

@@ -7,18 +7,14 @@ require 'hix_io/handlers/frontend'
 
 describe( HixIO::Frontend ) do
 
-	before( :all ) do
-		prep_db!
-		Strelka::App::Auth.configure( HixIO.global_config.auth )
-	end
-
-	after( :all ) { prep_db! }
+	before( :all ) { reset_db! }
+	after( :all ) { reset_db! }
 
 	let( :factory ) do
 		Mongrel2::RequestFactory.new( :route => '/' )
 	end
 
-	let( :user ) { find_a_user }
+	let( :user ) { find_or_create_user }
 
 	let( :short_url ) do
 		user.add_url({
@@ -27,9 +23,7 @@ describe( HixIO::Frontend ) do
 		})
 	end
 
-	subject do
-		described_class.new( *TEST_APP_PARAMS )
-	end
+	subject { described_class.new( *TEST_APP_PARAMS ) }
 
 	it 'rejects unknown methods' do
 		req = factory.put( '/' )
@@ -43,7 +37,7 @@ describe( HixIO::Frontend ) do
 		expect( res.body.read ).to match( /method not allowed/i )
 	end
 
-	it 'serves the main application' do
+	it 'serves the main application when not in dev mode' do
 		HixIO.config.dev = false
 		req = factory.get( '/' )
 
@@ -75,14 +69,13 @@ describe( HixIO::Frontend ) do
 		expect( res.body.read ).to match( /^$/ )
 	end
 
-	it 'responds properly to unknown short URL hashes' do
-		req = factory.get( '/bacon' )
+	it 'yields the proper status when given an unknown shortened URL' do
+		req = factory.get( '/deadbee' )
 
 		res = subject.handle( req )
 		res.body.rewind
 
 		expect( res.status ).to eq( HTTP::NOT_FOUND )
-		expect( res.body.read ).to match( /not found/i )
 	end
 
 end

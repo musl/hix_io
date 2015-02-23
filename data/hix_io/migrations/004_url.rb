@@ -7,7 +7,7 @@ Sequel.migration do
 		create_table( :urls ) do
 			varchar     :short, :fixed => true, :size => 7, :primary_key => true
 
-			foreign_key :user_id, :users, :null => false, :on_delete => :cascade
+			foreign_key :user_id, :users, :type => :text, :null => false, :on_delete => :cascade
 
 			text        :url, :null => false, :unique => true
 			inet        :source_ip, :null => false, :default => IPAddr.new( '0.0.0.0' )

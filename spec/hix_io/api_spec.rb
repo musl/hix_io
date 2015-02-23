@@ -7,8 +7,8 @@ require 'hix_io/handlers/api'
 
 describe( HixIO::API ) do
 
-	before( :all ) { prep_db! }
-	after( :all ) { prep_db! }
+	before( :all ) { reset_db! }
+	after( :all ) { reset_db! }
 
 	subject do
 		described_class.new( *TEST_APP_PARAMS )
@@ -18,15 +18,7 @@ describe( HixIO::API ) do
 		Mongrel2::RequestFactory.new( :route => '/' )
 	end
 
-	let( :user ) { find_a_user }
-
-	let( :post ) do
-		user.add_post({
-			:title => 'RSPEC ROCKS',
-			:body => 'Yes, it certainly does.',
-			:published => true
-		})
-	end
+	let( :user ) { find_or_create_user }
 
 	let( :url ) do
 		user.add_url({
@@ -42,45 +34,17 @@ describe( HixIO::API ) do
 			allow(subject.auth_provider).to receive( :authenticated_user ).and_return( nil )
 		end
 
-		it 'provides a list of posts' do
-			req = factory.get( '/posts' )
+		it 'refuses to shorten URLs for unathenticated requests' do
+			url = 'http://example.com/test'
+
+			req = factory.post( '/urls' )
+			req.content_type = 'application/x-www-form-urlencoded'
+			req.body = URI.encode_www_form({ :url => url })
 
 			res = subject.handle( req )
 			res.body.rewind
 
-			expect( res.status ).to eq( HTTP::OK )
-			expect( res.content_type ).to eq( 'application/json' )
-			expect {
-				JSON.parse( res.body.read )
-			}.not_to raise_error
-		end
-
-		it 'provides a detail on a post' do
-			req = factory.get( '/posts/%d' % [post.id] )
-
-			res = subject.handle( req )
-			res.body.rewind
-
-			expect( res.status ).to eq( HTTP::OK )
-			expect( res.content_type ).to eq( 'application/json' )
-			expect {
-				obj = JSON.parse( res.body.read )
-				expect( obj['title'] ).to eq( post.title )
-			}.not_to raise_error
-		end
-
-		it 'provides lists of top and latest shortened URLs' do
-			req = factory.get( '/urls/summary' )
-
-			res = subject.handle( req )
-			res.body.rewind
-
-			expect( res.status ).to eq( HTTP::OK )
-			expect {
-				obj = JSON.parse( res.body.read )
-				expect( obj['top_urls'] ).to be_a( Array )
-				expect( obj['latest_urls'] ).to be_a( Array )
-			}.not_to raise_error
+			expect( res.status ).to eq( HTTP::UNAUTHORIZED )
 		end
 
 	end

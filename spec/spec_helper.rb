@@ -28,27 +28,26 @@ require 'pathname'
 
 require 'hix_io'
 
+HixIO.load_config
+
 include Mongrel2::Constants
 
-HixIO.load_config( 'etc/config.yml' )
+def find_or_create_user
+	return HixIO::User.find_or_create( :email => 'tester@example.com' ) do |user|
+		user.name = 'Tester Mc. Tester',
+		user.password = Digest::SHA512.hexdigest( 'password' )
+	end
+end
 
-def prep_db!
+def reset_db!
 	raise "Hold on there, buddy. We're not in developer mode!" unless HixIO.dev?
 	HixIO.models.values.each { |model| model.dataset.delete }
 	HixIO.db[:sessions].delete
 	return nil
 end
 
-def find_a_user
-	HixIO::User.find_or_create( :email => 'a@b.c' ) do |user|
-		user.name = "Penelope Pentalobe"
-		user.password = Digest::SHA512.hexdigest( 'test' )
-		user.disable_on = Time.now() + 86400
-	end
-end
-
 RSpec.configure do |config|
-  config.formatter = :documentation # :progress, :html, :textmate
-  config.color = true
+	config.formatter = :documentation # :progress, :html, :textmate
+	config.color = true
 end
 

@@ -34,11 +34,7 @@ Notes on dev DB setup stuck here for a moment:
 
 == REQUIREMENTS:
 
-* ruby ~> 2.0
-* mongrel2 ~> 1.9.0
-* postgresql >= 9.3
-* See the Rakefile for the full list of gem dependencies & development
-  dependencies.
+* See the Rakefile.
 
 == DEVELOPERS:
 

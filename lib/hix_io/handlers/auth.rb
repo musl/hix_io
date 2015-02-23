@@ -22,7 +22,6 @@ class HixIO::Auth < Strelka::App
 	session_namespace :hix_io
 
 	no_auth_for { |req| req.verb == :POST }
-	no_perms_for //
 
 	########################################################################
 	### R O U T E S

@@ -5,7 +5,7 @@ require 'uri'
 
 # Class to describe a shortened URL.
 #
-class HixIO::URL < Sequel::Model( :hix_io__urls )
+class HixIO::URL < Sequel::Model( HixIO::table_symbol( :urls ) )
 
 	plugin :validation_helpers
 	plugin :json_serializer

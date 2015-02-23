@@ -1,8 +1,0 @@
-{{#post}}
-<div class="post">
-	<h2>{{title}}</h2>
-	<hr>
-	<p class="post-meta">Updated by {{user_id}} {{relative_date mtime}} ago.</p>
-	<p>{{{body}}}</p>
-</div>
-{{/post}}

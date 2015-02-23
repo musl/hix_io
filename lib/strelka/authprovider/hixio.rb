@@ -31,7 +31,8 @@ class Strelka::AuthProvider::HixIO < Strelka::AuthProvider
 	# the session. If not, require authentication.
 	#
 	def authenticate( request )
-		if user = check_session( request ) || check_login( request )
+		if user = check_session( request ) ||
+				  check_login( request )
 			self.auth_succeeded( request, user )
 			return user
 		end
@@ -42,6 +43,8 @@ class Strelka::AuthProvider::HixIO < Strelka::AuthProvider
 	# Determine if the +request+, +credentials+, and the list of +perms+ allow
 	# the user to access the given resource. If so, return true. If not, return
 	# false.
+	#
+	# For now, this just permits everything.
 	#
 	def authorize( credentials, request, perms )
 		return true

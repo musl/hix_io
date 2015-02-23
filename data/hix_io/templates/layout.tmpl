@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8" />
 
-		<title><?subscribe title || 'hix.io' ?></title>
+		<title><?subscribe title || hix.io ?></title>
 
 		<meta name="author" content="Michael Hix" />
 		<meta name="copyright" content="Copyright 2014 Michael Hix" />
@@ -24,20 +24,11 @@
 		<!--<![endif]-->
 
 		<link rel="stylesheet" href="/static/css/style.css" type="text/css" media="screen" charset="utf-8">
-		<link rel="stylesheet" href="/static/css/highlight/googlecode.min.css" type="text/css" media="screen" charset="utf-8">
-		<link rel="stylesheet" href="/static/css/font-awesome.min.css" type="text/css" media="screen" charset="utf-8">
 
-		<!-- If all of our scripts are well-behaved, nothing needs to go in the body. -->
-		<script src="/static/js/lib/jquery.min.js" type="text/javascript" charset="utf-8"></script>
-		<script src="/static/js/lib/can.js" type="text/javascript" charset="utf-8"></script>
-		<script src="/static/js/lib/highlight.min.js" type="text/javascript" charset="utf-8"></script>
-		<script src="/static/js/lib/moment.min.js" type="text/javascript" charset="utf-8"></script>
-
-		<script src="/static/js/hix_io.js" type="text/javascript" charset="utf-8"></script>
 		<?subscribe head ?>
+
 	</head>
 	<body>
-		<div id="messages"></div>
 		<?attr body ?>
 	</body>
 </html>

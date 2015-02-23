@@ -6,7 +6,7 @@
 module HixIO::Constants
 
 	# Semantic Version Number
-	VERSION = '0.0.2'
+	VERSION = '0.0.1'
 
 	# DVCS Revision Number
 	REVISION = %$Rev$
@@ -17,12 +17,9 @@ module HixIO::Constants
 	# The location for migrations, in the gem or in a development directory.
 	MIGRATION_DIR = DATA_DIR + 'migrations'
 
-	# The location for models.
-	MODEL_DIR = Pathname( __FILE__ ).parent + 'models'
-
 	# Defaults for config file locations to ease development and deployment.
 	CONFIG_PATHS = [
-		Pathname( ENV['HOME'] ) + '.hix_io.yml', # a file in a service account's homedir
+		Pathname( '/usr/local/etc/hix.io/config.yml' ),
 		Pathname( __FILE__ ).parent.parent.parent + 'etc/config.yml', # development. works anywhere in the source tree
 	].freeze
 

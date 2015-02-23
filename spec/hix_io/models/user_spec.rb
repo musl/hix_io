@@ -8,9 +8,8 @@ require 'pry'
 
 describe( HixIO::User ) do
 
-	before( :all ) { prep_db! }
-	after( :each ) { described_class.dataset.delete }
-	after( :all ) { prep_db! }
+	before( :all ) { reset_db! }
+	after( :all ) { reset_db! }
 
 	context 'dataset methods' do
 
@@ -20,12 +19,7 @@ describe( HixIO::User ) do
 
 	context 'instance methods' do
 
-		subject do
-			described_class.create({
-				:email => 'tester@example.com',
-				:password => Digest::SHA512.hexdigest( 'password' )
-			})
-		end
+		subject { find_or_create_user }
 
 		it 'generate an API password before creating it' do
 			expect( subject.api_secret ).to match( /^[[:xdigit:]]{128}$/i )
@@ -34,6 +28,11 @@ describe( HixIO::User ) do
 		it 'updates its own timestamps' do
 			expect( subject.ctime ).to be_a( Time )
 			expect( subject.mtime ).to be_a( Time )
+			expect( subject.mtime ).to be >= subject.ctime
+		end
+
+		it 'hides secrets when serializing a user' do
+			expect( JSON.parse( subject.to_json ).keys ).to_not include( %w[password api_secret] )
 		end
 	end
 

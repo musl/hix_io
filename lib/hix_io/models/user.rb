@@ -5,14 +5,13 @@ require 'securerandom'
 
 # Class to describe a user account.
 #
-class HixIO::User < Sequel::Model( :hix_io__users )
-
-	unrestrict_primary_key
+class HixIO::User < Sequel::Model( HixIO.table_symbol( :users ) )
 
 	plugin :validation_helpers
 	plugin :json_serializer
 
-	one_to_many :posts
+	unrestrict_primary_key
+
 	one_to_many :urls, :class => HixIO::URL
 
 	########################################################################
@@ -36,7 +35,7 @@ class HixIO::User < Sequel::Model( :hix_io__users )
 	# Create identity information.
 	#
 	def before_create
-		self.api_secret = Digest::SHA512.hexdigest( SecureRandom.random_bytes( 128 ))
+		self.generate_api_secret
 		super
 	end
 
@@ -44,9 +43,15 @@ class HixIO::User < Sequel::Model( :hix_io__users )
 	### I N S T A N C E   M E T H O D S
 	########################################################################
 
+	# Generate a new API secret for his user.
+	#
+	def generate_api_secret
+		self.api_secret = Digest::SHA512.hexdigest( SecureRandom.random_bytes( 128 ))
+	end
+
 	# Prevent secrets from being sent with user data.
 	#
-	def to_json( *a ) #:nodoc:
+	def to_json( *_ ) #:nodoc:
 		return super( :except => [:password, :api_secret] )
 	end
 

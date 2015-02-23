@@ -43,6 +43,7 @@ module HixIO
 	#
 	DEFAULT_CONFIG = {
 		self.config_key => {
+			:schema => 'hix_io',
 			:db_uri => 'postgres://hix_io@localhost/hix_io',
 			:skip_models => false,
 			:dev => false,
@@ -61,7 +62,7 @@ module HixIO
 		self.log.debug "Reading config from: %p" % [path]
 
 		if path.nil?
-			raise "No path to a config file given, and none found elsewhere."
+			raise "Unable to load configuration. No path was given and no config was found at the default paths."
 		end
 
 		@global_config = Configurability::Config.load( path, defaults )
@@ -84,11 +85,12 @@ module HixIO
 
 		# Molly guard. Hopefully this makes it harder tromp on the production database.
 		#
-		if self.dev? and self.config.db_uri !~ /dev$/
+		if self.dev? and self.config.schema !~ /dev$/
 			raise "We're in dev mode and the database name doesn't end in 'dev'."
 		end
 
 		@db ||= Sequel.connect( self.config.db_uri )
+		@db.execute "set search_path to '%s'" % [self.config.schema]
 
 		self.db.extension :null_dataset
 		self.db.extension :pg_inet
@@ -108,26 +110,26 @@ module HixIO
 		self.load_models
 	end
 
+	# Return a symbol for creating classes based on the schema
+	#
+	def self::table_symbol( table_name )
+		return ('%s__%s' % [self.config.schema, table_name]).to_sym
+	end
+
 	# Manually require all of our models when we're ready. Doing this
 	# automatically didn't allow for dependencies and consequently associations.
 	#
 	def self::load_models
 		@models ||= {}
 
-		require 'hix_io/models/photo'
-		@models[:Photo] = HixIO::Photo
-
-		require 'hix_io/models/photo_set'
-		@models[:PhotoSet] = HixIO::PhotoSet
-
 		require 'hix_io/models/url'
 		@models[:URL] = HixIO::URL
 
-		require 'hix_io/models/post'
-		@models[:Post] = HixIO::Post
-
 		require 'hix_io/models/user'
 		@models[:User] = HixIO::User
+
+		require 'hix_io/models/metric'
+		@models[:Metric] = HixIO::Metric
 	end
 
 	# Are we in development mode?

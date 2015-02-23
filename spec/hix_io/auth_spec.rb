@@ -9,17 +9,17 @@ require 'hix_io/handlers/auth'
 describe( HixIO::Auth ) do
 
 	before( :all ) do
-		prep_db!
+		reset_db!
 		Strelka::App::Auth.configure( HixIO.global_config.auth )
 	end
 
-	after( :all ) { prep_db! }
+	after( :all ) { reset_db! }
 
 	let( :factory ) do
 		Mongrel2::RequestFactory.new( :route => '/' )
 	end
 
-	let( :user ) { find_a_user }
+	let( :user ) { find_or_create_user }
 
 	subject do
 		described_class.new( *TEST_APP_PARAMS )
@@ -42,6 +42,21 @@ describe( HixIO::Auth ) do
 		expect( res.status ).to eq( HTTP::OK )
 		expect( returned_user['email'] ).to eq( user.email )
 		expect( res.session.id ).not_to be_nil
+	end
+
+	it 'denies login attempts with an incorrect password' do
+		req = factory.post( '/' )
+
+		req.content_type = 'application/x-www-form-encoded'
+		req.body = URI.encode_www_form( {
+			:email => user.email,
+			:password => 'flaming hot monkey balls'
+		} )
+
+		res = subject.handle( req )
+		res.body.rewind
+
+		expect( res.status ).to eq( HTTP::UNAUTHORIZED )
 	end
 
 	context 'authenticated requests'do
