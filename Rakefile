@@ -91,6 +91,19 @@ begin
 	desc "Rebuild and reinstall the gem."
 	task :reinstall => [:repackage, :uninstall, :install]
 
+	desc "Hack to deploy the gem to production."
+	task :deploy => [:repackage] do
+		gem_path = Pathname.new( "pkg/#{spec.name}-#{spec.version}.gem" ).expand_path
+		system "scp #{gem_path} root@hix.io:"
+		system "ssh root@hix.io '" +
+			"gem uninstall hix_io &&" +
+			"gem install #{gem_path.basename} &&" +
+			"svc -t /service/hix_io* &&" +
+			"sleep 5 &&" +
+			"svstat /service/*" +
+			"'"
+	end
+
 	desc "Create a source-able environment file for development"
 	task :devenv do
 		newlibpath = LIBDIR.realpath
