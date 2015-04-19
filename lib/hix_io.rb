@@ -127,9 +127,6 @@ module HixIO
 
 		require 'hix_io/models/user'
 		@models[:User] = HixIO::User
-
-		require 'hix_io/models/metric'
-		@models[:Metric] = HixIO::Metric
 	end
 
 	# Are we in development mode?

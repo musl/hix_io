@@ -22,7 +22,7 @@ dbsession:
 
 logging:
     __default__: 'warn (color)'
-    hix_io: 'debug (color)'
+    hix_io: 'warn (color)'
     loggability: 'warn (color)'
     configurability: 'warn (color)'
-    strelka: 'debug (color)'
+    strelka: 'warn (color)'
