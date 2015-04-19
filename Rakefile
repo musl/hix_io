@@ -38,7 +38,7 @@ begin
 
 	spec = Gem::Specification.new do |s|
 		s.description           = 'hix_io - a gem for my website'
-		s.homepage              = 'http://hix.io/'
+		s.homepage              = 'http:/hix.io/'
 		s.email                 = 'm@hix.io'
 		s.authors               = [ 'Mike Hix <m@hix.io>' ]
 		s.platform              = Gem::Platform::RUBY
@@ -55,13 +55,13 @@ begin
 		s.add_dependency 'strelka', '~> 0.9'
 		s.add_dependency 'inversion', '~> 0.12'
 		s.add_dependency 'sequel', '~> 4.13'
-		s.add_dependency 'pg', '~> 1.17'
+		s.add_dependency 'pg', '~> 0.18'
 		s.add_dependency 'loggability', '~> 0.11'
 		s.add_dependency 'trollop', '~> 2.0'
 
 		s.add_development_dependency 'pry', '~> 0.10'
-		s.add_development_dependency 'rdoc', '>= 4.1'
-		s.add_development_dependency 'rdoc-generator-fivefish', '>= 0.1'
+		s.add_development_dependency 'rdoc', '~> 4.1'
+		s.add_development_dependency 'rdoc-generator-fivefish', '~> 0.1'
 		s.add_development_dependency 'rspec', '~> 3.0'
 		s.add_development_dependency 'ruby-prof', '~> 0.15'
 		s.add_development_dependency 'simplecov', '~> 0.8'
@@ -209,59 +209,29 @@ README.rdoc
 bin/hix_io_configure
 bin/hix_io_migrate
 bin/hix_io_run
-bin/hix_io_sample_data
-data/hix_io/migrations/001_base.rb
-data/hix_io/migrations/002_user.rb
-data/hix_io/migrations/003_post.rb
-data/hix_io/migrations/004_url.rb
-data/hix_io/migrations/005_photo_set.rb
-data/hix_io/migrations/006_photo.rb
-data/hix_io/static/css/font-awesome.min.css
-data/hix_io/static/css/grids-responsive-min.css
-data/hix_io/static/css/grids-responsive-old-ie-min.css
-data/hix_io/static/css/highlight/googlecode.min.css
-data/hix_io/static/css/pure-min.css
-data/hix_io/static/css/reset.css
-data/hix_io/static/css/style.css
-data/hix_io/static/fonts/FontAwesome.otf
-data/hix_io/static/fonts/fontawesome-webfont.eot
-data/hix_io/static/fonts/fontawesome-webfont.svg
-data/hix_io/static/fonts/fontawesome-webfont.ttf
-data/hix_io/static/fonts/fontawesome-webfont.woff
-data/hix_io/static/images/.keep
-data/hix_io/static/js/admin.js
-data/hix_io/static/js/hix_io.js
-data/hix_io/static/js/index.js
-data/hix_io/static/js/lib/can.js
-data/hix_io/static/js/lib/highlight.min.js
-data/hix_io/static/js/lib/jquery.cookie.js
-data/hix_io/static/js/lib/jquery.min.js
-data/hix_io/static/js/lib/moment.min.js
-data/hix_io/static/js/lib/sha512.js
-data/hix_io/static/templates/admin/login_form.stache
-data/hix_io/static/templates/admin/post_form.stache
-data/hix_io/static/templates/admin/profile.stache
-data/hix_io/static/templates/admin/urls.stache
-data/hix_io/static/templates/message.stache
-data/hix_io/static/templates/pager.stache
-data/hix_io/static/templates/pics.stache
-data/hix_io/static/templates/post.stache
-data/hix_io/static/templates/posts.stache
-data/hix_io/static/templates/urls.stache
-data/hix_io/templates/admin.tmpl
-data/hix_io/templates/index.tmpl
-data/hix_io/templates/layout.tmpl
 etc/config.yml
-etc/hixio.conf.rb
-lib/hix_io.rb
+etc/hix_io.conf.rb
 lib/hix_io/constants.rb
 lib/hix_io/core_extensions.rb
 lib/hix_io/handlers/api.rb
 lib/hix_io/handlers/auth.rb
 lib/hix_io/handlers/frontend.rb
-lib/hix_io/models/photo.rb
-lib/hix_io/models/photo_set.rb
-lib/hix_io/models/post.rb
 lib/hix_io/models/url.rb
 lib/hix_io/models/user.rb
+lib/hix_io.rb
 lib/strelka/authprovider/hixio.rb
+data/hix_io/migrations/001_base.rb
+data/hix_io/migrations/002_session.rb
+data/hix_io/migrations/003_user.rb
+data/hix_io/migrations/004_url.rb
+data/hix_io/static/css/grids-responsive-min.css
+data/hix_io/static/css/grids-responsive-old-ie-min.css
+data/hix_io/static/css/pure-min.css
+data/hix_io/static/css/style.css
+data/hix_io/static/js/index.js
+data/hix_io/static/js/jquery.cookie.js
+data/hix_io/static/js/jquery.min.js
+data/hix_io/static/js/moment.min.js
+data/hix_io/static/js/sha512.js
+data/hix_io/templates/index.tmpl
+data/hix_io/templates/layout.tmpl
