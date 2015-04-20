@@ -13,15 +13,15 @@ extend Mongrel2::Config::DSL
 
 opts = Trollop.options do
 	banner 'HixIO Configuration Tool'
-	opt :etc_dir, 'Required: The path to the mongrel2 etc directory.', :type => :string, :required => true
+	opt :etc_dir, 'Optional: The path to the mongrel2 etc directory.', :type => :string
 	opt :debug, 'Force debug logging.', :default => false
 end
 
 debug = opts[:debug]
 Loggability.level = debug ? :debug : :info
 
-etc_dir = Pathname( opts[:etc_dir] ).expand_path
-HixIO.log.info 'Entering: %s' % [etc_dir]
+etc_dir = HixIO::CONFIG_PATHS.map { |p| p.parent }.select( &:readable? ).first
+HixIO.log.info 'Entering: %s' % [etc_dir.to_s]
 
 Pathname.glob( etc_dir + '*.conf.rb' ).each do |conf|
 	db_file = Pathname( conf.sub( /.conf.rb$/, '.sqlite' ) )
