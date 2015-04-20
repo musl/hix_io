@@ -14,3 +14,18 @@ html, button, input, select, textarea,
 	color: #565d64;
 }
 
+div.main {
+	margin: 1em 0;
+	max-width: 1024px;
+}
+
+div.logo-box {
+	background-color: #ddeeff;
+	text-align: center;
+}
+
+div.content-box {
+	background-color: #f7f7f7;
+	min-height: 512px;
+}
+
