@@ -59,7 +59,6 @@ module HixIO
 		defaults[self.config_key].merge!( opts )
 
 		path ||= HixIO::CONFIG_PATHS.find( &:readable? )
-		self.log.debug "Reading config from: %p" % [path]
 
 		if path.nil?
 			raise "Unable to load configuration. No path was given and no config was found at the default paths."
@@ -71,6 +70,8 @@ module HixIO
 		if Object.const_defined?( :RSpec )
 			Loggability.level = :fatal
 		end
+
+		self.log.debug "Config installed from: %p" % [path]
 
 		return self.global_config
 	end

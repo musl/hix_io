@@ -7,8 +7,8 @@ require 'hix_io'
 
 opts = Trollop.options do
 	banner 'HixIO Application Launcher'
-	opt :config, 'Required: The path to the HixIO config.', :type => :string, :default => nil
 	opt :app, 'Required: The app to launch.', :type => :string, :required => true
+	opt :config, 'The path to the HixIO config.', :type => :string, :default => nil
 	opt :debug, 'Force debug logging.', :default => false
 end
 
