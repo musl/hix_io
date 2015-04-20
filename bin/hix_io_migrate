@@ -7,7 +7,7 @@ require 'trollop'
 
 opts = Trollop.options do
     banner 'HixIO Migration Tool'
-    opt :config, 'Required: The path to the HixIO config.', :type => :string, :default => nil
+    opt :config, 'The path to the HixIO config.', :type => :string, :default => nil
     opt :debug, 'Force debug logging.', :default => false
     opt :target, 'Migration target. Omit to migrate to the latest available migration.', :default => nil, :type => :int
 end
