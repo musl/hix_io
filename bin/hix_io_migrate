@@ -25,7 +25,7 @@ migrator = migrator_class.new( HixIO.db, HixIO::MIGRATION_DIR, :target => opts[:
 HixIO.log.debug "Current Schema Version: %d" % [migrator.current]
 
 if migrator.is_current?
-    "The schema is current."
+    HixIO.log.debug "The schema is current."
     exit
 end
 
