@@ -2,8 +2,9 @@
 # vim: set nosta noet ts=4 sw=4 ft=ruby:
 # encoding: UTF-8
 
-require 'trollop'
+require 'etc'
 require 'hix_io'
+require 'trollop'
 
 opts = Trollop.options do
 	banner 'HixIO Application Launcher'
