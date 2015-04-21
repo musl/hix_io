@@ -8,6 +8,7 @@ require 'hix_io'
 opts = Trollop.options do
 	banner 'HixIO Application Launcher'
 	opt :app, 'Required: The app to launch.', :type => :string, :required => true
+	opt :user, 'Optional: The user to run as when started by root.', :default => 'nobody'
 	opt :config, 'The path to the HixIO config.', :type => :string, :default => nil
 	opt :debug, 'Force debug logging.', :default => false
 end
@@ -19,5 +20,17 @@ handler = HixIO.const_get( (HixIO.constants - snap).first )
 HixIO.load_config( opts[:config] )
 Loggability.level = opts[:debug] ? :debug : :info
 
-handler.run
+if Process.uid == 0
+	begin
+		Process::Sys.setuid( Etc.getpwnam( opts[:user] ).uid )
+	rescue Errno::EPERM
+		abort 'Unable to drop privileges.'
+	end
+	begin
+		Process::Sys.setuid( 0 )
+		abort 'Failed to drop privileges.'
+	rescue Errno::EPERM
+	end
+end
 
+handler.run
