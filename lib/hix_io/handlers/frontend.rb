@@ -40,7 +40,11 @@ class HixIO::Frontend < Strelka::App
 
 	get '/:short' do |req|
 		if url = HixIO::URL[:short => req.params[:short]]
-			url.update( :hits => url.hits + 1 )
+			Thread.new do
+				HixIO.db.transaction do
+					url.update( :hits => url.hits + 1 )
+				end
+			end
 			finish_with( HTTP::REDIRECT, '', :location => url.url )
 		end
 
