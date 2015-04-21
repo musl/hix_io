@@ -12,8 +12,21 @@ For great justice.
 
 It's not done yet.
 
-Notes on dev DB setup stuck here for a moment:
+== SYNOPSIS:
 
+* Install the gem: gem install hix_io
+* Create the config dir: mkdir -p /usr/local/etc/hix.io
+* Create the mongrel2 log dir: mkdir -p /var/log/mongrel2
+* Copy in configs: cp $GEM_HOME/gems/hix_io-<version>/etc/* /usr/local/etc/hix.io/
+* Edit the configs to taste.
+* Run: hix_io_configure
+* Create startup scripts for each service with your favorite tool to start the following commands.
+	* mongrel2 /usr/local/etc/hix.io/hix_io.sqlite main
+	* hix_io_run -a api
+	* hix_io_run -a auth
+	* hix_io_run -a frontend
+* Configure a standards-compliant HTTP proxy (apache, nginx, haproxy, or whatever works for you) to handle requests on 80 and ssl requests on 443 and forward them to localhost:8080.
+* Configure the database:
 	SQL setup:
 	- create role hix_io with login;
 	- alter role hix_io set search_path to hix_io;
@@ -25,12 +38,11 @@ Notes on dev DB setup stuck here for a moment:
 
 	Notes on connection limits:
 	- Each handler requires one database connection.
-	- Handlers that use the dbsession require two connections.
+	- Handlers that use the dbsession require two connections. (just auth for now)
 	- You'll need two more connections for running specs while the handlers are running.
+* Run: hix_io_migrate
 
-== SYNOPSIS:
-
-* gem install hix_io
+Notes on dev DB setup stuck here for a moment:
 
 == REQUIREMENTS:
 
