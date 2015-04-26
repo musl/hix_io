@@ -27,12 +27,16 @@ class HixIO::Auth < Strelka::App
 	### R O U T E S
 	########################################################################
 
+	# Get the logged in user.
+	#
 	get '/' do |req|
 		res = req.response
 		res.for( :json ) { req.authenticated_user }
 		return res
 	end
 
+	# Log in.
+	#
 	post '/' do |req|
 		res = req.response
 		user = self.auth_provider.authenticate( req ) ||
@@ -41,6 +45,8 @@ class HixIO::Auth < Strelka::App
 		return res
 	end
 
+	# Log out.
+	#
 	delete '/' do |req|
 		res = req.response
 		res.destroy_session if res.session?

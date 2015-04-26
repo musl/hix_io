@@ -31,6 +31,8 @@ class HixIO::API < Strelka::App
 	### R O U T E S
 	########################################################################
 
+	# Allow an authenticated user to shorten a URL.
+	#
 	post '/urls' do |req|
 		req.params.add :url, :string
 
@@ -51,4 +53,3 @@ class HixIO::API < Strelka::App
 	end
 
 end
-

@@ -32,12 +32,16 @@ class HixIO::Frontend < Strelka::App
 	### R O U T E S
 	########################################################################
 
+	# Index.
+	#
 	get '/' do |req|
 		tmpl = template( :index )
 		tmpl.meta = self.meta( req )
 		return tmpl
 	end
 
+	# Redirect for shortened URLs.
+	#
 	get '/:short' do |req|
 		if url = HixIO::URL[:short => req.params[:short]]
 			Thread.new do
@@ -77,4 +81,3 @@ class HixIO::Frontend < Strelka::App
 	end
 
 end
-
