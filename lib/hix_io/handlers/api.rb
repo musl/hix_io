@@ -27,9 +27,23 @@ class HixIO::API < Strelka::App
 
 	router :exclusive
 
+	# FIXME: Revisit this when adding other models.
+	no_auth_for { |req| req.verb == :GET }
+
 	########################################################################
 	### R O U T E S
 	########################################################################
+
+	# Return a summary of shortened URLs.
+	#
+	get '/urls/summary' do |req|
+		res = req.response
+		res.for( :json ) {{
+			:latest => HixIO::URL.latest.all,
+			:top => HixIO::URL.top.all
+		}}
+		return res
+	end
 
 	# Allow an authenticated user to shorten a URL.
 	#

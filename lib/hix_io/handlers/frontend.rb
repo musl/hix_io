@@ -24,10 +24,7 @@ class HixIO::Frontend < Strelka::App
 	default_type 'text/html'
 
 	layout 'layout.tmpl'
-	templates \
-		:index => 'index.tmpl',
-		:urls  => 'urls.tmpl',
-		:login => 'login.tmpl'
+	templates :index => 'index.tmpl'
 
 	param :short, /[0-9a-z]{7}/
 

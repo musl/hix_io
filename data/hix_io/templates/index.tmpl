@@ -1,10 +1,35 @@
 <?publish head ?>
+	<link rel="stylesheet" href="/static/css/style.css" type="text/css" media="screen" charset="utf-8">
+
+	<script type="text/javascript" src="/static/js/lib/jquery.min.js"></script>
+	<script type="text/javascript" src="/static/js/lib/can.min.js"></script>
+	<script type="text/javascript" src="/static/js/hix_io.js"></script>
+	<script type="text/javascript" charset="utf-8">HixIO.attr('meta', <?attr meta ?>);</script>
+	<script type="text/javascript" src="/static/js/index.js"></script>
 <?end publish ?>
 
-<h2>What now?</h2>
-<p>
-	Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris ac mi placerat, eleifend libero vel, accumsan orci. Praesent at nisi vehicula, sollicitudin lacus eu, posuere neque. Maecenas sapien lorem, porttitor id dui ac, auctor elementum ex. Donec lobortis quam quis purus facilisis scelerisque. Phasellus non vestibulum urna. Nulla facilisi. Nulla facilisi. Nulla sit amet dictum sapien. Morbi viverra suscipit tortor in volutpat. Praesent metus ipsum, porta a neque sed, tristique ullamcorper sapien.
-</p>
-<p>
-	Aenean tincidunt mauris est, eu faucibus sapien luctus ac. Nulla elementum vulputate ultrices. Sed sit amet sodales neque. Duis ac erat ac purus laoreet viverra. <a>Donec</a> id luctus eros, id pellentesque mi. Vestibulum et malesuada libero. Morbi mauris magna, ultricies in consequat sed, porta ac lorem.
-</p>
+<div class="pure-g main">
+	<div class="pure-u-1 pure-u-md-1-6"><!-- spacer --></div>
+	<div class="pure-u-1 pure-u-md-1-6 nav-box">
+		<p>
+			<a href="/" class="logo">
+				<img src="/static/images/knot_3_wolves.jpg" alt="hix.io">
+				<h1>hix.io</h1>
+			</a>
+		</p>
+		<ul>
+			<li><a href="/#!urls">urls</a></li>
+			<li><a href="http://code.hix.io/">code</a></li>
+		</ul>
+		<p><b>&#x2235;</b></p>
+	</div>
+	<div class="pure-u-1 pure-u-md-1-2 content-box">
+		<div class="column-pad">
+
+			<!-- The thing our canjs app latches onto. -->
+			<div id="main"></div>
+
+		</div>
+	</div>
+	<div class="pure-u-1 pure-u-md-1-6"><!-- spacer --></div>
+</div>
