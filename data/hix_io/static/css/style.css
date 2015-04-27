@@ -1,6 +1,6 @@
 
 /* Import both 300 and 400 so we get a 'real' bold face. */
-@import url(http://fonts.googleapis.com/css?family=Open+Sans:300,400);
+
 
 /* For source code listings. */
 @import url(http://fonts.googleapis.com/css?family=Source+Code+Pro:300);
@@ -64,7 +64,7 @@ div.main {
 
 @media screen and (min-width: 48em) {
 	div.main {
-		margin: 12em 0;
+		margin: 14em 0;
 	}
 }
 
@@ -72,13 +72,13 @@ div.nav-box {
 	text-align: center;
 }
 
-div.nav-box h1 a {
+div.nav-box a.logo {
+	border: 0;
 	color: inherit !important;
 }
 
 div.nav-box img {
-	width: 66%;
-	max-width: 128px;
+	height: 9em;
 }
 
 div.nav-box > ul {
@@ -103,6 +103,13 @@ div.content-box {
 }
 
 div.column-pad {
+	margin-top: 1em;
 	margin-left: 1em;
 	margin-right: 1em;
+}
+
+@media screen and (min-width: 48em) {
+	div.column-pad {
+		margin-top: 5em;
+	}
 }

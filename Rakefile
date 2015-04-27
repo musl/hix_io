@@ -246,5 +246,6 @@ data/hix_io/static/js/jquery.cookie.js
 data/hix_io/static/js/jquery.min.js
 data/hix_io/static/js/moment.min.js
 data/hix_io/static/js/sha512.js
+data/hix_io/static/images/knot_3_wolves.jpg
 data/hix_io/templates/index.tmpl
 data/hix_io/templates/layout.tmpl
