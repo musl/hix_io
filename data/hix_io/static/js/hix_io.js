@@ -10,7 +10,7 @@ var HixIO = new can.Map({
 	meta: {},
 	template_path: '/static/templates/',
 	template_suffix: '.stache',
-	user: null
+	user: false
 });
 
 /******************************************************************************
@@ -108,7 +108,10 @@ HixIO.highlightSyntax = function() {
  */
 HixIO.view_helpers = {
 	current_user: function(block) {
-		if(HixIO.attr('user')) { return block.fn(HixIO.attr('user')); }
+		if(HixIO.attr('user')) {
+			//return block.fn(HixIO.attr('user'));
+			return true;
+		}
 		return false;
 	},
 

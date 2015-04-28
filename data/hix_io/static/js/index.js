@@ -27,7 +27,15 @@ HixIO.URLControl = can.Control.extend({
 		view: 'urls'
 	}
 }, {
-	'urls route': function() {
+	init: function() {
+		var self;
+
+		self = this;
+
+		HixIO.bind('user', function() { self.update(); });
+	},
+
+	update: function() {
 		var self;
 
 		self = this;
@@ -41,11 +49,96 @@ HixIO.URLControl = can.Control.extend({
 					top_urls: HixIO.URL.models(data.top),
 					latest_urls: HixIO.URL.models(data.latest),
 					url: self.url,
+					shorten: self.shorten,
+					user: HixIO.attr('user')
 				}
 			));
 		}).error(function(data) {
 			console.log("Error fetching URLs. Status: " + data.status);
 			self.element.html('Error fetching URLs.');
+		});
+	},
+
+	'urls route': function() {
+		this.update();
+	},
+
+	shorten: function(context, element, event) {
+		var self;
+
+		self = this;
+
+		HixIO.URL.shorten({url: element[0].value}).success(function(data) {
+			self.url = data;
+			self.update();
+		}).error(function(data) {
+			if(data.status === 403) {
+				console.log('You aren\'t allowed to shorten urls.');
+			} else if(data.status === 401) {
+				console.log('You need to sign in to shorten URLs.');
+			} else {
+				console.log('I wasn\'t able to shorten that: ' + data.status);
+			}
+		});
+	}
+});
+
+/*
+ * A control for a shared photo timeline.
+ */
+HixIO.Menu = can.Control.extend({
+	defaults: {
+		view: 'menu'
+	}
+}, {
+	init: function(element, options) {
+		var self;
+
+		self = this;
+
+		this.update();
+		HixIO.bind('user', function() {
+			self.update();
+		});
+	},
+
+	update: function() {
+		this.element.html(HixIO.view(this.options.view, {
+			logout: this.logout,
+			login: this.login,
+			user: HixIO.attr('user')
+		}));
+		console.log('menu updated')
+	},
+
+	logout: function() {
+		var self;
+
+		self = this;
+
+		console.log('logout');
+
+		HixIO.ajax('/auth/', 'DELETE')().success(function(data) {
+			HixIO.attr('user', false);
+		}).error(function(data) {
+			console.log('Could not log out: ' + data.status);
+		});
+	},
+
+	login: function() {
+		var self;
+
+		self = this;
+
+		console.log('login');
+
+		HixIO.ajax('/auth/', 'POST')({
+			email: 'a@b.c',
+			password: 'test'
+		}).success(function(data) {
+			HixIO.attr('user', HixIO.User.model(data));
+		}).error(function(data) {
+			console.log('Could not log in: ' + data.status);
 		});
 	}
 });
@@ -55,6 +148,7 @@ HixIO.URLControl = can.Control.extend({
  ******************************************************************************/
 
 $(document).ready(function() {
+	HixIO.menu = new HixIO.Menu('#menu', {});
 	can.each([
 		HixIO.DefaultControl,
 		HixIO.URLControl

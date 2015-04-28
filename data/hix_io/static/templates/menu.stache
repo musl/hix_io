@@ -1,0 +1,10 @@
+<ul>
+	<li><a href="/#!urls">urls</a></li>
+	<li><a href="http://code.hix.io/">code</a></li>
+	{{#if user}}
+		<li>{{name}}</li>
+		<li><a can-click="logout">log out</a></li>
+	{{else}}
+		<li><a can-click="login">log in</a></li>
+	{{/if}}
+</ul>
