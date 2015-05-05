@@ -18,7 +18,7 @@ dbsession:
     connect: 'postgres://hix_io@localhost/db01'
     table_name: 'sessions'
     cookie_name: 'hix_io_session'
-    expires: '+1d'
+    expires: '+2d'
 
 logging:
     __default__: 'warn (color)'

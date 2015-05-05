@@ -17,7 +17,10 @@ class HixIO::Frontend < Strelka::App
 	plugins \
 		:routing,
 		:parameters,
-		:templating
+		:templating,
+		:sessions
+
+	session_namespace :hix_io
 
 	router :exclusive
 

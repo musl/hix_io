@@ -21,7 +21,10 @@ class HixIO::Auth < Strelka::App
 
 	session_namespace :hix_io
 
-	no_auth_for { |req| req.verb == :POST }
+	require_auth_for do |req|
+		self.log.debug "Auth: request verb %p" % [req.verb]
+		req.verb == :GET
+	end
 
 	########################################################################
 	### R O U T E S
@@ -40,7 +43,7 @@ class HixIO::Auth < Strelka::App
 	post '/' do |req|
 		res = req.response
 		user = self.auth_provider.authenticate( req ) ||
-			finish_with( HTTP::SERVER_ERROR, 'Who are you?' )
+			finish_with( HTTP::SERVER_ERROR, 'Auth bug!' )
 		res.for( :json ) { user }
 		return res
 	end
@@ -59,3 +62,4 @@ class HixIO::Auth < Strelka::App
 	end
 
 end
+

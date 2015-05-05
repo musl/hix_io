@@ -32,7 +32,7 @@ class Strelka::AuthProvider::HixIO < Strelka::AuthProvider
 	#
 	def authenticate( request )
 		if user = check_session( request ) ||
-				  check_login( request )
+			check_login( request )
 			self.auth_succeeded( request, user )
 			return user
 		end
@@ -58,13 +58,21 @@ class Strelka::AuthProvider::HixIO < Strelka::AuthProvider
 	# nil if none was found.
 	#
 	def check_session( request )
-		return nil unless request.session?
+		unless request.session?
+			self.log.warn('no session found')
+			return nil
+		end
 
-		req_ip = request.headers[:x_forwarded_for]
+		req_ip = request.headers[:x_forwarded_for] || request.remote_ip
 		session_ip = request.session[:src_ip]
-		user = ::HixIO::User[request.session[:id]]
+		user = ::HixIO::User[request.session[:email]]
 
-		return user if user and req_ip == session_ip
+		if user and req_ip == session_ip
+			self.log.warn('session checks out')
+			return user
+		end
+
+		self.log.warn('Invalid session. user: %s session ip: %s req ip: %s' % [user,session_ip,req_ip])
 	end
 
 	# Validate credentials given in a +request+, returning the user if they were
@@ -92,8 +100,8 @@ class Strelka::AuthProvider::HixIO < Strelka::AuthProvider
 	# Create a session for the given +user+ and +request+.
 	#
 	def make_session( user, request )
-		request.session[:id] = user.id
-		request.session[:src_ip] = request.headers[:x_forwarded_for]
+		request.session[:email] = user.email
+		request.session[:src_ip] = request.headers[:x_forwarded_for] || req.remote_ip
 	end
 
 end

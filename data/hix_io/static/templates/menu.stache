@@ -5,6 +5,10 @@
 		<li>{{name}}</li>
 		<li><a can-click="logout">log out</a></li>
 	{{else}}
-		<li><a can-click="login">log in</a></li>
+		<form method="post" action="/auth/">
+			<input type="email" id="email"><br>
+			<input type="password" id="password"><br>
+			<input type="submit">
+		</form>
 	{{/if}}
 </ul>

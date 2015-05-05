@@ -104,6 +104,27 @@ HixIO.highlightSyntax = function() {
 };
 
 /*
+ * Prep everything we need, and then call can.route.ready();
+ */
+HixIO.boot = function() {
+	var session = $.cookie('hix_io_session');
+	console.log('session: ' + session);
+
+	if(session) {
+		HixIO.User.current().success(function(data) {
+			HixIO.user = HixIO.User.model(data);
+			can.route.ready();
+		}).error(function(data) {
+			console.log('failed to fetch user for session: ' + session);
+			can.route.ready();
+		});
+	} else {
+		console.log('no session');
+		can.route.ready();
+	}
+}
+
+/*
  * Helpers for views.
  */
 HixIO.view_helpers = {
@@ -202,5 +223,7 @@ HixIO.URL = can.Model.extend({
 /*
  * User Accounts.
  */
-HixIO.User = can.Model.extend({}, {});
+HixIO.User = can.Model.extend({
+	current: HixIO.ajax('/auth/')
+}, {});
 

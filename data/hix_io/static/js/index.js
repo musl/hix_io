@@ -133,7 +133,7 @@ HixIO.Menu = can.Control.extend({
 		console.log('login');
 
 		HixIO.ajax('/auth/', 'POST')({
-			email: 'a@b.c',
+			email: 'm@hix.io',
 			password: 'test'
 		}).success(function(data) {
 			HixIO.attr('user', HixIO.User.model(data));
@@ -155,5 +155,6 @@ $(document).ready(function() {
 	], function(Control) {
 		return new Control('#main');
 	});
-	can.route.ready();
+	HixIO.boot();
 });
+
