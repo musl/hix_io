@@ -67,12 +67,13 @@ class Strelka::AuthProvider::HixIO < Strelka::AuthProvider
 		session_ip = request.session[:src_ip]
 		user = ::HixIO::User[request.session[:email]]
 
-		if user and req_ip == session_ip
+		if !user.nil? and req_ip == session_ip
 			self.log.warn('session checks out')
 			return user
 		end
 
 		self.log.warn('Invalid session. user: %s session ip: %s req ip: %s' % [user,session_ip,req_ip])
+		return false
 	end
 
 	# Validate credentials given in a +request+, returning the user if they were
@@ -87,6 +88,7 @@ class Strelka::AuthProvider::HixIO < Strelka::AuthProvider
 		request.body.rewind
 
 		form = Hash[URI.decode_www_form( request.body.read )]
+		self.log.warn "Form: %p" % [form]
 		user = ::HixIO::User.where( :email => form['email'] ).first
 
 		if user and form['password'] == user.password

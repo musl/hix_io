@@ -19,7 +19,7 @@ var HixIO = new can.Map({
 
 /*
  * Delegate a method on our namespace to another object.
- * 
+ *
  * Arguments:
  *     name: (required)
  *         The name of the function to create on this namespace.
@@ -48,7 +48,7 @@ HixIO.view = function(name, obj) {
  * Perform an asynchronous HTTP request and return the deferred result. See
  * can.ajax() and JQuery.ajax() for more information. I created this to help
  * keep the model definitions nice and clean and free of duplicated code.
- * 
+ *
  * Arguments:
  *
  *     path: (required)
@@ -91,7 +91,7 @@ HixIO.ajax = function(path, method, type) {
 HixIO.highlightSyntax = function() {
 	$('pre code').each(function() {
 		var e, lang;
-		
+
 		e = $(this);
 		lang = e.attr('data-language');
 
@@ -112,7 +112,7 @@ HixIO.boot = function() {
 
 	if(session) {
 		HixIO.User.current().success(function(data) {
-			HixIO.user = HixIO.User.model(data);
+			HixIO.attr('user', HixIO.User.model(data));
 			can.route.ready();
 		}).error(function(data) {
 			console.log('failed to fetch user for session: ' + session);
@@ -123,6 +123,38 @@ HixIO.boot = function() {
 		can.route.ready();
 	}
 }
+
+HixIO.login = function(email, password) {
+	var self;
+
+	self = this;
+
+	if(email == "" || password == "") { return; }
+
+	HixIO.ajax('/auth/', 'POST')({
+		"email": email,
+		"password": password
+	}).success(function(data) {
+		HixIO.attr('user', HixIO.User.model(data));
+	}).error(function(data) {
+		console.log('Could not log in: ' + data.status);
+	});
+};
+
+HixIO.logout = function() {
+	var self;
+
+	self = this;
+
+	console.log('logout');
+
+	HixIO.ajax('/auth/', 'DELETE')().success(function(data) {
+		$.removeCookie(HixIO.session_cookie_name);
+		HixIO.attr('user', false);
+	}).error(function(data) {
+		console.log('Could not log out: ' + data.status);
+	});
+};
 
 /*
  * Helpers for views.
@@ -174,12 +206,12 @@ HixIO.view_helpers = {
 			// TODO: Turn this into a block helper.
 			return $('<span></span>').addClass("validation-error arrow_box").html(errors.join(' '));
 		}
-		return false;	
+		return false;
 	},
 
 	datatable: function(data, columns) {
 		var cols, table, wrapper;
-		
+
 		table = $('<table></table>');
 		table.wrap('<div></div>');
 		wrapper = table.parent();

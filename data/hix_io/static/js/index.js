@@ -24,7 +24,7 @@ HixIO.DefaultControl = can.Control.extend({
  */
 HixIO.URLControl = can.Control.extend({
 	defaults: {
-		view: 'urls'
+		view: 'urls',
 	}
 }, {
 	init: function() {
@@ -32,7 +32,13 @@ HixIO.URLControl = can.Control.extend({
 
 		self = this;
 
-		HixIO.bind('user', function() { self.update(); });
+		this.url = null;
+
+		HixIO.bind('user', function() {
+			var route;
+			route = can.route.attr('route');
+			if(route && route.match( /^urls/ )) { self.update(); }
+		});
 	},
 
 	update: function() {
@@ -64,12 +70,11 @@ HixIO.URLControl = can.Control.extend({
 	},
 
 	shorten: function(context, element, event) {
-		var self;
-
-		self = this;
-
-		HixIO.URL.shorten({url: element[0].value}).success(function(data) {
-			self.url = data;
+		// FIXME: this is in the context ef the data passed to the view.
+		HixIO.URL.shorten({
+			url: element[0].value
+		}).success(function(data) {
+			self.url = HixIO.URL.model(data);
 			self.update();
 		}).error(function(data) {
 			if(data.status === 403) {
@@ -104,42 +109,27 @@ HixIO.Menu = can.Control.extend({
 
 	update: function() {
 		this.element.html(HixIO.view(this.options.view, {
-			logout: this.logout,
 			login: this.login,
+			logout: this.logout,
 			user: HixIO.attr('user')
 		}));
 		console.log('menu updated')
 	},
 
-	logout: function() {
-		var self;
+	login: function(context, element, event) {
+		var email;
+		var password;
 
-		self = this;
+		email = $('#email').val();
+		password = $('#password').val();
 
-		console.log('logout');
+		console.log('login form: ' + email + ' : ' + password);
 
-		HixIO.ajax('/auth/', 'DELETE')().success(function(data) {
-			HixIO.attr('user', false);
-		}).error(function(data) {
-			console.log('Could not log out: ' + data.status);
-		});
+		HixIO.login(email, password);
 	},
 
-	login: function() {
-		var self;
-
-		self = this;
-
-		console.log('login');
-
-		HixIO.ajax('/auth/', 'POST')({
-			email: 'm@hix.io',
-			password: 'test'
-		}).success(function(data) {
-			HixIO.attr('user', HixIO.User.model(data));
-		}).error(function(data) {
-			console.log('Could not log in: ' + data.status);
-		});
+	logout: function(context, element, event) {
+		HixIO.logout();
 	}
 });
 

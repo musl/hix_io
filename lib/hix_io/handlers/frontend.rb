@@ -38,6 +38,8 @@ class HixIO::Frontend < Strelka::App
 	# Index.
 	#
 	get '/' do |req|
+		req.session.create unless req.session?
+
 		tmpl = template( :index )
 		tmpl.meta = self.meta( req )
 		return tmpl
@@ -70,6 +72,7 @@ class HixIO::Frontend < Strelka::App
 			:stamp => Time.now,
 			:dev => HixIO.dev?,
 			:ssl => req.ssl?,
+			:scheme => req.scheme
 		}
 
 		if HixIO.dev?
