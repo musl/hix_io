@@ -15,10 +15,10 @@ class HixIO::Frontend < Strelka::App
 	config_key :frontend
 
 	plugins \
-		:routing,
-		:parameters,
-		:templating,
-		:sessions
+	:routing,
+	:parameters,
+	:templating,
+	:sessions
 
 	session_namespace :hix_io
 
@@ -49,10 +49,8 @@ class HixIO::Frontend < Strelka::App
 	#
 	get '/:short' do |req|
 		if url = HixIO::URL[:short => req.params[:short]]
-			Thread.new do
-				HixIO.db.transaction do
-					url.update( :hits => url.hits + 1 )
-				end
+			HixIO.db.transaction do
+				url.update( :hits => url.hits + 1 )
 			end
 			finish_with( HTTP::REDIRECT, '', :location => url.url )
 		end
