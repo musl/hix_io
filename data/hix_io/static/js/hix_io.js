@@ -6,12 +6,13 @@
  * Namespace
  ******************************************************************************/
 
-var HixIO = new can.Map({
-	meta: {},
-	template_path: '/static/templates/',
-	template_suffix: '.stache',
-	user: false
-});
+ var HixIO = new can.Map({
+ 	meta: {},
+ 	template_path: '/static/templates/',
+ 	template_suffix: '.stache',
+ 	user: false,
+ 	message: ''
+ });
 
 /******************************************************************************
  * Utility Functions
@@ -28,21 +29,21 @@ var HixIO = new can.Map({
  *         The object to delegate the function to.
  *
  */
-HixIO.delegate = function(name, object) {
-	HixIO[name] = function() {
-		object[name].apply(object, arguments);
-	};
-};
+ HixIO.delegate = function(name, object) {
+ 	HixIO[name] = function() {
+ 		object[name].apply(object, arguments);
+ 	};
+ };
 
 /*
  * Render a view with a template's short name and the view helpers included.
  */
-HixIO.view = function(name, obj) {
-	var tmpl;
+ HixIO.view = function(name, obj) {
+ 	var tmpl;
 
-	tmpl = HixIO.attr('template_path') + name + HixIO.attr('template_suffix');
-	return can.view(tmpl, obj, HixIO.view_helpers);
-};
+ 	tmpl = HixIO.attr('template_path') + name + HixIO.attr('template_suffix');
+ 	return can.view(tmpl, obj, HixIO.view_helpers);
+ };
 
 /*
  * Perform an asynchronous HTTP request and return the deferred result. See
@@ -60,19 +61,19 @@ HixIO.view = function(name, obj) {
  *     type: (optional, default: 'json')
  *         Content-Type for the request.
  */
-HixIO.ajax = function(path, method, type) {
-	if(!method) { method = 'GET'; }
-	if(!type) { type = 'json'; }
+ HixIO.ajax = function(path, method, type) {
+ 	if(!method) { method = 'GET'; }
+ 	if(!type) { type = 'json'; }
 
-	return function(params) {
-		return can.ajax({
-			url: path,
-			type: method,
-			data: params,
-			dataType: type
-		});
-	};
-};
+ 	return function(params) {
+ 		return can.ajax({
+ 			url: path,
+ 			type: method,
+ 			data: params,
+ 			dataType: type
+ 		});
+ 	};
+ };
 
 /*
  * Attempt to syntax-highlight all 'code' elements nested within 'pre'
@@ -88,79 +89,104 @@ HixIO.ajax = function(path, method, type) {
  * highlighting is performed.
  *
  */
-HixIO.highlightSyntax = function() {
-	$('pre code').each(function() {
-		var e, lang;
+ HixIO.highlightSyntax = function() {
+ 	$('pre code').each(function() {
+ 		var e, lang;
 
-		e = $(this);
-		lang = e.attr('data-language');
+ 		e = $(this);
+ 		lang = e.attr('data-language');
 
-		if(!lang) {
-			hljs.highlightBlock(this);
-		} else if(hljs.getLanguage(lang)) {
-			e.html(hljs.highlight(lang, e.html(), true));
-		}
-	});
-};
+ 		if(!lang) {
+ 			hljs.highlightBlock(this);
+ 		} else if(hljs.getLanguage(lang)) {
+ 			e.html(hljs.highlight(lang, e.html(), true));
+ 		}
+ 	});
+ };
 
 /*
  * Prep everything we need, and then call can.route.ready();
  */
-HixIO.boot = function() {
-	var session = $.cookie('hix_io_session');
+ HixIO.boot = function() {
+ 	var session;
 
-	console.log('session: ' + session);
-
-	if(session) {
+ 	if(session = $.cookie('hix_io_session')) {
+		// If there's a session, wait until it's determined if the user is
+		// logged in before rendering the app.
 		HixIO.User.current().success(function(data) {
 			HixIO.attr('user', HixIO.User.model(data));
 			can.route.ready();
 		}).error(function(data) {
-			console.log('failed to fetch user for session: ' + session);
 			can.route.ready();
 		});
-	} else {
-		console.log('no session');
-		can.route.ready();
+		return;
 	}
-}
 
-HixIO.login = function(email, password) {
-	var self;
-
-	self = this;
-
-	if(email == "" || password == "") { return; }
-
-	HixIO.ajax('/auth/', 'POST')({
-		"email": email,
-		"password": password
-	}).success(function(data) {
-		HixIO.attr('user', HixIO.User.model(data));
-	}).error(function(data) {
-		console.log('Could not log in: ' + data.status);
-	});
+	// If there's no session, just boot.
+	can.route.ready();
 };
 
-HixIO.logout = function() {
-	var self;
+/*
+ * Display a message to the user or just log it to the console based
+ * on the given level.
+ */
+ HixIO.log = function(message, level) {
+ 	switch(level) {
+ 		case "error":
+ 		case "warn":
+ 		case "info":
+ 		HixIO.attr('message', {'message': message, 'level': level});
+ 		if(HixIO.meta.dev) { console.log(level + ": " + message); }
+ 		break;
+ 		default:
+ 		console.log(message);
+ 		break;
+ 	}
+ };
 
-	self = this;
+/*
+ * Authenticate the current session.
+ */
+ HixIO.login = function(email, password) {
+ 	var self;
 
-	HixIO.ajax('/auth/', 'DELETE')().success(function(data) {
-		$.removeCookie(HixIO.session_cookie_name);
-		HixIO.attr('user', false);
-	}).error(function(data) {
-		console.log('Could not log out: ' + data.status);
-	});
-};
+ 	self = this;
+
+ 	if(email == "" || password == "") { return; }
+
+ 	HixIO.ajax('/auth/', 'POST')({
+ 		"email": email,
+ 		"password": password
+ 	}).success(function(data) {
+ 		HixIO.attr('user', HixIO.User.model(data));
+ 	}).error(function(data) {
+ 		HixIO.log(data.status + ": Could not log in.", "warn");
+ 	});
+ };
+
+/*
+ * Destroy the current session.
+ */
+ HixIO.logout = function() {
+ 	var self;
+
+ 	self = this;
+
+ 	HixIO.ajax('/auth/', 'DELETE')().success(function(data) {
+ 		$.removeCookie(HixIO.session_cookie_name);
+ 		HixIO.attr('user', false);
+ 	}).error(function(data) {
+ 		HixIO.log
+ 		(data.status + ": Could not log out.", "warn");
+ 	});
+ };
 
 /*
  * Helpers for views.
  */
-HixIO.view_helpers = {
-	current_user: function(block) {
-		if(HixIO.attr('user')) {
+ HixIO.view_helpers = {
+ 	current_user: function(block) {
+ 		if(HixIO.attr('user')) {
 			//return block.fn(HixIO.attr('user'));
 			return true;
 		}
@@ -254,15 +280,15 @@ HixIO.view_helpers = {
 /*
  * URLs for a URL-shortener.
  */
-HixIO.URL = can.Model.extend({
-	summary: HixIO.ajax('/api/v1/urls/summary'),
-	shorten: HixIO.ajax('/api/v1/urls', 'POST')
-}, {});
+ HixIO.URL = can.Model.extend({
+ 	summary: HixIO.ajax('/api/v1/urls/summary'),
+ 	shorten: HixIO.ajax('/api/v1/urls', 'POST')
+ }, {});
 
 /*
  * User Accounts.
  */
-HixIO.User = can.Model.extend({
-	current: HixIO.ajax('/auth/')
-}, {});
+ HixIO.User = can.Model.extend({
+ 	current: HixIO.ajax('/auth/')
+ }, {});
 

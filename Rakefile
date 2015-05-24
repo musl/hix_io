@@ -253,5 +253,6 @@ data/hix_io/static/templates/home.stache
 data/hix_io/static/templates/menu.stache
 data/hix_io/static/templates/urls.stache
 data/hix_io/static/templates/user.stache
+data/hix_io/static/templates/message_box.stache
 data/hix_io/templates/index.tmpl
 data/hix_io/templates/layout.tmpl

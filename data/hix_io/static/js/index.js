@@ -44,7 +44,7 @@
  				logout: HixIO.logout,
  				user: HixIO.attr('user')
  			}
- 		));
+ 			));
  	},
 
  	'user route': function() {
@@ -121,11 +121,11 @@
 			self.update();
 		}).error(function(data) {
 			if(data.status === 403) {
-				console.log('You aren\'t allowed to shorten urls.');
+				HixIO.log('You aren\'t allowed to shorten urls.', 'warn');
 			} else if(data.status === 401) {
-				console.log('You need to sign in to shorten URLs.');
+				HixIO.log('You need to sign in to shorten URLs.', 'warn');
 			} else {
-				console.log('I wasn\'t able to shorten that: ' + data.status);
+				HixIO.log('I wasn\'t able to shorten that: ' + data.status, 'warn');
 			}
 		});
 	}
@@ -160,19 +160,69 @@
 
  });
 
+
+/*
+ * A control for a shared photo timeline.
+ */
+ HixIO.MessageBox = can.Control.extend({
+ 	defaults: {
+ 		view: 'message_box',
+ 		delay: 10000
+ 	}
+ }, {
+ 	init: function(element, options) {
+ 		var self;
+
+ 		self = this;
+
+ 		HixIO.bind('message', function() {
+ 			var message;
+
+ 			message = HixIO.attr('message');
+ 			if(message && message.message) { self.update(); }
+ 		});
+
+ 		this.timeout = null;
+ 	},
+
+ 	update: function() {
+ 		var message, self;
+
+ 		self = this;
+
+ 		if(this.timeout) { clearTimeout(this.timeout); }
+
+ 		this.element.html(HixIO.view(
+ 			this.options.view, HixIO.removeAttr('message')
+ 			));
+
+ 		this.timeout = setTimeout(function() {
+ 			self.element.html('');
+ 		}, this.options.delay);
+ 	}
+
+ });
+
 /******************************************************************************
  * Application entry point.
  ******************************************************************************/
 
  $(document).ready(function() {
- 	HixIO.menu = new HixIO.Menu('#menu', {});
+
+ 	/* Routable controls; those that share control over the main content. */
  	can.each([
  		HixIO.DefaultControl,
  		HixIO.URLControl,
- 		HixIO.UserControl
+ 		HixIO.UserControl,
  		], function(Control) {
  			return new Control('#main');
  		});
- 	HixIO.boot();
- });
 
+ 	/* Common controls, those with their own elements. */
+ 	HixIO.menu = new HixIO.Menu('#menu', {});
+ 	HixIO.message_box = new HixIO.MessageBox('#message_box', {});
+
+ 	/* Start the event loop. */
+ 	HixIO.boot();
+
+ });

@@ -114,6 +114,29 @@ div.column-pad {
 	}
 }
 
-/* Modal */
+/* Message Box */
 
+p.message {
+	margin-top: 0;
+	border-width: 1px;
+	border-style: solid;
+	padding: 0.5em 1em;
+}
 
+p.message-error {
+	background-color: #ffdddd;
+	border-color: #ddbbbb;
+	color: #440000;
+}
+
+p.message-warn {
+	background-color: #ffeedd;
+	border-color: #ddccbb;
+	color: #442200;
+}
+
+p.message-info {
+	background-color: #ddeeff;
+	border-color: #bbccdd;
+	color: #000044;
+}
