@@ -135,6 +135,7 @@
  		case "error":
  		case "warn":
  		case "info":
+ 		case "success":
  		HixIO.attr('message', {'message': message, 'level': level});
  		if(HixIO.meta.dev) { console.log(level + ": " + message); }
  		break;
@@ -159,6 +160,7 @@
  		"password": password
  	}).success(function(data) {
  		HixIO.attr('user', HixIO.User.model(data));
+ 		HixIO.log("Logged in.", "success");
  	}).error(function(data) {
  		HixIO.log(data.status + ": Could not log in.", "warn");
  	});
@@ -175,6 +177,7 @@
  	HixIO.ajax('/auth/', 'DELETE')().success(function(data) {
  		$.removeCookie(HixIO.session_cookie_name);
  		HixIO.attr('user', false);
+ 		HixIO.log("Logged out.", "success");
  	}).error(function(data) {
  		HixIO.log
  		(data.status + ": Could not log out.", "warn");

@@ -140,3 +140,9 @@ p.message-info {
 	border-color: #bbccdd;
 	color: #000044;
 }
+
+p.message-success {
+	background-color: #ddffdd;
+	border-color: #bbddbb;
+	color: #004400;
+}
