@@ -108,6 +108,7 @@ HixIO.highlightSyntax = function() {
  */
 HixIO.boot = function() {
 	var session = $.cookie('hix_io_session');
+
 	console.log('session: ' + session);
 
 	if(session) {
@@ -146,8 +147,6 @@ HixIO.logout = function() {
 
 	self = this;
 
-	console.log('logout');
-
 	HixIO.ajax('/auth/', 'DELETE')().success(function(data) {
 		$.removeCookie(HixIO.session_cookie_name);
 		HixIO.attr('user', false);
@@ -180,17 +179,25 @@ HixIO.view_helpers = {
 	expand_link: function(path, html) {
 		var url;
 
-		console.log('expand_link(' + path + ', ' + html + ');');
-
 		url = HixIO.attr('meta').scheme + '://' + HixIO.attr('meta').host + '/' + path;
 		if(typeof html !== 'string' ) { html = url; }
 
 		return $('<a></a>').attr('href', url).html(html);
 	},
 
-	short_date: function(date_arg) {
+	iso_date: function(date_arg) {
 		if(typeof date_arg === 'function') { date_arg = date_arg(); }
 		return (new Date(date_arg)).toISOString();
+	},
+
+	time: function(date_arg) {
+		if(typeof date_arg === 'function') { date_arg = date_arg(); }
+		return moment(new Date(date_arg)).format('HH:mm');
+	},
+
+	date: function(date_arg) {
+		if(typeof date_arg === 'function') { date_arg = date_arg(); }
+		return moment(new Date(date_arg)).format('YYYY-MM-DD');
 	},
 
 	relative_date: function(date_arg) {

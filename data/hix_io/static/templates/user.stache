@@ -1,0 +1,23 @@
+{{#if user}}
+
+<h2>Your Info</h2>
+<p>
+	You are known as {{user.name}}, hopefully reachable at <em>{{user.email}}</em>,
+	and your account was created {{relative_date user.ctime}}.
+</p>
+
+{{else}}
+
+<h2>Log In</h2>
+
+<form class="pure-form pure-form-stacked">
+	<fieldset>
+		<input type="email" id="email" placeholder="someone@example.com">
+		<input type="password" id="password" placeholder="********************">
+	</fieldset>
+	<fieldset>
+		<button class="pure-button pure-button-primary" can-click="login">log in</button>
+	</fieldset>
+</form>
+
+{{/if}}
