@@ -122,13 +122,13 @@
 		}).success(function(data) {
 			self.url = HixIO.URL.model(data);
 			self.update();
-		}).error(function(data) {
-			if(data.status === 403) {
+		}).error(function(xhr) {
+			if(xhr.status === 403) {
 				HixIO.log('You aren\'t allowed to shorten urls.', 'warn');
-			} else if(data.status === 401) {
+			} else if(xhr.status === 401) {
 				HixIO.log('You need to sign in to shorten URLs.', 'warn');
 			} else {
-				HixIO.log('I wasn\'t able to shorten that: ' + data.status, 'warn');
+				HixIO.log('I wasn\'t able to shorten that: ' + xhr.responseText, 'warn');
 			}
 		});
 	}

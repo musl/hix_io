@@ -2,7 +2,7 @@
 
 {{#if user}}
 	<div class="pure-form pure-g">
-		<input type="url" id="shorten" name="shorten" class="pure-input pure-u-1" value="http://example.com" can-enter="shorten">
+		<input type="url" id="shorten" name="shorten" class="pure-input pure-u-1" placeholder="http://example.com" can-enter="shorten">
 	</div>
 	{{#url}}
 	<h2>Short URL:</h2>
