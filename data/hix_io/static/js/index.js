@@ -179,26 +179,38 @@
  			var message;
 
  			message = HixIO.attr('message');
- 			if(message && message.message) { self.update(); }
+ 			if(message && message.message) { self.show(); }
  		});
+
+ 		can.route.bind('route', function() { self.cancel(); });
 
  		this.timeout = null;
  	},
 
- 	update: function() {
+ 	cancel: function() {
+ 		if(this.timeout) {
+ 			this.timeout = null;
+ 			clearTimeout(this.timeout);
+ 		}
+ 		this.hide();
+ 	},
+
+ 	show: function() {
  		var message, self;
 
  		self = this;
 
- 		if(this.timeout) { clearTimeout(this.timeout); }
-
+ 		this.cancel();
  		this.element.html(HixIO.view(
  			this.options.view, HixIO.removeAttr('message')
  			));
-
  		this.timeout = setTimeout(function() {
- 			self.element.html('');
+ 			self.hide();
  		}, this.options.delay);
+ 	},
+
+ 	hide: function() {
+ 		this.element.html('');
  	}
 
  });
