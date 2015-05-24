@@ -103,6 +103,7 @@
  					user: HixIO.attr('user')
  				}
  				));
+ 			self.url = null;
  		}).error(function(data) {
  			self.element.html('Error fetching URLs.');
  		});

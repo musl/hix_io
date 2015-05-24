@@ -5,8 +5,7 @@
 		<input type="url" id="shorten" name="shorten" class="pure-input pure-u-1" placeholder="http://example.com" can-enter="shorten">
 	</div>
 	{{#url}}
-	<h2>Short URL:</h2>
-	<p>{{expand_link short}}</p>
+	<p><b>Short URL:</b> {{expand_link short}}</p>
 	{{/url}}
 {{else}}
 	<p>Please sign in to shorten URLs.</p>
