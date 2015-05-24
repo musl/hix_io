@@ -99,7 +99,7 @@
  					top_urls: HixIO.URL.models(data.top),
  					latest_urls: HixIO.URL.models(data.latest),
  					url: self.url,
- 					shorten: self.shorten,
+ 					shorten: self.shorten.bind(self),
  					user: HixIO.attr('user')
  				}
  				));
@@ -113,7 +113,10 @@
  	},
 
  	shorten: function(context, element, event) {
-		// FIXME: this is in the context ef the data passed to the view.
+ 		var self;
+
+ 		self = this;
+
 		HixIO.URL.shorten({
 			url: element[0].value
 		}).success(function(data) {

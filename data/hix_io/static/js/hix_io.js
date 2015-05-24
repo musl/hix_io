@@ -149,12 +149,7 @@
  * Authenticate the current session.
  */
  HixIO.login = function(email, password) {
- 	var self;
-
- 	self = this;
-
  	if(email == "" || password == "") { return; }
-
  	HixIO.ajax('/auth/', 'POST')({
  		"email": email,
  		"password": password
@@ -170,17 +165,12 @@
  * Destroy the current session.
  */
  HixIO.logout = function() {
- 	var self;
-
- 	self = this;
-
  	HixIO.ajax('/auth/', 'DELETE')().success(function(data) {
  		$.removeCookie(HixIO.session_cookie_name);
  		HixIO.attr('user', false);
  		HixIO.log("Logged out.", "success");
  	}).error(function(data) {
- 		HixIO.log
- 		(data.status + ": Could not log out.", "warn");
+ 		HixIO.log(data.status + ": Could not log out.", "warn");
  	});
  };
 
@@ -208,6 +198,7 @@
 	expand_link: function(path, html) {
 		var url;
 
+		if(typeof path === 'function') { path = path(); }
 		url = HixIO.attr('meta').scheme + '://' + HixIO.attr('meta').host + '/' + path;
 		if(typeof html !== 'string' ) { html = url; }
 
