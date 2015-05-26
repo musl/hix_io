@@ -99,6 +99,8 @@ begin
 			"gem uninstall hix_io &&" +
 			"gem install #{gem_path.basename} &&" +
 			"svc -t /service/hix_io* &&" +
+			"hix_io_configure &&" +
+			"svc -t /service/mongrel2 &&" +
 			"sleep 5 &&" +
 			"svstat /service/*" +
 			"'"
