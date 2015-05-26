@@ -26,7 +26,7 @@ end
 
 MANIFEST = File.read( __FILE__ ).split( /^__END__/, 2 ).last.split
 
-task :default => [ :clobber, :docs, :coverage ]
+task :default => [ :clobber, :docs, :coverage, :test_user ]
 
 ########################################################################
 ### P A C K A G I N G
@@ -182,6 +182,17 @@ begin
 		]
 
 		system cmd.flatten.join( ' ' )
+	end
+end
+
+begin
+	desc 'Create a tester user.'
+	task :test_user do
+		HixIO.load_config
+		HixIO::User.find_or_create( :email => 'a@b.c' ) { |new_user|
+			new_user.name = 'Tester McTester'
+			new_user.password = Digest::SHA512.hexdigest('a')
+		}
 	end
 end
 
