@@ -150,6 +150,8 @@
  */
  HixIO.login = function(email, password) {
  	if(email == "" || password == "") { return; }
+ 	password = CryptoJS.SHA512(password).toString(CryptoJS.enc.Hex);
+ 	console.log(password);
  	HixIO.ajax('/auth/', 'POST')({
  		"email": email,
  		"password": password
