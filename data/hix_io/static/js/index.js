@@ -52,8 +52,7 @@
  	},
 
  	login: function(context, element, event) {
- 		var email;
- 		var password;
+ 		var email, password;
 
  		email = $('#email').val();
  		password = $('#password').val();
@@ -200,7 +199,7 @@
  	},
 
  	show: function() {
- 		var message, self;
+ 		var self;
 
  		self = this;
 

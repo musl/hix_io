@@ -172,10 +172,9 @@ begin
 				--browser
 				--predef $
 				--predef can
-				--predef hljs
-				--predef jsSHA
 				--predef HixIO
 				--predef moment
+				--predef CryptoJS
 				--unparam
 				--white
 			],
