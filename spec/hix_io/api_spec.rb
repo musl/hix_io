@@ -85,6 +85,18 @@ describe( HixIO::API ) do
 			expect( res.status ).to eq( HTTP::UNPROCESSABLE_ENTITY )
 		end
 
+		it 'provides a summary of shortened URLs' do
+			req = factory.get( '/urls/summary' )
+			req.content_type = 'application/x-www-form-urlencoded'
+			res = subject.handle( req )
+
+			expect( res.status ).to eq( HTTP::OK )
+
+			res.body.rewind
+			summary = nil
+			expect { summary = JSON.parse( res.body.read ) }.not_to raise_error
+		end
+
 	end
 
 end

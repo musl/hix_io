@@ -59,7 +59,7 @@ describe( HixIO::Auth ) do
 		expect( res.status ).to eq( HTTP::UNAUTHORIZED )
 	end
 
-	context 'authenticated requests'do
+	context 'authenticated requests' do
 
 		before( :each ) do
 			allow(subject.auth_provider).to receive( :authenticate ).and_return( user )

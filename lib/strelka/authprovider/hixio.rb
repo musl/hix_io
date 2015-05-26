@@ -59,7 +59,7 @@ class Strelka::AuthProvider::HixIO < Strelka::AuthProvider
 	#
 	def check_session( request )
 		unless request.session?
-			self.log.warn('no session found')
+			self.log.debug('no session found')
 			return nil
 		end
 
@@ -68,11 +68,11 @@ class Strelka::AuthProvider::HixIO < Strelka::AuthProvider
 		user = ::HixIO::User[request.session[:email]]
 
 		if !user.nil? and req_ip == session_ip
-			self.log.warn('session checks out')
+			self.log.debug('session checks out')
 			return user
 		end
 
-		self.log.warn('Invalid session. user: %s session ip: %s req ip: %s' % [user,session_ip,req_ip])
+		self.log.debug('Invalid session. user: %s session ip: %s req ip: %s' % [user,session_ip,req_ip])
 		return false
 	end
 
@@ -82,13 +82,13 @@ class Strelka::AuthProvider::HixIO < Strelka::AuthProvider
 	def check_login( request )
 
 		# TODO: find a better way to control which routes can create sessions.
-		HixIO.log.warn( "%p: %p" % [request.path, request.verb] )
+		HixIO.log.debug( "%p: %p" % [request.path, request.verb] )
 		return unless request.path =~ /\/(auth)?/ and request.verb == :POST
 
 		request.body.rewind
 
 		form = Hash[URI.decode_www_form( request.body.read )]
-		self.log.warn "Form: %p" % [form]
+		self.log.debug "Form: %p" % [form]
 		user = ::HixIO::User.where( :email => form['email'] ).first
 
 		if user and form['password'] == user.password
