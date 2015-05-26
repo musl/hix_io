@@ -1,6 +1,6 @@
 <ul>
-	<li><a href="/#!urls">urls</a></li>
 	<li><a href="http://code.hix.io/">code</a></li>
+	<li><a href="/#!urls">urls</a></li>
 	{{#if user}}
 	<li><a href="/#!user">{{user.name}}</a></li>
 	<li><a can-click="logout">log out</a></li>

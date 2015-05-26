@@ -24,4 +24,3 @@ module HixIO::Constants
 	].freeze
 
 end
-
