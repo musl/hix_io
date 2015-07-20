@@ -15,7 +15,6 @@ Sequel.migration do
 			index :hits
 			index :short
 			index :ctime
-			index :mtime
 		end
 	end
 
