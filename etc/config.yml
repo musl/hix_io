@@ -8,6 +8,9 @@ hix_io:
 auth:
     provider: 'hixio'
 
+hix_io_user:
+    salt: 'How are you, Lois?'
+
 mongrel2:
     configdb: 'etc/hix_io.sqlite'
 

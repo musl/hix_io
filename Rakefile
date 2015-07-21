@@ -190,9 +190,10 @@ begin
 	desc 'Create a tester user.'
 	task :test_user do
 		HixIO.load_config
+		return unless HixIO.dev?
 		HixIO::User.find_or_create( :email => 'a@b.c' ) { |new_user|
 			new_user.name = 'Tester McTester'
-			new_user.password = Digest::SHA512.hexdigest('a')
+			new_user.password = 'a'
 		}
 	end
 end

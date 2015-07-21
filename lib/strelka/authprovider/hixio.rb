@@ -9,19 +9,6 @@ require 'strelka/mixins'
 #
 class Strelka::AuthProvider::HixIO < Strelka::AuthProvider
 
-	extend Configurability
-
-	config_key :hix_io_auth
-
-	# Configuration defaults for Configurability.
-	DEFAULT_CONFIG = {}
-
-	# Configurability hook. Configure this class with the given +section+.
-	#
-	def self::configure( section )
-		super( section )
-	end
-
 	########################################################################
 	### A U T H   H O O K S
 	########################################################################
@@ -91,7 +78,7 @@ class Strelka::AuthProvider::HixIO < Strelka::AuthProvider
 		self.log.debug "Form: %p" % [form]
 		user = ::HixIO::User.where( :email => form['email'] ).first
 
-		if user and form['password'] == user.password
+		if user && ::HixIO::User.hash_password( form['password'] ) == user.password
 			make_session( user, request )
 			return user
 		end

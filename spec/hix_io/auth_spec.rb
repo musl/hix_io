@@ -31,7 +31,7 @@ describe( HixIO::Auth ) do
 		req.content_type = 'application/x-www-form-encoded'
 		req.body = URI.encode_www_form( {
 			:email => user.email,
-			:password => user.password,
+			:password => 'password',
 		} )
 
 		res = subject.handle( req )

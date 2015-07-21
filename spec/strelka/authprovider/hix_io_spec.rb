@@ -41,7 +41,7 @@ describe( Strelka::AuthProvider::HixIO ) do
 	end
 
 	it 'should accept valid login attempts' do
-		req.body = URI.encode_www_form( { :email => user.email, :password => user.password } )
+		req.body = URI.encode_www_form( { :email => user.email, :password => 'password' } )
 		expect( subject.authenticate( req ) ).to eq( user )
 	end
 

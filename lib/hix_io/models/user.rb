@@ -1,5 +1,6 @@
 # vim: set nosta noet ts=4 sw=4 ft=ruby:# encoding: UTF-8
 
+require 'configurability'
 require 'digest/sha2'
 require 'securerandom'
 
@@ -14,6 +15,31 @@ class HixIO::User < Sequel::Model( HixIO.table_symbol( :users ) )
 
 	one_to_many :urls, :class => HixIO::URL
 
+	extend Configurability
+	config_key :hix_io_user
+
+	# Configuration defaults for Configurability.
+	DEFAULT_CONFIG = {
+		salt: nil,
+		digest: 'sha512'
+	}
+
+	# Supported Digests
+	DIGESTS = {
+		'sha2' => Digest::SHA2,
+		'sha256' => Digest::SHA256,
+		'sha384' => Digest::SHA384,
+		'sha512' => Digest::SHA512
+	}
+
+	class << self
+		# A salt for hashing passwords.
+		attr_reader :salt
+
+		# A digest for hashing passwords.
+		attr_reader :digest
+	end
+
 	########################################################################
 	### D A T A S E T S
 	########################################################################
@@ -26,6 +52,20 @@ class HixIO::User < Sequel::Model( HixIO.table_symbol( :users ) )
 	### H O O K S
 	########################################################################
 
+	# Configurability hook. Configure this class with the given +section+.
+	#
+	def self::configure( section )
+		super( section )
+
+		abort( 'You must configure %s with a section called %s.' % [self.name, self.config_key] ) if section.nil?
+
+		@salt = section[:salt] ||
+			abort( 'You must provide a salt for hashing passwords.' )
+
+		@digest = DIGESTS[section[:digest] || DEFAULT_CONFIG[:digest]] ||
+			abort( 'Invalid digest.' )
+	end
+
 	# Validates this model.
 	#
 	def validate
@@ -35,19 +75,30 @@ class HixIO::User < Sequel::Model( HixIO.table_symbol( :users ) )
 	# Create identity information.
 	#
 	def before_create
-		self.generate_api_secret
+		self.api_secret = self.class.make_api_secret
+		self.password = self.class.hash_password( self.password )
 		super
+	end
+
+	########################################################################
+	### C L A S S   M E T H O D S
+	########################################################################
+
+	# Hash a password.
+	#
+	def self::hash_password( pass )
+		return self.digest.hexdigest( self.salt + pass )
+	end
+
+	# Generate an API secret.
+	#
+	def self::make_api_secret
+		return self.digest.hexdigest( SecureRandom.random_bytes( 128 ) )
 	end
 
 	########################################################################
 	### I N S T A N C E   M E T H O D S
 	########################################################################
-
-	# Generate a new API secret for his user.
-	#
-	def generate_api_secret
-		self.api_secret = Digest::SHA512.hexdigest( SecureRandom.random_bytes( 128 ))
-	end
 
 	# Prevent secrets from being sent with user data.
 	#
@@ -56,4 +107,3 @@ class HixIO::User < Sequel::Model( HixIO.table_symbol( :users ) )
 	end
 
 end
-

@@ -35,7 +35,7 @@ include Mongrel2::Constants
 def find_or_create_user
 	return HixIO::User.find_or_create( :email => 'tester@example.com' ) do |user|
 		user.name = 'Tester Mc. Tester',
-		user.password = Digest::SHA512.hexdigest( 'password' )
+		user.password = 'password'
 	end
 end
 
