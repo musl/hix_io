@@ -17,7 +17,7 @@ class HixIO::Auth < Strelka::App
 		:negotiation,
 		:sessions
 
-	default_type 'text/plain'
+	default_type 'application/json'
 
 	session_namespace :hix_io
 
@@ -43,7 +43,7 @@ class HixIO::Auth < Strelka::App
 	post '/' do |req|
 		res = req.response
 		user = self.auth_provider.authenticate( req ) ||
-			finish_with( HTTP::SERVER_ERROR, 'Auth bug!' )
+			finish_with( HTTP::SERVER_ERROR, '' )
 		res.for( :json ) { user }
 		return res
 	end
