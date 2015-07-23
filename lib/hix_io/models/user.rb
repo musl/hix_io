@@ -33,10 +33,14 @@ class HixIO::User < Sequel::Model( HixIO.table_symbol( :users ) )
 	}
 
 	class << self
-		# A salt for hashing passwords.
+		# A salt for hashing passwords. It's a required part of the
+		# configuration. Set +salt+ to a long, random string for best
+		# results.
 		attr_reader :salt
 
-		# A digest for hashing passwords.
+		# A digest for hashing passwords. This is configurable with
+		# the +digest+ key. Supported digests are: SHA2, SHA256,
+		# SHA384, and SHA512.
 		attr_reader :digest
 	end
 
@@ -57,13 +61,12 @@ class HixIO::User < Sequel::Model( HixIO.table_symbol( :users ) )
 	def self::configure( section )
 		super( section )
 
-		abort( 'You must configure %s with a section called %s.' % [self.name, self.config_key] ) if section.nil?
+		abort( 'No config for %s found. Please provide a section called "%s" that includes a salt.' % [self.name, self.config_key] ) if section.nil?
 
-		@salt = section[:salt] ||
-			abort( 'You must provide a salt for hashing passwords.' )
+		@salt = section[:salt] || abort( 'You must provide a salt for hashing passwords.' )
 
-		@digest = DIGESTS[section[:digest] || DEFAULT_CONFIG[:digest]] ||
-			abort( 'Invalid digest.' )
+		digest_name = (section[:digest] || DEFAULT_CONFIG[:digest]).downcase
+		@digest = DIGESTS[digest_name] || abort( 'Invalid digest: "%s"' % [digest_name] )
 	end
 
 	# Validates this model.
