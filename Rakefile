@@ -71,16 +71,16 @@ begin
 
 	Gem::PackageTask.new( spec ).define
 
-	desc "Install the gem."
+	desc 'Install the gem.'
 	task :install => [:package] do |t|
 		require 'rubygems/commands/install_command'
 		cmd = Gem::Commands::InstallCommand.new
-		gem_path = Pathname.new( "pkg/#{spec.name}-#{spec.version}.gem" ).expand_path.to_s
-		cmd.handle_options ['--no-ri', '--no-rdoc', gem_path ]
+		path = Pathname.new( 'pkg/%s-%s.gem' % [spec.name, spec.version] ).expand_path.to_s
+		cmd.handle_options ['--no-ri', '--no-rdoc', path ]
 		cmd.execute
 	end
 
-	desc "Uninstall the gem."
+	desc 'Uninstall the gem.'
 	task :uninstall do |t|
 		require 'rubygems/commands/uninstall_command'
 		cmd = Gem::Commands::UninstallCommand.new
@@ -88,7 +88,7 @@ begin
 		cmd.execute
 	end
 
-	desc "Rebuild and reinstall the gem."
+	desc 'Rebuild and reinstall the gem.'
 	task :reinstall => [:repackage, :uninstall, :install]
 
 	desc 'Hack to deploy the gem.'
@@ -107,7 +107,7 @@ begin
 		system 'ssh %s "%s"' % [as, script.join( '&&' )]
 	end
 
-	desc "Create a source-able environment file for development"
+	desc 'Create a source-able environment file for development.'
 	task :devenv do
 		newlibpath = LIBDIR.realpath
 		newlibpath += ':' + ENV['RUBYLIB'] if ENV['RUBYLIB']
@@ -116,13 +116,13 @@ begin
 		env.open( 'w' ) do |f|
 			case ENV['SHELL']
 			when /csh$/
-				f.puts "setenv RUBYLIB %s" % [ newlibpath ]
+				f.puts 'setenv RUBYLIB %s' % [ newlibpath ]
 			else
-				f.puts "export RUBYLIB=%s" % [ newlibpath ]
+				f.puts 'export RUBYLIB=%s' % [ newlibpath ]
 			end
 		end
 
-		$stderr.puts "Source #{env.realpath} from your shell."
+		$stderr.puts 'Source %s from your shell.' % [env.realpath]
 	end
 
 rescue LoadError
@@ -137,14 +137,14 @@ begin
 	require 'rspec/core/rake_task'
 	task :test => :spec
 
-	desc "Run specs"
+	desc 'Run specs.'
 	RSpec::Core::RakeTask.new do |t|
-		t.pattern = "spec/**/*_spec.rb"
+		t.pattern = 'spec/**/*_spec.rb'
 	end
 
 	### Code coverage, using SimpleCov
 	###
-	desc "Build a coverage report"
+	desc 'Build a coverage report.'
 	task :coverage do
 		ENV['COVERAGE'] = 'yep'
 		Rake::Task[:spec].invoke

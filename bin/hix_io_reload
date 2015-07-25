@@ -10,6 +10,6 @@ commands = [
 	'svc -t /service/*mongrel2',
 	'sleep 5',
 	'svstat /service/*'
-	]
+]
 
 system( commands.join(' && ') )
