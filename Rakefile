@@ -50,7 +50,7 @@ begin
 		s.require_path          = 'lib'
 		s.files                 = MANIFEST
 		s.required_ruby_version = '>= 2.0.0'
-		s.executables           = %w[hix_io_configure hix_io_migrate hix_io_run]
+		s.executables           = %w[hix_io_configure hix_io_migrate hix_io_run hix_io_reload]
 
 		s.add_dependency 'strelka', '~> 0.9'
 		s.add_dependency 'inversion', '~> 0.12'
@@ -91,20 +91,20 @@ begin
 	desc "Rebuild and reinstall the gem."
 	task :reinstall => [:repackage, :uninstall, :install]
 
-	desc "Hack to deploy the gem to production."
+	desc 'Hack to deploy the gem.'
 	task :deploy => [:repackage] do
-		gem_path = Pathname.new( "pkg/#{spec.name}-#{spec.version}.gem" ).expand_path
-		system "scp #{gem_path} root@hix.io:"
-		system "ssh root@hix.io '" +
-			"gem uninstall hix_io &&" +
-			"gem install #{gem_path.basename} &&" +
-			"svc -t /service/hix_io* &&" +
-			"cp /usr/local/lib/ruby/gems/2.1/gems/#{gem_path.basename.sub(/\.gem$/, '')}/etc/hix_io.conf.rb /usr/local/etc/hix.io/hix_io.conf.rb &&" +
-			"hix_io_configure &&" +
-			"svc -t /service/*mongrel2 &&" +
-			"sleep 5 &&" +
-			"svstat /service/*" +
-			"'"
+		local = Pathname.new( 'pkg/%s-%s.gem' % [spec.name, spec.version] ).expand_path
+		remote = '/tmp/%s' % [local.basename]
+		script = [
+			'gem uninstall -x -I %s' % [spec.name],
+			'gem install --no-ri --no-rdoc %s' % [remote],
+			'%s_reload' % [spec.name],
+		]
+
+		as = ENV['as'] or abort 'Missing environment varaiable "as". Example: rake deploy as=someone@example.com'
+
+		system 'scp %s %s:%s' % [local, as, remote]
+		system 'ssh %s "%s"' % [as, script.join( '&&' )]
 	end
 
 	desc "Create a source-able environment file for development"
@@ -178,25 +178,25 @@ begin
 				--predef CryptoJS
 				--unparam
 				--white
-			],
+				],
 				Pathname.glob( DATADIR + 'static/js/*.js' )
-		]
+			]
 
-		system cmd.flatten.join( ' ' )
+			system cmd.flatten.join( ' ' )
+		end
 	end
-end
 
-begin
-	desc 'Create a tester user.'
-	task :test_user do
-		HixIO.load_config
-		return unless HixIO.dev?
-		HixIO::User.find_or_create( :email => 'a@b.c' ) { |new_user|
-			new_user.name = 'Tester McTester'
-			new_user.password = 'a'
-		}
+	begin
+		desc 'Create a tester user.'
+		task :test_user do
+			HixIO.load_config
+			return unless HixIO.dev?
+			HixIO::User.find_or_create( :email => 'a@b.c' ) { |new_user|
+				new_user.name = 'Tester McTester'
+				new_user.password = 'a'
+			}
+		end
 	end
-end
 
 ########################################################################
 ### D O C U M E N T A T I O N
@@ -236,6 +236,7 @@ README.rdoc
 bin/hix_io_configure
 bin/hix_io_migrate
 bin/hix_io_run
+bin/hix_io_reload
 etc/config.yml
 etc/hix_io.conf.rb
 lib/hix_io/constants.rb
