@@ -101,7 +101,7 @@ begin
 			"svc -t /service/hix_io* &&" +
 			"cp /usr/local/lib/ruby/gems/2.1/gems/#{gem_path.basename.sub(/\.gem$/, '')}/etc/hix_io.conf.rb /usr/local/etc/hix.io/hix_io.conf.rb &&" +
 			"hix_io_configure &&" +
-			"svc -t /service/mongrel2 &&" +
+			"svc -t /service/*mongrel2 &&" +
 			"sleep 5 &&" +
 			"svstat /service/*" +
 			"'"
