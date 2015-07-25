@@ -4,3 +4,4 @@ data/hix_io/static/docs/.*
 .*.vim
 .env
 node_modules/.*
+.*\.sublime-\w+$
