@@ -4,12 +4,12 @@ require 'rubygems'
 
 spec = Gem::Specification.find_by_name( 'hix_io' )
 commands = [
-	'svc -t /service/hix_io*',
-	'cp %s/etc/*.conf.rb /usr/local/etc/hix.io/' % [spec.full_gem_path],
+	'svc -t /var/service/hix_io*',
+	'cp %s/etc/*.conf.rb /usr/local/hix.io/etc/' % [spec.full_gem_path],
 	'hix_io_configure',
-	'svc -t /service/*mongrel2',
+	'svc -t /var/service/*mongrel2',
 	'sleep 5',
-	'svstat /service/*'
+	'svstat /var/service/*'
 ]
 
 system( commands.join(' && ') )

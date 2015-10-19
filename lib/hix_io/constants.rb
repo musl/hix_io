@@ -19,7 +19,7 @@ module HixIO::Constants
 
 	# Defaults for config file locations to ease development and deployment.
 	CONFIG_PATHS = [
-		Pathname( '/usr/local/etc/hix.io/config.yml' ),
+		Pathname( '/usr/local/hix.io/etc/config.yml' ),
 		Pathname( __FILE__ ).parent.parent.parent + 'etc/config.yml', # development. works anywhere in the source tree
 	].freeze
 
