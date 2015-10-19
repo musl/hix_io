@@ -6,7 +6,7 @@
 module HixIO::Constants
 
 	# Semantic Version Number
-	VERSION = '0.1.3'
+	VERSION = '0.1.4'
 
 	# DVCS Revision Number
 	REVISION = %$Rev$
