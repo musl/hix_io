@@ -1,14 +1,14 @@
 {{#if user}}
 
-<h2>Your Info</h2>
+<h2>
+	<img src="/static/images/default-user.png" alt="user picture" class="user-picture"> {{user.name}}</h2>
 <p>
-	You are known as {{user.name}}, hopefully reachable at <em>{{user.email}}</em>,
-	and your account was created {{relative_date user.ctime}}.
+	You have been known here as {{user.name}} for about {{relative_date user.ctime}}. You're hopefully reachable at: <a href="mailto:{{user.email}}"><em>{{user.email}}</em></a>
 </p>
 
 {{else}}
 
-<h2>Log In</h2>
+<h2>Hi, who are you?</h2>
 
 <form class="pure-form pure-form-stacked">
 	<fieldset>
@@ -16,7 +16,7 @@
 		<input type="password" id="password" placeholder="********************">
 	</fieldset>
 	<fieldset>
-		<button class="pure-button pure-button-primary" can-click="login">log in</button>
+		<button class="pure-button pure-button-primary" can-click="login"><i class="fa fa-key"></i> log in</button>
 	</fieldset>
 </form>
 

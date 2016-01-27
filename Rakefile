@@ -97,7 +97,7 @@ begin
 		remote = '/tmp/%s' % [local.basename]
 		script = [
 			'gem uninstall -x -I %s' % [spec.name],
-			'gem install --no-ri --no-rdoc %s' % [remote],
+			'gem install --no-user-install --no-ri --no-rdoc %s' % [remote],
 			'%s_reload' % [spec.name],
 		]
 
@@ -256,7 +256,8 @@ data/hix_io/static/css/grids-responsive-min.css
 data/hix_io/static/css/grids-responsive-old-ie-min.css
 data/hix_io/static/css/pure-min.css
 data/hix_io/static/css/style.css
-data/hix_io/static/images/knot_3_wolves.jpg
+data/hix_io/static/images/knot.jpg
+data/hix_io/static/images/default-user.png
 data/hix_io/static/js/hix_io.js
 data/hix_io/static/js/index.js
 data/hix_io/static/js/lib/can.min.js

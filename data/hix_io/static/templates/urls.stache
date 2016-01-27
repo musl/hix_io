@@ -1,6 +1,6 @@
-<h2>Shorten a URL</h2>
 
 {{#if user}}
+	<h2>Shorten a URL</h2>
 	<div class="pure-form pure-g">
 		<input type="url" id="shorten" name="shorten" class="pure-input pure-u-1" placeholder="http://example.com" can-enter="shorten">
 	</div>
@@ -8,7 +8,8 @@
 	<p><b>Short URL:</b> {{expand_link short}}</p>
 	{{/url}}
 {{else}}
-	<p>Please log in to shorten URLs.</p>
+	<h2>Shortened URLs</h2>
+	<p><small>Please log in if you would like to shorten URLs.</small></p>
 {{/if}}
 
 <div class="pure-g">
@@ -20,9 +21,9 @@
 		<ol>
 			{{#latest_urls}}
 			<li>
-				<a href="{{scheme}}://{{host}}/{{short}}">{{scheme}}://{{host}}/{{short}}</a>
+				<a class="tool-tip" data-tooltip="{{url}}" href="{{scheme}}://{{host}}/{{short}}">{{scheme}}://{{host}}/{{short}}</a>
 				<br>
-				<small>{{relative_date ctime}} &middot; {{url}}</small>
+				<small>{{relative_date ctime}}</small>
 			</li>
 			{{/latest_urls}}
 		</ol>
@@ -36,9 +37,9 @@
 		<ol>
 			{{#top_urls}}
 			<li>
-				<a href="{{scheme}}://{{host}}/{{short}}">{{scheme}}://{{host}}/{{short}}</a>
+				<a class="tool-tip" data-tooltip="{{url}}" href="{{scheme}}://{{host}}/{{short}}">{{scheme}}://{{host}}/{{short}}</a>
 				<br>
-				<small>{{hits}} hits &middot; {{url}}</small>
+				<small>{{hits}} hits</small>
 			</li>
 			{{/top_urls}}
 		</ol>

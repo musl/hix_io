@@ -21,10 +21,6 @@ describe( HixIO::User ) do
 
 		subject { find_or_create_user }
 
-		it 'generate an API password before creating it' do
-			expect( subject.api_secret ).to match( /^[[:xdigit:]]{128}$/i )
-		end
-
 		it 'updates its own timestamps' do
 			expect( subject.ctime ).to be_a( Time )
 			expect( subject.mtime ).to be_a( Time )

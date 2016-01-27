@@ -195,7 +195,7 @@
 
 	relative_date: function(date_arg) {
 		if(typeof date_arg === 'function') { date_arg = date_arg(); }
-		return moment(new Date(date_arg)).fromNow();
+		return moment(new Date(date_arg)).fromNow(true);
 	}
 };
 

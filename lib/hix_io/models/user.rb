@@ -3,15 +3,19 @@
 require 'configurability'
 require 'digest/sha2'
 require 'securerandom'
+require 'bcrypt'
 
 # Class to describe a user account.
 #
 class HixIO::User < Sequel::Model( HixIO.table_symbol( :users ) )
 
+	include BCrypt
+
+	# The primary key for this model is a mutable string.
+	unrestrict_primary_key
+
 	plugin :validation_helpers
 	plugin :json_serializer
-
-	unrestrict_primary_key
 
 	one_to_many :urls, :class => HixIO::URL
 
@@ -19,29 +23,9 @@ class HixIO::User < Sequel::Model( HixIO.table_symbol( :users ) )
 	config_key :hix_io_user
 
 	# Configuration defaults for Configurability.
-	DEFAULT_CONFIG = {
-		salt: nil,
-		digest: 'sha512'
-	}
-
-	# Supported Digests
-	DIGESTS = {
-		'sha2' => Digest::SHA2,
-		'sha256' => Digest::SHA256,
-		'sha384' => Digest::SHA384,
-		'sha512' => Digest::SHA512
-	}
+	DEFAULT_CONFIG = {}
 
 	class << self
-		# A salt for hashing passwords. It's a required part of the
-		# configuration. Set +salt+ to a long, random string for best
-		# results.
-		attr_reader :salt
-
-		# A digest for hashing passwords. This is configurable with
-		# the +digest+ key. Supported digests are: SHA2, SHA256,
-		# SHA384, and SHA512.
-		attr_reader :digest
 	end
 
 	########################################################################
@@ -60,13 +44,6 @@ class HixIO::User < Sequel::Model( HixIO.table_symbol( :users ) )
 	#
 	def self::configure( section )
 		super( section )
-
-		abort( 'No config for %s found. Please provide a section called "%s" that includes a salt.' % [self.name, self.config_key] ) if section.nil?
-
-		@salt = section[:salt] || abort( 'You must provide a salt for hashing passwords.' )
-
-		digest_name = (section[:digest] || DEFAULT_CONFIG[:digest]).downcase
-		@digest = DIGESTS[digest_name] || abort( 'Invalid digest: "%s"' % [digest_name] )
 	end
 
 	# Validates this model.
@@ -78,25 +55,14 @@ class HixIO::User < Sequel::Model( HixIO.table_symbol( :users ) )
 	# Create identity information.
 	#
 	def before_create
-		self.api_secret = self.class.make_api_secret
-		self.password = self.class.hash_password( self.password )
+		self.password = BCrypt::Password.create( self.password )
 		super
 	end
 
-	########################################################################
-	### C L A S S   M E T H O D S
-	########################################################################
-
-	# Hash a password.
+	# Check a string against thiis user's password.
 	#
-	def self::hash_password( pass )
-		return self.digest.hexdigest( self.salt + pass )
-	end
-
-	# Generate an API secret.
-	#
-	def self::make_api_secret
-		return self.digest.hexdigest( SecureRandom.random_bytes( 128 ) )
+	def check_password( password )
+		return BCrypt::Password.new( self.password ) == password
 	end
 
 	########################################################################

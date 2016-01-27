@@ -114,6 +114,10 @@ div.column-pad {
 	}
 }
 
+img.user-picture {
+	margin: 0 0.25em -0.125em 0.5em;
+}
+
 /* Message Box */
 
 p.message {
@@ -146,3 +150,58 @@ p.message-success {
 	border-color: #bbddbb;
 	color: #004400;
 }
+
+/* Tool Tips */
+
+a {
+	position: relative;
+}
+
+a[data-tooltip]:link, a[data-tooltip]:visited {
+	position: relative;
+	xtext-decoration: none;
+	xborder-bottom: solid 1px;
+}
+
+a[data-tooltip]:before {
+  content: "";
+  position: absolute;
+  top: 17px;
+  left: 17px;
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 10px solid #444444;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+a[data-tooltip]:after {
+  content: attr(data-tooltip);
+  position: absolute;
+  color: #ffffff;
+  top: 27px;
+  left: 0px;
+  background: #444444;
+  padding: 7px 15px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  white-space: nowrap;
+  visibility: hidden;
+  z-index: 100;
+  pointer-events: none;
+}
+
+a[data-tooltip]:hover:before, a[data-tooltip]:hover:after {
+  visibility: visible;
+  /*
+  -webkit-transition: visibility 0s linear 0s;
+  -moz-transition: visibility 0s linear 0s;
+  -o-transition: visibility 0s linear 0s;
+  transition: visibility 0s linear 0s;
+  */
+  pointer-events: none;
+}
+

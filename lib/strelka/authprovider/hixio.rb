@@ -78,7 +78,7 @@ class Strelka::AuthProvider::HixIO < Strelka::AuthProvider
 		self.log.debug "Form: %p" % [form]
 		user = ::HixIO::User.where( :email => form['email'] ).first
 
-		if user && ::HixIO::User.hash_password( form['password'] ) == user.password
+		if user && user.check_password( form['password'] )
 			make_session( user, request )
 			return user
 		end

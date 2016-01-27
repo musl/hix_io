@@ -7,8 +7,7 @@ Sequel.migration do
 		create_table( :users ) do
 			text        :email,      :primary_key => true, :index => true
 			text        :name,       :null => false
-			text        :password,   :null => false, :length => 128
-			text        :api_secret, :null => false
+			text        :password,   :null => false, :length => 60
 			timestamptz	:ctime,      :null => false, :default => 'now()'.lit
 			timestamptz	:mtime,      :null => false, :default => 'now()'.lit
 		end
