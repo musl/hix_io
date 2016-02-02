@@ -23,31 +23,33 @@ It's not done yet.
 * Configure a standards-compliant HTTP proxy (apache, nginx, haproxy, or the like) to do ssl termination.
 * Configure the database:
 * PostgresSQL setup:
-	- create role hix_io with login;
-	- alter role hix_io set search_path to hix_io;
-	- create database hix_io owner hix_io;
-	- grant all on database hix_io to hix_io;
-	- \c hix_io;
-	- create schema hix_io authorization hix_io;
-	- grant all on schema hix_io to hix_io;
-	- create schema hix_io_dev authorization hix_io;
-	- grant all on schema hix_io_dev to hix_io;
+    create role hix_io with login;
+    alter role hix_io set search_path to hix_io;
+    create database hix_io owner hix_io;
+    grant all on database hix_io to hix_io;
+    \c hix_io;
+    create schema hix_io authorization hix_io;
+    grant all on schema hix_io to hix_io;
+    create schema hix_io_dev authorization hix_io;
+    grant all on schema hix_io_dev to hix_io;
 * Run: hix_io_migrate
 * Create startup scripts for each service with your favorite service management tool to run the following:
-	* mongrel2 /usr/local/etc/hix.io/hix_io.sqlite main
-	* hix_io_run -a api
-	* hix_io_run -a auth
-	* hix_io_run -a frontend
+    * mongrel2 /usr/local/etc/hix.io/hix_io.sqlite main
+    * hix_io_run -a api
+    * hix_io_run -a auth
+    * hix_io_run -a frontend
 * Start the services
 
 * Notes on connection limits:
-	- Each handler requires one database connection.
-	- Handlers that use the dbsession require two connections, since the dbsession Strelka plugin makes its own connection.
-	- You'll need two more connections for running specs while the handlers are running.
+    * Each handler requires one database connection.
+    * Handlers that use the dbsession require two connections, since the dbsession Strelka plugin makes its own connection.
+    * You'll need two more connections for running specs while the handlers are running.
 
 == REQUIREMENTS:
 
-* See the Rakefile.
+* Mongrel2 1.10+
+* PostgreSQL 9.1+
+* See the Rakefile for gem dependencies.
 
 == DEVELOPERS:
 
