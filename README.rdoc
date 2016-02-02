@@ -14,14 +14,18 @@ It's not done yet.
 
 == SYNOPSIS:
 
-* Install the gem: gem install hix_io
-* Create the config dir: mkdir -p /usr/local/etc/hix.io
-* Create the mongrel2 log dir: mkdir -p /var/log/mongrel2
-* Copy in configs: cp $GEM_HOME/gems/hix_io-<version>/etc/* /usr/local/etc/hix.io/
+* Install the gem:
+    gem install hix_io
+* Create the config dir:
+    mkdir -p /usr/local/etc/hix.io
+* Create the mongrel2 log dir:
+    mkdir -p /var/log/mongrel2
+* Copy in configs:
+    cp $GEM_HOME/gems/hix_io-<version>/etc/* /usr/local/etc/hix.io/
 * Edit the configs to taste.
 * Run:
     hix_io_configure
-* Configure a standards-compliant HTTP proxy (apache, nginx, haproxy, or the like) to do ssl termination.
+* Configure a standards-compliant HTTP proxy (apache, nginx, haproxy, or the like) to do ssl termination and proxy requests to 127.0.0.01:8080
 * Configure the database:
 * PostgresSQL setup:
     create role hix_io with login;
@@ -35,7 +39,7 @@ It's not done yet.
     grant all on schema hix_io_dev to hix_io;
 * Run:
     hix_io_migrate
-* Create startup scripts for each service with your favorite service management tool to run the following:
+* Create startup scripts for each of the following services with your favorite service management tool:
   * mongrel2 /usr/local/etc/hix.io/hix_io.sqlite main
   * hix_io_run -a api
   * hix_io_run -a auth
