@@ -25,16 +25,18 @@ It's not done yet.
 * Edit the configs to taste.
 * Run:
     hix_io_configure
-* Configure a standards-compliant HTTP proxy (apache, nginx, haproxy, or the like) to do ssl termination and proxy requests to: http://127.0.0.01:8080/
-* Configure the database:
+* Configure a standards-compliant HTTP proxy (apache, nginx, haproxy, or the like) to do ssl termination and proxy requests to: http://127.0.0.01:8080
 * PostgresSQL setup:
     create role hix_io with login;
     alter role hix_io set search_path to hix_io;
+
     create database hix_io owner hix_io;
     grant all on database hix_io to hix_io;
     \c hix_io;
+
     create schema hix_io authorization hix_io;
     grant all on schema hix_io to hix_io;
+
     create schema hix_io_dev authorization hix_io;
     grant all on schema hix_io_dev to hix_io;
 * Run:
