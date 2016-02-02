@@ -25,7 +25,7 @@ It's not done yet.
 * Edit the configs to taste.
 * Run:
     hix_io_configure
-* Configure a standards-compliant HTTP proxy (apache, nginx, haproxy, or the like) to do ssl termination and proxy requests to 127.0.0.01:8080
+* Configure a standards-compliant HTTP proxy (apache, nginx, haproxy, or the like) to do ssl termination and proxy requests to: http://127.0.0.01:8080/
 * Configure the database:
 * PostgresSQL setup:
     create role hix_io with login;
@@ -40,10 +40,10 @@ It's not done yet.
 * Run:
     hix_io_migrate
 * Create startup scripts for each of the following services with your favorite service management tool:
-  * mongrel2 /usr/local/etc/hix.io/hix_io.sqlite main
-  * hix_io_run -a api
-  * hix_io_run -a auth
-  * hix_io_run -a frontend
+    mongrel2 /usr/local/etc/hix.io/hix_io.sqlite main
+    hix_io_run -a api
+    hix_io_run -a auth
+    hix_io_run -a frontend
 * Start the services
 
 * Notes on connection limits:
