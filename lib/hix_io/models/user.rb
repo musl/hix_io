@@ -19,15 +19,6 @@ class HixIO::User < Sequel::Model( HixIO.table_symbol( :users ) )
 
 	one_to_many :urls, :class => HixIO::URL
 
-	extend Configurability
-	config_key :hix_io_user
-
-	# Configuration defaults for Configurability.
-	DEFAULT_CONFIG = {}
-
-	class << self
-	end
-
 	########################################################################
 	### D A T A S E T S
 	########################################################################
@@ -39,12 +30,6 @@ class HixIO::User < Sequel::Model( HixIO.table_symbol( :users ) )
 	########################################################################
 	### H O O K S
 	########################################################################
-
-	# Configurability hook. Configure this class with the given +section+.
-	#
-	def self::configure( section )
-		super( section )
-	end
 
 	# Validates this model.
 	#

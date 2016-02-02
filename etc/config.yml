@@ -8,9 +8,6 @@ hix_io:
 auth:
     provider: 'hixio'
 
-hix_io_user:
-    salt: 'How are you, Lois?'
-
 mongrel2:
     configdb: 'etc/hix_io.sqlite'
 
@@ -19,7 +16,7 @@ sessions:
 
 dbsession:
     connect: 'postgres://hix_io@localhost/db01'
-    table_name: 'sessions'
+    table_name: 'hix_io_dev.sessions'
     cookie_name: 'hix_io_session'
     expires: '+2d'
 

@@ -58,6 +58,7 @@ begin
 		s.add_dependency 'pg', '~> 0.18'
 		s.add_dependency 'loggability', '~> 0.11'
 		s.add_dependency 'trollop', '~> 2.0'
+		s.add_dependency 'bcrypt', '~> 3.1.10'
 
 		s.add_development_dependency 'pry', '~> 0.10'
 		s.add_development_dependency 'rdoc', '~> 4.1'

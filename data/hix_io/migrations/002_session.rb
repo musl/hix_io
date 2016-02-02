@@ -5,9 +5,9 @@ Sequel.migration do
 
 	up do
 		create_table :sessions do
-			text        :session_id, :primary_key => true
-			text        :session
-			timestamptz :created
+			text :session_id, :primary_key => true
+			text :session
+			timestamp :created
 
 			index :session_id
 		end
